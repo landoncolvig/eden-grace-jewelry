@@ -38,8 +38,8 @@ gcloud functions deploy "$NAME" \
   --timeout=30s \
   --min-instances=0 \
   --max-instances=10 \
-  --set-env-vars="SITE_URL=https://jennasjewelry.com" \
-  --set-secrets="STRIPE_SECRET_KEY=jj-stripe-secret-key:latest,STRIPE_WEBHOOK_SECRET=jj-stripe-webhook-secret:latest,SHIPPO_TOKEN=jj-shippo-token:latest"
+  --set-env-vars="SITE_URL=https://jennasjewelry.com,API_BASE_URL=${API_BASE_URL:-}" \
+  --set-secrets="STRIPE_SECRET_KEY=jj-stripe-secret-key:latest,STRIPE_WEBHOOK_SECRET=jj-stripe-webhook-secret:latest,SHIPPO_TOKEN=jj-shippo-token:latest,GMAIL_OAUTH=jj-gmail-oauth:latest,LABEL_SIGNING_KEY=jj-label-signing-key:latest,ORIGIN_JSON=jj-origin:latest"
 
 echo
 echo "==> Deployed. Endpoint:"

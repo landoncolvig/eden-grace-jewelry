@@ -37,10 +37,10 @@ export default function SiteHeader() {
             Pieces
           </Link>
           <Link
-            href="/#how"
+            href="/about"
             className="hidden text-bench/75 transition-colors hover:text-bench sm:block"
           >
-            How it&rsquo;s made
+            About
           </Link>
           <Link
             href="/cart"

@@ -39,9 +39,8 @@ export default function Hero() {
               at a time.
             </h1>
             <p className="mt-6 max-w-md leading-relaxed text-ink-soft">
-              Gemstone and freshwater pearl strands, laid out on the board and
-              finished at the bench. Natural stone varies, so no two come out
-              the same.
+              Natural gemstone strands, laid out on the board and finished at
+              the bench. The stones vary, so no two come out the same.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">

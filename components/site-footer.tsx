@@ -31,13 +31,13 @@ export default function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/product/pearl-strand" className="text-bench/75 hover:text-bench">
-                Freshwater Pearl Strand
+              <Link href="/product/name-necklace" className="text-bench/75 hover:text-bench">
+                Name Necklace
               </Link>
             </li>
             <li>
-              <Link href="/product/name-necklace" className="text-bench/75 hover:text-bench">
-                Name Necklace
+              <Link href="/about" className="text-bench/75 hover:text-bench">
+                About Jenna
               </Link>
             </li>
             <li>
