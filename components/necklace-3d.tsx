@@ -75,15 +75,30 @@ const TEXTURE_PX = 256;
  * of the font as outline data.
  */
 /**
- * Near black, and it has to be.
+ * Near black, but darkening the ink alone was never going to be enough.
  *
- * The map multiplies into the diffuse term before lighting, so under this
- * scene's environment a mid-tone texel gets scaled back up and reads grey.
- * Only a value close to zero survives the multiply at any light intensity.
- * Measured against the lit disc face, not against the page, which is why this
- * is not --color-ink.
+ * The colour map multiplies into the DIFFUSE term, while clearcoat and
+ * iridescence add SPECULAR on top, and specular is not multiplied by albedo.
+ * So a black texel under this environment still receives a full white
+ * highlight and reads mid-grey. Two earlier attempts at this failed for
+ * exactly that reason.
+ *
+ * The fix is the roughness map below: the letter is made matte so it takes no
+ * highlight at all, while the surrounding nacre stays polished. That is also
+ * what the real object does, since a stamped letter is filled with pigment and
+ * does not shine like the shell around it.
  */
 const LETTER_INK = '#0b0807';
+
+/** Shared glyph placement, so colour and roughness stay in register. */
+function paintGlyph(ctx: CanvasRenderingContext2D, char: string, family: string) {
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `700 ${Math.round(TEXTURE_PX * 0.52)}px ${family}`;
+  // Optical rather than metric centring: cap-height glyphs sit high in the
+  // em box, so a mathematically centred letter reads as floating.
+  ctx.fillText(char, TEXTURE_PX / 2, TEXTURE_PX * 0.545);
+}
 
 function drawLetter(char: string, family: string, face: string, ink: string) {
   const canvas = document.createElement('canvas');
@@ -95,17 +110,44 @@ function drawLetter(char: string, family: string, face: string, ink: string) {
 
   ctx.fillStyle = face;
   ctx.fillRect(0, 0, TEXTURE_PX, TEXTURE_PX);
-
   ctx.fillStyle = ink;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = `700 ${Math.round(TEXTURE_PX * 0.52)}px ${family}`;
-  // Optical rather than metric centring: cap-height glyphs sit high in the
-  // em box, so a mathematically centred letter reads as floating.
-  ctx.fillText(char, TEXTURE_PX / 2, TEXTURE_PX * 0.545);
+  paintGlyph(ctx, char, family);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+/**
+ * The roughness companion to drawLetter.
+ *
+ * White where the glyph is, near-black elsewhere: three.js reads this channel
+ * as roughness directly, so the letter becomes fully matte while the shell
+ * around it stays polished. This is the map that actually makes the letter
+ * readable, because it removes the specular highlight over the glyph rather
+ * than trying to out-darken it.
+ *
+ * No colour space is set: roughness is linear data, not colour, and tagging it
+ * sRGB would apply a gamma curve to a value that is not one.
+ */
+function drawLetterRoughness(char: string, family: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = TEXTURE_PX;
+  canvas.height = TEXTURE_PX;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  // Polished nacre around the glyph.
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(0, 0, TEXTURE_PX, TEXTURE_PX);
+
+  // Matte pigment in the stamped letter.
+  ctx.fillStyle = '#ffffff';
+  paintGlyph(ctx, char, family);
+
+  const texture = new THREE.CanvasTexture(canvas);
   texture.anisotropy = 4;
   return texture;
 }
@@ -118,7 +160,9 @@ function drawLetter(char: string, family: string, face: string, ink: string) {
  * the texture permanently: unlike DOM text, a canvas does not repaint itself
  * when the real face arrives.
  */
-function useLetterTextures(word: string) {
+type LetterMaps = { map: THREE.Texture | null; roughnessMap: THREE.Texture | null };
+
+function useLetterTextures(word: string): LetterMaps[] {
   const palette = usePalette();
   const invalidate = useThree((state) => state.invalidate);
   const [fontsReady, setFontsReady] = useState(false);
@@ -138,14 +182,15 @@ function useLetterTextures(word: string) {
       getComputedStyle(document.documentElement).getPropertyValue('--font-fraunces').trim() ||
       'Georgia, serif';
 
-    const cache = new Map<string, THREE.Texture | null>();
+    const cache = new Map<string, LetterMaps>();
     return Array.from(word.toUpperCase()).map((char) => {
-      // Not palette.ink. The nacre material is glossy and sits under a bright
-      // environment, and the specular wash lifts a mid-tone letter until it is
-      // unreadable at hero size. The stamped letters on the real piece are
-      // near-black for the same reason, so this is also what the object does.
-      if (!cache.has(char)) cache.set(char, drawLetter(char, family, palette.paper, LETTER_INK));
-      return cache.get(char) ?? null;
+      if (!cache.has(char)) {
+        cache.set(char, {
+          map: drawLetter(char, family, palette.paper, LETTER_INK),
+          roughnessMap: drawLetterRoughness(char, family),
+        });
+      }
+      return cache.get(char) ?? { map: null, roughnessMap: null };
     });
     // fontsReady is a redraw trigger, not data. Once the real face lands every
     // texture has to be rebuilt against it.
@@ -157,11 +202,13 @@ function useLetterTextures(word: string) {
     // when the buyer edits the word, and they edit it a character at a time.
     return () => {
       const seen = new Set<THREE.Texture>();
-      textures.forEach((texture) => {
-        if (texture && !seen.has(texture)) {
-          seen.add(texture);
-          texture.dispose();
-        }
+      textures.forEach(({ map, roughnessMap }) => {
+        [map, roughnessMap].forEach((texture) => {
+          if (texture && !seen.has(texture)) {
+            seen.add(texture);
+            texture.dispose();
+          }
+        });
       });
     };
   }, [textures, invalidate]);
@@ -175,17 +222,15 @@ function useLetterTextures(word: string) {
  * there, which is where a real one swings from.
  */
 function Letter({
-  texture,
+  maps,
   x,
   animate,
   phase,
-  opacity,
 }: {
-  texture: THREE.Texture | null;
+  maps: LetterMaps;
   x: number;
   animate: boolean;
   phase: number;
-  opacity: number;
 }) {
   const pivot = useRef<THREE.Group>(null);
   // Small enough that the letter stays readable at the extremes. Past about
@@ -203,7 +248,7 @@ function Letter({
     <group ref={pivot} position={[x, attachY, 0]}>
       <mesh>
         <torusGeometry args={[RING_R, 0.014, 8, 24]} />
-        <GoldMaterial opacity={opacity} />
+        <GoldMaterial />
       </mesh>
 
       <group position={[0, -RING_R - DISC_R + 0.03, 0]}>
@@ -211,13 +256,13 @@ function Letter({
             is covered by the nacre disc below. */}
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[DISC_R, DISC_R, DISC_DEPTH, 44]} />
-          <GoldMaterial opacity={opacity} />
+          <GoldMaterial />
         </mesh>
         {/* The nacre face, inset far enough to leave the gold showing as a
             rim, with the letter mapped onto it. */}
         <mesh position={[0, 0, DISC_DEPTH / 2 + 0.001]}>
           <circleGeometry args={[DISC_R * 0.87, 44]} />
-          <NacreMaterial map={texture} opacity={opacity} />
+          <NacreMaterial map={maps.map} roughnessMap={maps.roughnessMap} />
         </mesh>
       </group>
     </group>
@@ -227,13 +272,11 @@ function Letter({
 function Piece({
   word,
   strand,
-  muted,
   animate,
   onReady,
 }: {
   word: string;
   strand: string;
-  muted: boolean;
   animate: boolean;
   onReady?: () => void;
 }) {
@@ -251,7 +294,6 @@ function Piece({
   // wire. The piece gets smaller on screen, which is what a photograph of the
   // real thing would do.
   const designWidth = Math.max(MIN_DESIGN_W, letters.length * pitch + 2.4);
-  const opacity = muted ? 0.42 : 1;
 
   useEffect(() => {
     onReady?.();
@@ -272,19 +314,17 @@ function Piece({
           halfWidth={designWidth * 1.1}
           radius={BEAD_R}
           color={STRAND_COLORS[strand] ?? STRAND_COLORS[DEFAULT_STRAND]}
-          opacity={opacity}
         />
 
         {letters.map((char, i) => (
           <Letter
             key={`${char}-${i}`}
-            texture={textures[i] ?? null}
+            maps={textures[i] ?? { map: null, roughnessMap: null }}
             x={firstX + i * pitch}
             animate={animate}
             // A sixth of a turn between neighbours, so the light walks along
             // the row instead of flashing across all of it at once.
             phase={i * 0.55}
-            opacity={opacity}
           />
         ))}
       </group>
@@ -295,14 +335,12 @@ function Piece({
 export default function Necklace3D({
   word,
   strand = DEFAULT_STRAND,
-  muted,
   animate,
   onReady,
 }: {
   word: string;
   /** One of the catalog's `base` choices. Anything else falls back to blue. */
   strand?: string;
-  muted: boolean;
   animate: boolean;
   onReady?: () => void;
 }) {
@@ -323,7 +361,7 @@ export default function Necklace3D({
       <ambientLight intensity={0.25} />
       <directionalLight position={[3, 5, 6]} intensity={0.85} />
       <Suspense fallback={null}>
-        <Piece word={word} strand={strand} muted={muted} animate={animate} onReady={onReady} />
+        <Piece word={word} strand={strand} animate={animate} onReady={onReady} />
       </Suspense>
     </Canvas>
   );

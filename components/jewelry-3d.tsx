@@ -147,15 +147,8 @@ export function BenchEnvironment() {
  * Gold-tone findings: the jump rings the letters hang from, and the accent
  * rounds. The only actual metal on the piece.
  */
-export function GoldMaterial({
-  roughness = 0.18,
-  opacity = 1,
-}: {
-  roughness?: number;
-  opacity?: number;
-}) {
+export function GoldMaterial({ roughness = 0.18 }: { roughness?: number }) {
   const palette = usePalette();
-  const faded = opacity < 1;
   return (
     <meshPhysicalMaterial
       color={palette.brass}
@@ -164,9 +157,6 @@ export function GoldMaterial({
       clearcoat={0.4}
       clearcoatRoughness={0.2}
       envMapIntensity={1.4}
-      transparent={faded}
-      opacity={opacity}
-      depthWrite={!faded}
     />
   );
 }
@@ -178,14 +168,7 @@ export function GoldMaterial({
  *
  * Left white by default because the strand colours the beads per instance.
  */
-export function BeadMaterial({
-  color = '#ffffff',
-  opacity = 1,
-}: {
-  color?: string;
-  opacity?: number;
-}) {
-  const faded = opacity < 1;
+export function BeadMaterial({ color = '#ffffff' }: { color?: string }) {
   return (
     <meshPhysicalMaterial
       color={color}
@@ -195,9 +178,6 @@ export function BeadMaterial({
       clearcoatRoughness={0.06}
       ior={1.55}
       envMapIntensity={1.1}
-      transparent={faded}
-      opacity={opacity}
-      depthWrite={!faded}
     />
   );
 }
@@ -214,18 +194,24 @@ export function BeadMaterial({
 export function NacreMaterial({
   color,
   map,
-  opacity = 1,
+  roughnessMap,
 }: {
   color?: string;
   map?: THREE.Texture | null;
-  opacity?: number;
+  /**
+   * Per-texel roughness. The letter discs use it to make the stamped glyph
+   * matte while the shell around it stays polished, which is the only thing
+   * that keeps the letter readable: clearcoat and iridescence add specular on
+   * top of the diffuse term, so darkening the colour map alone never wins.
+   */
+  roughnessMap?: THREE.Texture | null;
 }) {
   const palette = usePalette();
-  const faded = opacity < 1;
   return (
     <meshPhysicalMaterial
       color={color ?? palette.paper}
       map={map ?? null}
+      roughnessMap={roughnessMap ?? null}
       metalness={0}
       // Nacre is glossy, but a mirror finish here blew out the stamped letters
       // on the disc faces. Backed off far enough to keep them legible while
@@ -237,9 +223,6 @@ export function NacreMaterial({
       iridescenceIOR={1.6}
       iridescenceThicknessRange={[120, 420]}
       envMapIntensity={1.25}
-      transparent={faded}
-      opacity={opacity}
-      depthWrite={!faded}
     />
   );
 }
@@ -345,7 +328,6 @@ export function Strand({
   color,
   finish = 'stone',
   seed = 7,
-  opacity = 1,
 }: {
   halfWidth?: number;
   sag?: number;
@@ -357,7 +339,6 @@ export function Strand({
   color: string;
   finish?: Finish;
   seed?: number;
-  opacity?: number;
 }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
 
@@ -418,11 +399,7 @@ export function Strand({
       {/* White, both of them: the shade of each bead rides on the instance
           colour, and the shader multiplies the two. A tinted material here
           would tint the whole strand a second time. */}
-      {finish === 'pearl' ? (
-        <NacreMaterial color="#ffffff" opacity={opacity} />
-      ) : (
-        <BeadMaterial opacity={opacity} />
-      )}
+      {finish === 'pearl' ? <NacreMaterial color="#ffffff" /> : <BeadMaterial />}
     </instancedMesh>
   );
 }

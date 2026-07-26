@@ -61,7 +61,7 @@ const ACCENT_OFFSETS = [-1, -0.62, -0.3, 0.3, 0.62, 1];
  * whole strand, because that is where they land on the piece: the front is
  * what shows above a collar.
  */
-function Accents({ opacity }: { opacity: number }) {
+function Accents() {
   return (
     <>
       {ACCENT_OFFSETS.map((offset, i) => {
@@ -71,11 +71,7 @@ function Accents({ opacity }: { opacity: number }) {
         return (
           <mesh key={offset} position={[x, y, 0]} scale={gold ? BEAD_R * 1.05 : BEAD_R * 1.25}>
             <sphereGeometry args={[1, 16, 12]} />
-            {gold ? (
-              <GoldMaterial roughness={0.16} opacity={opacity} />
-            ) : (
-              <NacreMaterial opacity={opacity} />
-            )}
+            {gold ? <GoldMaterial roughness={0.16} /> : <NacreMaterial />}
           </mesh>
         );
       })}
@@ -88,14 +84,12 @@ function Piece({
   finish,
   accents,
   animate,
-  opacity,
   onReady,
 }: {
   color: string;
   finish: Finish;
   accents: boolean;
   animate: boolean;
-  opacity: number;
   onReady?: () => void;
 }) {
   const sway = useRef<THREE.Group>(null);
@@ -116,9 +110,8 @@ function Piece({
           pitch={0.114}
           color={color}
           finish={finish}
-          opacity={opacity}
         />
-        {accents ? <Accents opacity={opacity} /> : null}
+        {accents ? <Accents /> : null}
       </group>
     </FitToViewport>
   );
@@ -129,7 +122,6 @@ export default function Strand3D({
   finish = 'stone',
   accents = false,
   animate,
-  muted = false,
   onReady,
 }: {
   /** One of the catalog's `stone` choices. Ignored when finish is 'pearl'. */
@@ -138,7 +130,6 @@ export default function Strand3D({
   /** Mirrors the pearl-and-gold accent add-on. */
   accents?: boolean;
   animate: boolean;
-  muted?: boolean;
   onReady?: () => void;
 }) {
   const palette = usePalette();
@@ -160,7 +151,6 @@ export default function Strand3D({
         finish={finish}
         accents={accents}
         animate={animate}
-        opacity={muted ? 0.42 : 1}
         onReady={onReady}
       />
     </Canvas>

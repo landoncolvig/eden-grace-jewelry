@@ -41,12 +41,11 @@ export default function Home() {
           {PRODUCTS.map((product) => (
             <Link key={product.slug} href={`/product/${product.slug}`} className="group block">
               <article className="flex h-full flex-col overflow-hidden rounded-xl border border-rule bg-paper transition-colors hover:border-rose">
-                {/* A band of the piece's own stone across the top of each
-                    card. An earlier attempt tinted the photo itself with a
-                    multiply blend, which muddied the beads: the photo's cream
-                    background multiplied down and the whole strand went hazy.
-                    The colour belongs next to the product, not on top of it. */}
-                <div className="h-1.5 w-full" style={{ backgroundColor: product.swatch }} />
+                {/* No decorative colour band here. Two earlier attempts at
+                    adding one, a multiply tint over the photo and a stripe
+                    across the card top, both read as colour bolted onto the
+                    card rather than belonging to it. The stones are the colour
+                    on this page; the card's job is to stay out of the way. */}
                 <Image
                   src={photo(product.image, 'sm')}
                   alt={`${product.name}, ${product.tagline.toLowerCase()}`}

@@ -166,11 +166,14 @@ function Stack({
   flat,
   scene,
   ready,
+  muted = false,
   className,
 }: {
   flat: ReactNode;
   scene: ReactNode;
   ready: boolean;
+  /** Dims the whole piece while it is standing in for a word nobody typed. */
+  muted?: boolean;
   className?: string;
 }) {
   return (
@@ -184,10 +187,13 @@ function Stack({
       {scene ? (
         // The canvas carries no information the flat piece does not, and it
         // cannot be read aloud, so it stays out of the accessibility tree.
+        // Fading the placeholder happens here rather than on the materials.
+        // Turning the metal and the nacre translucent lets the gold back of
+        // each disc show through its own face, and the letters go to mud.
         <div
           aria-hidden
           className="absolute inset-0 transition-opacity duration-700"
-          style={{ opacity: ready ? 1 : 0 }}
+          style={{ opacity: ready ? (muted ? 0.45 : 1) : 0 }}
         >
           {scene}
         </div>
@@ -214,6 +220,7 @@ export function NecklacePiece({
     <Stack
       className={className}
       ready={ready}
+      muted={settled.length === 0}
       flat={
         <NecklaceSvg
           word={typed || DEFAULT_WORD}
@@ -227,7 +234,6 @@ export function NecklacePiece({
             <Necklace3D
               word={settled || DEFAULT_WORD}
               strand={strand}
-              muted={settled.length === 0}
               animate={animate}
               onReady={onReady}
             />
