@@ -105,9 +105,24 @@ function priceCart(rawLines) {
       seen.add(addOn.id);
 
       const addOnQty = clampInt(rawAddOn.qty ?? 1, 1, addOn.maxQty ?? 1);
-      const value = addOn.input
-        ? sanitizeText(rawAddOn.value, addOn.input.maxLength)
-        : '';
+
+      let value = '';
+      if (addOn.choices) {
+        // A picker's value has to be one Jenna can actually make. Anything
+        // else is dropped to empty, which makes a required picker fail the
+        // missingRequired check below rather than reaching the bench as a
+        // stone that does not exist.
+        const submitted = sanitizeText(rawAddOn.value, 60);
+        const match = addOn.choices.find(
+          (c) => c.toLowerCase() === submitted.toLowerCase(),
+        );
+        if (submitted && !match) {
+          dropped.push(`invalid ${addOn.id} for ${product.slug}: ${submitted}`);
+        }
+        value = match || '';
+      } else if (addOn.input) {
+        value = sanitizeText(rawAddOn.value, addOn.input.maxLength);
+      }
 
       resolvedAddOns.push({
         id: addOn.id,
@@ -117,6 +132,7 @@ function priceCart(rawLines) {
         priceCents: addOn.priceCents * addOnQty,
         weightOz: addOn.weightOz * addOnQty,
         required: Boolean(addOn.required),
+        choices: addOn.choices,
       });
     }
 

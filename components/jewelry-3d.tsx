@@ -41,6 +41,7 @@ export function usePalette() {
       brass: token('--color-brass', '#b08d57'),
       brassDeep: token('--color-brass-deep', '#8a6d3f'),
       ink: token('--color-ink', '#1b2a33'),
+      inkFaint: token('--color-ink-faint', '#8b969d'),
       bench: token('--color-bench', '#edeeea'),
       paper: token('--color-paper', '#fbfbf9'),
       patina: token('--color-patina', '#4a7c74'),
@@ -177,10 +178,15 @@ export function GoldMaterial({
  * Sterling with a hand-brushed face. Rougher than the gold, and anisotropic,
  * so the highlight smears in one direction the way a brushed surface does
  * instead of pooling into a point.
+ *
+ * Drawn off the faint-ink token rather than the near-white bench one. Silver
+ * is physically almost a perfect mirror, and a near-white mirror in a room
+ * this bright comes out as a white disc on a light page: no edge, no piece.
+ * Taking the base down a step buys back the contrast that reads as metal.
  */
 export function SilverMaterial({
-  roughness = 0.32,
-  anisotropy = 0.75,
+  roughness = 0.34,
+  anisotropy = 0.8,
 }: {
   roughness?: number;
   anisotropy?: number;
@@ -188,12 +194,12 @@ export function SilverMaterial({
   const palette = usePalette();
   return (
     <meshPhysicalMaterial
-      color={palette.bench}
+      color={palette.inkFaint}
       metalness={1}
       roughness={roughness}
       anisotropy={anisotropy}
       anisotropyRotation={Math.PI / 2}
-      envMapIntensity={1.25}
+      envMapIntensity={1.35}
     />
   );
 }
@@ -345,7 +351,13 @@ export function Chain({
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, links.length]} frustumCulled={false}>
       <torusGeometry args={[linkRadius, tube, 8, 16]} />
-      {metal === 'gold' ? <GoldMaterial roughness={0.24} /> : <SilverMaterial roughness={0.3} />}
+      {metal === 'gold' ? (
+        <GoldMaterial roughness={0.24} />
+      ) : (
+        // No brushing on a chain: the links are small enough that an
+        // anisotropic smear erases the shape of them.
+        <SilverMaterial roughness={0.22} anisotropy={0} />
+      )}
     </instancedMesh>
   );
 }

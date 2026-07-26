@@ -28,11 +28,13 @@ import {
 } from './jewelry-3d';
 
 const DESIGN_W = 5.2;
-const DESIGN_H = 2.9;
-const CLASP_Y = 1.0;
+const DESIGN_H = 2.6;
+const CLASP_Y = 0.95;
 
 const DISC_DEPTH = 0.055;
-const STONE_SPACING = 0.17;
+const STONE_SPACING = 0.2;
+const STONE_RADIUS = 0.078;
+const BEZEL_RADIUS = 0.09;
 
 /** Nine stones is where a row stops reading as a row. */
 const MAX_STONES = 9;
@@ -40,7 +42,7 @@ const MAX_STONES = 9;
 function discRadius(stones: number) {
   // Wide enough to hold the row with a margin of metal either side, and never
   // narrower than a single-stone disc looks right at.
-  return Math.max(0.6, ((stones - 1) * STONE_SPACING) / 2 + 0.34);
+  return Math.max(0.62, ((stones - 1) * STONE_SPACING) / 2 + 0.36);
 }
 
 function Piece({
@@ -96,14 +98,14 @@ function Piece({
                   which is why it sits proud of the face. Open-ended, because
                   the stone is what closes it. */}
               <mesh position={[0, 0, face - 0.012]} rotation={[Math.PI / 2, 0, 0]}>
-                <cylinderGeometry args={[0.062, 0.062, 0.05, 28, 1, true]} />
+                <cylinderGeometry args={[BEZEL_RADIUS, BEZEL_RADIUS, 0.055, 28, 1, true]} />
                 <SilverMaterial roughness={0.18} anisotropy={0} />
               </mesh>
               {/* The stone. Flat-shaded facets on a low-poly solid, each one
                   catching a different part of the room. That scatter is the
                   read; a smooth sphere here would look like a bead. */}
-              <mesh position={[0, 0, face + 0.008]} scale={[1, 1, 0.62]}>
-                <dodecahedronGeometry args={[0.055, 0]} />
+              <mesh position={[0, 0, face + 0.01]} scale={[1, 1, 0.62]}>
+                <dodecahedronGeometry args={[STONE_RADIUS, 0]} />
                 <StoneMaterial />
               </mesh>
             </group>

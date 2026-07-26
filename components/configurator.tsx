@@ -1,8 +1,16 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { formatUSD, priceCart, type AddOn, type CartAddOn, type Product } from '@/lib/shop';
+import {
+  formatUSD,
+  photo,
+  priceCart,
+  type AddOn,
+  type CartAddOn,
+  type Product,
+} from '@/lib/shop';
 import { useCart } from './cart-context';
 
 /**
@@ -30,12 +38,18 @@ export default function Configurator({ product }: { product: Product }) {
   // of the order rather than a separate toy.
   const seeded = (search.get('name') ?? '').slice(0, 12);
 
+  // Pickers default to their first choice so the piece is always buildable and
+  // the order sheet is never half blank. Free-text specs start empty (or
+  // seeded from the hero) because there is no sensible default for a name.
   const [required, setRequired] = useState<Record<string, string>>(() =>
-    Object.fromEntries(requiredAddOns.map((a) => [a.id, seeded])),
+    Object.fromEntries(
+      requiredAddOns.map((a) => [a.id, a.choices ? a.choices[0] : seeded]),
+    ),
   );
   const [options, setOptions] = useState<Record<string, { qty: number; value: string }>>({});
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const [shot, setShot] = useState(product.image);
 
   function toggle(addOn: AddOn) {
     setAdded(false);
@@ -72,8 +86,6 @@ export default function Configurator({ product }: { product: Product }) {
     setAdded(true);
   }
 
-  const primaryWord = requiredAddOns[0] ? required[requiredAddOns[0].id]?.trim() : '';
-
   return (
     <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
       <button
@@ -86,17 +98,41 @@ export default function Configurator({ product }: { product: Product }) {
       <div className="mt-8 grid gap-12 lg:grid-cols-[1fr_400px] lg:gap-16">
         {/* Left: the piece and its specification */}
         <div>
-          <div
-            className="flex h-56 items-center justify-center rounded-sm px-6 sm:h-72"
-            style={{ background: `${product.swatch}14` }}
-          >
-            <span
-              className="text-center font-script text-5xl sm:text-6xl"
-              style={{ color: product.swatch }}
-            >
-              {requiredAddOns.length > 0 ? primaryWord || 'your word' : '• • •'}
-            </span>
+          <div className="overflow-hidden rounded-sm border border-rule bg-paper">
+            <Image
+              src={photo(shot)}
+              alt={`${product.name}, ${product.tagline.toLowerCase()}`}
+              width={1500}
+              height={1500}
+              priority
+              className="w-full"
+            />
           </div>
+
+          {product.gallery.length > 0 && (
+            <div className="mt-3 flex gap-3 overflow-x-auto pb-1">
+              {[product.image, ...product.gallery].map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => setShot(g)}
+                  aria-label={`View ${g.replace(/-/g, ' ')}`}
+                  aria-pressed={shot === g}
+                  className={`shrink-0 overflow-hidden rounded-sm border transition-colors ${
+                    shot === g ? 'border-ink' : 'border-rule hover:border-ink-faint'
+                  }`}
+                >
+                  <Image
+                    src={photo(g, 'sm')}
+                    alt=""
+                    width={600}
+                    height={600}
+                    className="h-16 w-16 object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
 
           <h1 className="mt-8 font-display text-3xl sm:text-4xl">{product.name}</h1>
           <p className="mt-1 text-ink-soft">{product.tagline}</p>
@@ -113,34 +149,68 @@ export default function Configurator({ product }: { product: Product }) {
             </div>
           </dl>
 
-          {requiredAddOns.map((spec) => (
-            <div key={spec.id} className="mt-10">
-              <label
-                htmlFor={spec.id}
-                className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint"
-              >
-                {spec.note}
-              </label>
-              <div className="mt-2 flex items-end gap-3 border-b border-ink pb-2">
-                <input
-                  id={spec.id}
-                  value={required[spec.id] ?? ''}
-                  onChange={(e) => {
-                    const v = e.target.value.slice(0, spec.input?.maxLength ?? 40);
-                    setRequired((prev) => ({ ...prev, [spec.id]: v }));
-                    setAdded(false);
-                  }}
-                  maxLength={spec.input?.maxLength}
-                  placeholder={spec.input?.placeholder}
-                  autoComplete="off"
-                  className="min-w-0 flex-1 bg-transparent font-display text-2xl outline-none placeholder:text-ink-faint"
-                />
-                <span className="font-spec text-xs tabular-nums text-ink-faint">
-                  {(required[spec.id] ?? '').length}/{spec.input?.maxLength}
-                </span>
+          {requiredAddOns.map((spec) =>
+            spec.choices ? (
+              // A picker, not a dropdown. There are three to five options and
+              // they are the interesting decision on the page, so hiding them
+              // behind a select would bury the thing the buyer came to choose.
+              <fieldset key={spec.id} className="mt-10">
+                <legend className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
+                  {spec.note}
+                </legend>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {spec.choices.map((choice) => {
+                    const active = required[spec.id] === choice;
+                    return (
+                      <button
+                        key={choice}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => {
+                          setRequired((prev) => ({ ...prev, [spec.id]: choice }));
+                          setAdded(false);
+                        }}
+                        className={`rounded-sm border px-4 py-2 text-sm transition-colors ${
+                          active
+                            ? 'border-ink bg-ink text-bench'
+                            : 'border-rule bg-paper text-ink-soft hover:border-ink hover:text-ink'
+                        }`}
+                      >
+                        {choice}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            ) : (
+              <div key={spec.id} className="mt-10">
+                <label
+                  htmlFor={spec.id}
+                  className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint"
+                >
+                  {spec.note}
+                </label>
+                <div className="mt-2 flex items-end gap-3 border-b border-ink pb-2">
+                  <input
+                    id={spec.id}
+                    value={required[spec.id] ?? ''}
+                    onChange={(e) => {
+                      const v = e.target.value.slice(0, spec.input?.maxLength ?? 40);
+                      setRequired((prev) => ({ ...prev, [spec.id]: v }));
+                      setAdded(false);
+                    }}
+                    maxLength={spec.input?.maxLength}
+                    placeholder={spec.input?.placeholder}
+                    autoComplete="off"
+                    className="min-w-0 flex-1 bg-transparent font-display text-2xl uppercase outline-none placeholder:text-ink-faint"
+                  />
+                  <span className="font-spec text-xs tabular-nums text-ink-faint">
+                    {(required[spec.id] ?? '').length}/{spec.input?.maxLength}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            ),
+          )}
 
           <h2 className="mt-12 font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
             Options

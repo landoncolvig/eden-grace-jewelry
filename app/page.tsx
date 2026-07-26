@@ -1,25 +1,26 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import NamePreview from '@/components/name-preview';
-import { PRODUCTS, formatUSD } from '@/lib/shop';
+import { PRODUCTS, formatUSD, photo } from '@/lib/shop';
 
-// The three steps are a real sequence with real waiting in between, which is
-// why they are numbered. Order carries information here: the buyer is being
-// told when they can still change their mind (before step two).
+// A real sequence with real waiting in between, which is why it is numbered.
+// The order carries information the buyer needs: when they can still change
+// their mind, and when the piece stops being changeable.
 const STEPS = [
   {
     n: '01',
-    title: 'You set the spec',
-    body: 'Pick the piece, then the options. Engraving, chain length, stones. The order sheet builds itself as you go, so you see the exact piece and the exact price before you pay.',
+    title: 'You pick the piece',
+    body: 'Choose the stone, the length, and whether it carries pearls or letters. The order sheet builds itself as you go, so you see the exact necklace and the exact price before you pay.',
   },
   {
     n: '02',
-    title: 'Jenna cuts it',
-    body: 'Every letter is pierced and filed by hand from a single sheet. This is the point of no return, which is why made-to-order pieces stop being returnable once it starts.',
+    title: 'Jenna strings it',
+    body: 'Beads are laid out on the board, then strung one at a time on nylon-coated steel wire and finished with a clasp. Natural stone varies, so your strand will not be identical to the photo.',
   },
   {
     n: '03',
     title: 'It ships USPS',
-    body: 'Finished, polished, boxed, and sent Ground Advantage with tracking. Shipping is quoted to your ZIP at checkout, and it is free over $150.',
+    body: 'Boxed and sent Ground Advantage with tracking. Shipping is quoted to your ZIP at checkout, and it is free over $75.',
   },
 ];
 
@@ -30,49 +31,40 @@ export default function Home() {
 
       <section id="pieces" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
         <div className="flex items-baseline justify-between gap-6 border-b border-rule pb-4">
-          <h2 className="font-display text-2xl sm:text-3xl">Two pieces</h2>
+          <h2 className="font-display text-2xl sm:text-3xl">Three ways to wear it</h2>
           <p className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
-            Both made to order
+            All made to order
           </p>
         </div>
 
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 sm:gap-10">
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 sm:gap-10">
           {PRODUCTS.map((product) => (
-            <Link
-              key={product.slug}
-              href={`/product/${product.slug}`}
-              className="group block"
-            >
-              <article className="flex h-full flex-col rounded-sm border border-rule bg-paper p-7 transition-colors hover:border-brass">
-                {/* Each piece gets its own metal, drawn rather than photographed
-                    so the demo does not depend on product photos existing yet.
-                    Swap this block for an Image once Jenna has shots. */}
-                <div
-                  className="mb-7 flex h-40 items-center justify-center rounded-sm"
-                  style={{ background: `${product.swatch}14` }}
-                >
-                  <span
-                    className="font-script text-5xl"
-                    style={{ color: product.swatch }}
-                  >
-                    {product.slug === 'name-necklace' ? 'Jenna' : '• • •'}
-                  </span>
-                </div>
+            <Link key={product.slug} href={`/product/${product.slug}`} className="group block">
+              <article className="flex h-full flex-col overflow-hidden rounded-sm border border-rule bg-paper transition-colors hover:border-brass">
+                <Image
+                  src={photo(product.image, 'sm')}
+                  alt={`${product.name}, ${product.tagline.toLowerCase()}`}
+                  width={600}
+                  height={600}
+                  className="w-full"
+                />
 
-                <h3 className="font-display text-xl">{product.name}</h3>
-                <p className="mt-1 text-sm text-ink-soft">{product.tagline}</p>
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="font-display text-xl">{product.name}</h3>
+                  <p className="mt-1 text-sm text-ink-soft">{product.tagline}</p>
 
-                <p className="mt-4 flex-1 text-sm leading-relaxed text-ink-soft">
-                  {product.description}
-                </p>
+                  <p className="mt-4 flex-1 text-sm leading-relaxed text-ink-soft">
+                    {product.description}
+                  </p>
 
-                <div className="mt-6 flex items-baseline justify-between border-t border-rule pt-4">
-                  <span className="font-spec text-sm tabular-nums">
-                    {formatUSD(product.priceCents)}
-                  </span>
-                  <span className="text-sm text-ink-soft transition-colors group-hover:text-brass">
-                    Configure &rarr;
-                  </span>
+                  <div className="mt-6 flex items-baseline justify-between border-t border-rule pt-4">
+                    <span className="font-spec text-sm tabular-nums">
+                      {formatUSD(product.priceCents)}
+                    </span>
+                    <span className="text-sm text-ink-soft transition-colors group-hover:text-brass">
+                      Make one &rarr;
+                    </span>
+                  </div>
                 </div>
               </article>
             </Link>

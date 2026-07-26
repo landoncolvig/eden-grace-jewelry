@@ -19,6 +19,9 @@ export type AddOn = {
   priceCents: number;
   weightOz: number;
   maxQty?: number;
+  required?: boolean;
+  /** When present the value must be one of these. Enforced server-side too. */
+  choices?: string[];
   input?: { placeholder: string; maxLength: number };
 };
 
@@ -32,8 +35,16 @@ export type Product = {
   material: string;
   leadTime: string;
   swatch: string;
+  /** Basename in /public/products. Both .webp and -sm.webp exist. */
+  image: string;
+  gallery: string[];
   addOns: AddOn[];
 };
+
+/** Full-size and grid-size paths for a product photo basename. */
+export function photo(name: string, size: 'full' | 'sm' = 'full'): string {
+  return `/products/${name}${size === 'sm' ? '-sm' : ''}.webp`;
+}
 
 /** What the browser stores and sends. Never contains a price. */
 export type CartAddOn = { id: string; qty?: number; value?: string };

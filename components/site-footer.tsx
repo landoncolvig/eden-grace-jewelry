@@ -7,8 +7,8 @@ export default function SiteFooter() {
         <div>
           <p className="font-display text-lg">Jenna&rsquo;s Jewelry</p>
           <p className="mt-2 max-w-xs text-sm leading-relaxed text-ink-soft">
-            Made to order in the studio. Every piece is cut, filed, and finished by
-            hand before it ships.
+            Made to order at the bench. Every strand is laid out, strung, and
+            finished by hand before it ships.
           </p>
         </div>
 
@@ -18,13 +18,18 @@ export default function SiteFooter() {
           </h2>
           <ul className="mt-3 space-y-2">
             <li>
-              <Link href="/product/name-necklace" className="text-ink-soft hover:text-ink">
-                Custom Name Necklace
+              <Link href="/product/gemstone-strand" className="text-ink-soft hover:text-ink">
+                Gemstone Strand
               </Link>
             </li>
             <li>
-              <Link href="/product/birthstone-pendant" className="text-ink-soft hover:text-ink">
-                Birthstone Pendant
+              <Link href="/product/pearl-strand" className="text-ink-soft hover:text-ink">
+                Freshwater Pearl Strand
+              </Link>
+            </li>
+            <li>
+              <Link href="/product/name-necklace" className="text-ink-soft hover:text-ink">
+                Name Necklace
               </Link>
             </li>
             <li>
@@ -40,8 +45,8 @@ export default function SiteFooter() {
             Shipping
           </h2>
           <p className="mt-3 leading-relaxed text-ink-soft">
-            USPS Ground Advantage, quoted to your ZIP at checkout. Free over $150.
-            Made-to-order pieces are not returnable once cutting starts.
+            USPS Ground Advantage, quoted to your ZIP at checkout. Free over $75.
+            Personalised pieces are not returnable once stringing starts.
           </p>
         </div>
       </div>

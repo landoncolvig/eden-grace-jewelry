@@ -38,9 +38,9 @@ export default function NamePreview() {
           Made to order
         </p>
         <h1 className="mt-4 max-w-2xl font-display text-4xl leading-[1.08] sm:text-6xl">
-          Necklaces cut by hand,
+          Necklaces strung by hand,
           <br />
-          one word at a time.
+          one bead at a time.
         </h1>
 
         {/* The piece itself, hung from a chain so it reads as jewelry rather
@@ -84,7 +84,7 @@ export default function NamePreview() {
               Make this one
             </button>
             <p className="mt-3 text-center text-xs text-ink-soft">
-              14k gold fill, from $68. Ships in 10 to 14 days.
+              Mother-of-pearl letters, $42. Ships in 7 to 10 days.
             </p>
           </div>
         </div>

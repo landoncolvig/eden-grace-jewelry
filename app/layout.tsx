@@ -40,17 +40,17 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://jennasjewelry.com'),
   title: {
-    default: "Jenna's Jewelry | Necklaces cut by hand, one at a time",
+    default: "Jenna's Jewelry | Beaded necklaces, strung by hand",
     template: "%s | Jenna's Jewelry",
   },
   description:
-    'Custom name necklaces and birthstone pendants, made to order. Every letter is cut and filed by hand, so no two pieces come out the same.',
+    'Gemstone and freshwater pearl necklaces, strung by hand and made to order. Natural stone varies, so no two strands come out the same.',
   openGraph: {
     type: 'website',
     siteName: "Jenna's Jewelry",
     title: "Jenna's Jewelry",
     description:
-      'Custom name necklaces and birthstone pendants, made to order in 14k gold fill and sterling silver.',
+      'Gemstone strands, freshwater pearl necklaces, and mother-of-pearl name necklaces, made to order.',
   },
 };
 
