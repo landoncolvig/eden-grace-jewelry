@@ -2,6 +2,7 @@
 
 import { useState, useId } from 'react';
 import { useRouter } from 'next/navigation';
+import { DEFAULT_WORD, NecklacePiece } from './piece-3d';
 
 const MAX_CHARS = 12;
 
@@ -11,6 +12,12 @@ const MAX_CHARS = 12;
  * type. Rather than photograph a finished piece, let the buyer set their own
  * word and watch it become the product.
  *
+ * The piece is rendered as real geometry, extruded and lit, because the thing
+ * being sold is metal rather than lettering: what a buyer is deciding is
+ * whether their word looks good with an edge on it. It arrives as a lazily
+ * loaded canvas over the flat treatment, which is what shows on a machine that
+ * cannot draw it. See components/piece-3d.
+ *
  * The typed name carries through to the configurator as a query parameter, so
  * the hero is the first step of the order rather than a separate toy.
  */
@@ -18,13 +25,6 @@ export default function NamePreview() {
   const [name, setName] = useState('');
   const router = useRouter();
   const inputId = useId();
-
-  const shown = name.trim() || 'Jenna';
-  const isPlaceholder = name.trim().length === 0;
-
-  // The script face gets wider per character than a text face, so long names
-  // have to be pulled in or they run past the chain.
-  const fontSize = shown.length <= 5 ? 92 : shown.length <= 8 ? 74 : 58;
 
   function start() {
     const q = name.trim() ? `?name=${encodeURIComponent(name.trim())}` : '';
