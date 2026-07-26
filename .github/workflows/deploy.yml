@@ -1,0 +1,73 @@
+name: Deploy to GitHub Pages
+
+# The storefront is a static export. Nothing secret is built into it: the
+# Stripe key and Shippo token live in the Cloud Function, and the only value
+# baked in here is the public API base URL.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let an in-flight deploy finish rather than cancelling it, so the live site is
+# never left half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build static export
+        # .env files are gitignored, so the API base comes from a repo variable:
+        #   gh variable set NEXT_PUBLIC_API_BASE --body "https://..."
+        # It is a variable rather than a secret because it is a public URL that
+        # ships in the client bundle either way. Secrets belong in the function.
+        env:
+          NEXT_PUBLIC_API_BASE: ${{ vars.NEXT_PUBLIC_API_BASE }}
+        run: |
+          test -n "$NEXT_PUBLIC_API_BASE" || {
+            echo "NEXT_PUBLIC_API_BASE repo variable is not set."
+            echo "Checkout would silently POST to the site's own origin and 404."
+            exit 1
+          }
+          npm run build
+
+      - name: Verify the export actually produced pages
+        # A misconfigured output mode fails silently by publishing an empty
+        # directory, which looks like a successful deploy until someone visits.
+        run: |
+          test -f out/index.html || { echo "out/index.html missing"; exit 1; }
+          test -f out/cart/index.html || { echo "cart page missing"; exit 1; }
+          test -f out/.nojekyll || { echo ".nojekyll missing, _next assets will 404"; exit 1; }
+          echo "Exported $(find out -name '*.html' | wc -l) pages"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

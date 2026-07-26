@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Regenerated from ../../shared on every deploy. Committing it would let the
+# function's copy of the prices drift from the storefront's.
+functions/api/shared/
+functions/api/node_modules/

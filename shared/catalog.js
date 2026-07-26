@@ -159,15 +159,17 @@ const PRODUCTS = [
   },
 ];
 
-/** Where parcels ship from. Drives the USPS zone, so it has to be real. */
-const ORIGIN = {
-  name: "Jenna's Jewelry",
-  street1: '',
-  city: '',
-  state: '',
-  zip: '',
-  country: 'US',
-};
+/**
+ * NOTE: the ship-from address is deliberately NOT in this file.
+ *
+ * This repository is public so GitHub Pages can serve it, and the origin is a
+ * private residence. A home address committed here would be indexed, scraped,
+ * and permanent in git history. It lives in Secret Manager as ORIGIN_JSON and
+ * is read by the Cloud Function only, which is the only half that needs it:
+ * the storefront never rates or labels anything.
+ *
+ * See functions/api/origin.js.
+ */
 
 /** Outer dimensions of the shipping box, inches. Same box for every order. */
 const PARCEL_DIMS = { length: 6, width: 4, height: 2 };
@@ -208,7 +210,6 @@ function formatUSD(cents) {
 
 module.exports = {
   PRODUCTS,
-  ORIGIN,
   PARCEL_DIMS,
   FALLBACK_SHIPPING_CENTS,
   FREE_SHIPPING_THRESHOLD_CENTS,

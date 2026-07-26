@@ -20,11 +20,17 @@ const Stripe = require('stripe');
 
 const { priceCart, applyShippingRules } = require('./shared/pricing.js');
 const {
-  ORIGIN,
   PARCEL_DIMS,
   FALLBACK_SHIPPING_CENTS,
   formatUSD,
 } = require('./shared/catalog.js');
+const { getOrigin } = require('./origin.js');
+const {
+  verifySession,
+  emailOrderToOwner,
+  buyLabel,
+  emailTrackingToCustomer,
+} = require('./orders.js');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   // Pinning means a Stripe-side API change cannot silently alter behaviour.
@@ -33,6 +39,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 const SITE = process.env.SITE_URL || 'https://jennasjewelry.com';
 const SHIPPO_TOKEN = process.env.SHIPPO_TOKEN || '';
+// This function's own public URL, used to build the signed buy-label link that
+// goes into Jenna's order email.
+const API_BASE = (process.env.API_BASE_URL || '').replace(/\/$/, '');
 
 const ALLOWED_ORIGINS = new Set([
   'https://jennasjewelry.com',
@@ -88,14 +97,9 @@ async function quoteUSPS(zip, weightOz) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        address_from: {
-          name: ORIGIN.name,
-          street1: ORIGIN.street1,
-          city: ORIGIN.city,
-          state: ORIGIN.state,
-          zip: ORIGIN.zip,
-          country: 'US',
-        },
+        // Throws if unconfigured, which the caller turns into the flat-rate
+        // fallback rather than a failed checkout.
+        address_from: getOrigin(),
         // Rating only needs the destination ZIP, so nothing else about the
         // customer is sent to Shippo at quote time.
         address_to: { zip, country: 'US' },
@@ -195,6 +199,8 @@ functions.http('api', async (req, res) => {
 
   try {
     if (route === 'webhook') return await handleWebhook(req, res);
+    // Clicked from Jenna's inbox, so this one is a GET.
+    if (route === 'label') return await handleLabel(req, res);
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
     if (route === 'shipping-quote') return await handleQuote(req, res);
     if (route === 'create-checkout-session') return await handleCheckout(req, res);
@@ -387,6 +393,30 @@ async function fulfill(sessionId) {
     });
   }
 
+  const items = (session.line_items.data || []).map((li) => ({
+    quantity: li.quantity,
+    description: li.description,
+    // Stripe puts the configurator's spec text into the line description, but
+    // the metadata copy is the one that survives a description truncation.
+    spec: li.price && li.price.product_data ? undefined : undefined,
+    amount: formatUSD(li.amount_total),
+  }));
+
+  // Attach the per-line spec from metadata, which is the record of what to make.
+  const specs = String((session.metadata && session.metadata.spec) || '').split(' ;; ');
+  items.forEach((item, i) => {
+    const match = /\[(.*)\]$/.exec(specs[i] || '');
+    if (match) item.spec = match[1];
+  });
+
+  try {
+    await emailOrderToOwner({ session, items, apiBase: API_BASE });
+  } catch (err) {
+    // A mail failure must not look like a payment failure. The order is real
+    // and is in the Stripe dashboard either way.
+    console.error('order email failed', { sessionId, error: err.message });
+  }
+
   console.log('ORDER PAID', {
     sessionId,
     email: session.customer_details && session.customer_details.email,
@@ -402,8 +432,117 @@ async function fulfill(sessionId) {
     })),
   });
 
-  // TODO: persist the order and email Jenna. Until then the record of what to
-  // make lives in the Stripe dashboard and in this log line, both of which are
-  // durable. A Firestore write here would also give real idempotency, which
-  // the in-memory Set above only approximates.
+  // TODO: persist the order somewhere queryable. Until then the record of what
+  // to make lives in the Stripe dashboard, in Jenna's inbox, and in this log
+  // line. A Firestore write here would also give real idempotency, which the
+  // in-memory Set above only approximates.
+}
+
+/* ------------------------------------------------------------------ *
+ * Buy label (clicked from the order email)
+ * ------------------------------------------------------------------ */
+
+/** Minimal styled page, since this renders in whatever browser her phone opens. */
+function labelPage({ title, body, primary, primaryHref }) {
+  return `<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title></head>
+<body style="margin:0;background:#edeeea;font-family:system-ui,sans-serif;color:#1b2a33;">
+<div style="max-width:460px;margin:0 auto;padding:48px 20px;">
+  <div style="background:#fbfbf9;border:1px solid #1b2a33;padding:28px;">
+    <h1 style="margin:0 0 14px;font-size:22px;font-weight:600;">${title}</h1>
+    <div style="font-size:15px;line-height:1.6;color:#56646d;">${body}</div>
+    ${
+      primary
+        ? `<a href="${primaryHref}" style="display:block;margin-top:22px;background:#1b2a33;color:#edeeea;text-decoration:none;padding:14px;text-align:center;font-size:16px;">${primary}</a>`
+        : ''
+    }
+  </div>
+</div></body></html>`;
+}
+
+async function handleLabel(req, res) {
+  const sessionId = String(req.query.session || '');
+  const token = String(req.query.token || '');
+
+  res.set('Content-Type', 'text/html; charset=utf-8');
+
+  if (!sessionId || !verifySession(sessionId, token)) {
+    return res.status(403).send(
+      labelPage({
+        title: 'That link is not valid',
+        body: 'The signature did not match. Open the link straight from the order email rather than copying part of it.',
+      }),
+    );
+  }
+
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ['collected_information'],
+  });
+
+  if (session.payment_status === 'unpaid') {
+    return res.status(409).send(
+      labelPage({
+        title: 'This order is not paid',
+        body: 'No label was bought. Check the order in Stripe before shipping anything.',
+      }),
+    );
+  }
+
+  // Idempotency lives on the Stripe session rather than in memory, so a second
+  // click, a forwarded email, or a cold start all return the label already
+  // bought instead of buying another one.
+  const existing = session.metadata && session.metadata.label_url;
+  if (existing) {
+    return res.send(
+      labelPage({
+        title: 'Label already bought',
+        body: `This order's postage was already purchased, so you have not been charged twice.<br><br>Tracking <strong>${
+          (session.metadata && session.metadata.tracking) || 'unknown'
+        }</strong>`,
+        primary: 'Open the label PDF',
+        primaryHref: existing,
+      }),
+    );
+  }
+
+  let label;
+  try {
+    label = await buyLabel(session);
+  } catch (err) {
+    console.error('label purchase failed', { sessionId, error: err.message });
+    return res.status(502).send(
+      labelPage({
+        title: 'Could not buy the label',
+        body: `USPS or Shippo refused the purchase. Nothing was charged. You can buy this one by hand in the Shippo dashboard.<br><br><code style="font-size:13px;color:#a4442f;">${String(
+          err.message,
+        ).slice(0, 200)}</code>`,
+      }),
+    );
+  }
+
+  await stripe.checkout.sessions.update(sessionId, {
+    metadata: {
+      ...(session.metadata || {}),
+      label_url: label.labelPdf,
+      tracking: label.tracking,
+    },
+  });
+
+  emailTrackingToCustomer({ session, label }).catch((err) =>
+    console.error('tracking email failed', { sessionId, error: err.message }),
+  );
+
+  console.log('LABEL BOUGHT', { sessionId, tracking: label.tracking, cost: label.cost });
+
+  return res.send(
+    labelPage({
+      title: 'Label bought',
+      body: `Tracking <strong>${label.tracking}</strong>${
+        label.cost ? ` &middot; ${label.cost}` : ''
+      }<br><br>The customer has been emailed the tracking number. Print on a 4x6 label or on paper and tape it down.`,
+      primary: 'Open the label PDF',
+      primaryHref: label.labelPdf,
+    }),
+  );
 }
