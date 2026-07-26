@@ -1,0 +1,18 @@
+{
+  "name": "jennas-jewelry-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stripe checkout and USPS rating for jennasjewelry.com",
+  "main": "index.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "functions-framework --target=api",
+    "dev": "functions-framework --target=api --port=8080"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^4.0.0",
+    "stripe": "^22.3.2"
+  }
+}

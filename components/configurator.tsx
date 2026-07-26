@@ -10,31 +10,36 @@ import { useCart } from './cart-context';
  *
  * A custom piece does not exist until it is specified, so the add-ons are not
  * upsells, they are the specification. The panel on the right is a work order
- * that writes itself as the buyer toggles options: what gets made, what it
- * weighs against, and what it costs, all visible before anything is added to
- * the cart. That transparency is the reason to configure here rather than to
- * discover the real total on the Stripe page.
+ * that writes itself as the buyer toggles options: what gets made and what it
+ * costs, visible before anything is added to the cart. That transparency is
+ * the reason to configure here rather than to discover the real total on the
+ * Stripe page.
  */
 export default function Configurator({ product }: { product: Product }) {
   const search = useSearchParams();
   const router = useRouter();
   const { addLine } = useCart();
 
-  // The hero passes the word the buyer already typed. Picking it up here means
-  // the hero is step one of the order, not a separate demo.
-  const seededName = (search.get('name') ?? '').slice(0, 12);
+  // Required specs (what a name necklace reads) are part of the piece, not
+  // options, so they are always present and get their own input above the
+  // options list.
+  const requiredAddOns = useMemo(() => product.addOns.filter((a) => a.required), [product]);
+  const optionalAddOns = useMemo(() => product.addOns.filter((a) => !a.required), [product]);
 
-  const [selected, setSelected] = useState<Record<string, { qty: number; value: string }>>({});
+  // The hero passes the word the buyer already typed, so the hero is step one
+  // of the order rather than a separate toy.
+  const seeded = (search.get('name') ?? '').slice(0, 12);
+
+  const [required, setRequired] = useState<Record<string, string>>(() =>
+    Object.fromEntries(requiredAddOns.map((a) => [a.id, seeded])),
+  );
+  const [options, setOptions] = useState<Record<string, { qty: number; value: string }>>({});
   const [qty, setQty] = useState(1);
-  const [engraveWord, setEngraveWord] = useState(seededName);
   const [added, setAdded] = useState(false);
-
-  const isNameNecklace = product.slug === 'name-necklace';
-  const wordMissing = isNameNecklace && engraveWord.trim().length === 0;
 
   function toggle(addOn: AddOn) {
     setAdded(false);
-    setSelected((prev) => {
+    setOptions((prev) => {
       const next = { ...prev };
       if (next[addOn.id]) delete next[addOn.id];
       else next[addOn.id] = { qty: 1, value: '' };
@@ -42,51 +47,32 @@ export default function Configurator({ product }: { product: Product }) {
     });
   }
 
-  function setAddOnValue(id: string, value: string) {
-    setAdded(false);
-    setSelected((prev) => (prev[id] ? { ...prev, [id]: { ...prev[id], value } } : prev));
-  }
-
-  function setAddOnQty(id: string, next: number, max: number) {
-    setAdded(false);
-    setSelected((prev) =>
-      prev[id]
-        ? { ...prev, [id]: { ...prev[id], qty: Math.min(Math.max(next, 1), max) } }
-        : prev,
-    );
-  }
-
   const cartAddOns: CartAddOn[] = useMemo(
-    () =>
-      Object.entries(selected).map(([id, v]) => ({
-        id,
-        qty: v.qty,
-        value: v.value,
-      })),
-    [selected],
+    () => [
+      ...requiredAddOns.map((a) => ({ id: a.id, qty: 1, value: required[a.id] ?? '' })),
+      ...Object.entries(options).map(([id, v]) => ({ id, qty: v.qty, value: v.value })),
+    ],
+    [requiredAddOns, required, options],
   );
 
-  // Priced by the same module the server uses, so this figure and the Stripe
-  // charge come from one implementation.
+  // Priced by the same module the Cloud Function uses, so this figure and the
+  // Stripe charge come from one implementation. missingRequired is the same
+  // check the server will run, so the button disables for exactly the reason
+  // the server would refuse.
   const preview = useMemo(
     () => priceCart([{ slug: product.slug, qty, addOns: cartAddOns }]),
     [product.slug, qty, cartAddOns],
   );
   const line = preview.lines[0];
+  const blocked = preview.missingRequired.length > 0;
 
   function addToCart() {
-    if (wordMissing) return;
-    const withWord: CartAddOn[] = isNameNecklace
-      ? [{ id: '__word', value: engraveWord.trim() }, ...cartAddOns]
-      : cartAddOns;
-
-    // '__word' is not a catalog add-on and would be dropped by the pricer, so
-    // the typed word rides along as part of the engraving add-on when present,
-    // and otherwise as the line's own spec text.
-    const finalAddOns = withWord.filter((a) => a.id !== '__word');
-    addLine(product.slug, finalAddOns, qty);
+    if (blocked) return;
+    addLine(product.slug, cartAddOns, qty);
     setAdded(true);
   }
+
+  const primaryWord = requiredAddOns[0] ? required[requiredAddOns[0].id]?.trim() : '';
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
@@ -98,14 +84,17 @@ export default function Configurator({ product }: { product: Product }) {
       </button>
 
       <div className="mt-8 grid gap-12 lg:grid-cols-[1fr_400px] lg:gap-16">
-        {/* Left: the piece and its options */}
+        {/* Left: the piece and its specification */}
         <div>
           <div
-            className="flex h-56 items-center justify-center rounded-sm sm:h-72"
+            className="flex h-56 items-center justify-center rounded-sm px-6 sm:h-72"
             style={{ background: `${product.swatch}14` }}
           >
-            <span className="font-script text-5xl sm:text-6xl" style={{ color: product.swatch }}>
-              {isNameNecklace ? engraveWord.trim() || 'your word' : '• • •'}
+            <span
+              className="text-center font-script text-5xl sm:text-6xl"
+              style={{ color: product.swatch }}
+            >
+              {requiredAddOns.length > 0 ? primaryWord || 'your word' : '• • •'}
             </span>
           </div>
 
@@ -124,46 +113,42 @@ export default function Configurator({ product }: { product: Product }) {
             </div>
           </dl>
 
-          {isNameNecklace && (
-            <div className="mt-10">
+          {requiredAddOns.map((spec) => (
+            <div key={spec.id} className="mt-10">
               <label
-                htmlFor="word"
+                htmlFor={spec.id}
                 className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint"
               >
-                What should it say
+                {spec.note}
               </label>
               <div className="mt-2 flex items-end gap-3 border-b border-ink pb-2">
                 <input
-                  id="word"
-                  value={engraveWord}
+                  id={spec.id}
+                  value={required[spec.id] ?? ''}
                   onChange={(e) => {
-                    setEngraveWord(e.target.value.slice(0, 12));
+                    const v = e.target.value.slice(0, spec.input?.maxLength ?? 40);
+                    setRequired((prev) => ({ ...prev, [spec.id]: v }));
                     setAdded(false);
                   }}
-                  maxLength={12}
-                  placeholder="Jenna"
+                  maxLength={spec.input?.maxLength}
+                  placeholder={spec.input?.placeholder}
                   autoComplete="off"
                   className="min-w-0 flex-1 bg-transparent font-display text-2xl outline-none placeholder:text-ink-faint"
                 />
                 <span className="font-spec text-xs tabular-nums text-ink-faint">
-                  {engraveWord.length}/12
+                  {(required[spec.id] ?? '').length}/{spec.input?.maxLength}
                 </span>
               </div>
-              {wordMissing && (
-                <p className="mt-2 text-sm text-flag">
-                  Type the word before adding this to the cart.
-                </p>
-              )}
             </div>
-          )}
+          ))}
 
           <h2 className="mt-12 font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
             Options
           </h2>
           <ul className="mt-4 divide-y divide-rule border-y border-rule">
-            {product.addOns.map((addOn) => {
-              const active = Boolean(selected[addOn.id]);
-              const state = selected[addOn.id];
+            {optionalAddOns.map((addOn) => {
+              const state = options[addOn.id];
+              const active = Boolean(state);
               const max = addOn.maxQty ?? 1;
 
               return (
@@ -173,6 +158,7 @@ export default function Configurator({ product }: { product: Product }) {
                       type="button"
                       role="switch"
                       aria-checked={active}
+                      aria-label={addOn.label}
                       onClick={() => toggle(addOn)}
                       className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-[3px] border transition-colors ${
                         active
@@ -201,7 +187,7 @@ export default function Configurator({ product }: { product: Product }) {
                         className="flex w-full items-baseline justify-between gap-4 text-left"
                       >
                         <span className="text-sm">{addOn.label}</span>
-                        <span className="font-spec shrink-0 text-sm tabular-nums text-ink-soft">
+                        <span className="shrink-0 font-spec text-sm tabular-nums text-ink-soft">
                           +{formatUSD(addOn.priceCents)}
                         </span>
                       </button>
@@ -215,8 +201,13 @@ export default function Configurator({ product }: { product: Product }) {
                           <div className="flex items-center rounded-sm border border-rule">
                             <button
                               type="button"
-                              aria-label="One fewer"
-                              onClick={() => setAddOnQty(addOn.id, state.qty - 1, max)}
+                              aria-label={`One fewer ${addOn.label}`}
+                              onClick={() =>
+                                setOptions((p) => ({
+                                  ...p,
+                                  [addOn.id]: { ...p[addOn.id], qty: Math.max(1, state.qty - 1) },
+                                }))
+                              }
                               className="px-2.5 py-1 text-ink-soft hover:text-ink"
                             >
                               &minus;
@@ -226,8 +217,13 @@ export default function Configurator({ product }: { product: Product }) {
                             </span>
                             <button
                               type="button"
-                              aria-label="One more"
-                              onClick={() => setAddOnQty(addOn.id, state.qty + 1, max)}
+                              aria-label={`One more ${addOn.label}`}
+                              onClick={() =>
+                                setOptions((p) => ({
+                                  ...p,
+                                  [addOn.id]: { ...p[addOn.id], qty: Math.min(max, state.qty + 1) },
+                                }))
+                              }
                               className="px-2.5 py-1 text-ink-soft hover:text-ink"
                             >
                               +
@@ -239,9 +235,15 @@ export default function Configurator({ product }: { product: Product }) {
                       {active && addOn.input && (
                         <input
                           value={state.value}
-                          onChange={(e) => setAddOnValue(addOn.id, e.target.value)}
+                          onChange={(e) =>
+                            setOptions((p) => ({
+                              ...p,
+                              [addOn.id]: { ...p[addOn.id], value: e.target.value },
+                            }))
+                          }
                           maxLength={addOn.input.maxLength}
                           placeholder={addOn.input.placeholder}
+                          aria-label={`${addOn.label} detail`}
                           autoComplete="off"
                           className="mt-3 w-full rounded-sm border border-rule bg-paper px-3 py-2 text-sm outline-none placeholder:text-ink-faint focus:border-brass"
                         />
@@ -263,47 +265,53 @@ export default function Configurator({ product }: { product: Product }) {
               </h2>
             </div>
 
-            <dl className="space-y-0 px-6 py-5 font-spec text-sm">
+            <dl className="px-6 py-5 font-spec text-sm">
               <div className="flex justify-between gap-4 py-1.5">
                 <dt className="text-ink-soft">Piece</dt>
                 <dd className="text-right">{product.name}</dd>
               </div>
 
-              {isNameNecklace && (
-                <div className="flex justify-between gap-4 py-1.5">
-                  <dt className="text-ink-soft">Reads</dt>
-                  <dd className="text-right">
-                    {engraveWord.trim() ? (
-                      <span className="font-script text-xl text-brass">{engraveWord.trim()}</span>
+              {requiredAddOns.map((spec) => (
+                <div key={spec.id} className="flex justify-between gap-4 py-1.5">
+                  <dt className="text-ink-soft">{spec.label}</dt>
+                  <dd className="min-w-0 text-right">
+                    {required[spec.id]?.trim() ? (
+                      <span className="font-script text-xl break-words text-brass">
+                        {required[spec.id].trim()}
+                      </span>
                     ) : (
                       <span className="text-ink-faint">not set</span>
                     )}
                   </dd>
                 </div>
-              )}
+              ))}
 
               <div className="flex justify-between gap-4 border-b border-rule py-1.5 pb-3">
                 <dt className="text-ink-soft">Base</dt>
                 <dd className="tabular-nums">{formatUSD(product.priceCents)}</dd>
               </div>
 
-              {line?.addOns.length ? (
-                line.addOns.map((a) => (
-                  <div key={a.id} className="flex justify-between gap-4 py-1.5">
-                    <dt className="min-w-0 text-ink-soft">
-                      {a.qty > 1 ? `${a.qty} x ` : ''}
-                      {a.label}
-                      {a.value && (
-                        <span className="block truncate text-xs text-ink-faint">{a.value}</span>
-                      )}
-                    </dt>
-                    <dd className="shrink-0 tabular-nums text-patina">
-                      +{formatUSD(a.priceCents)}
-                    </dd>
-                  </div>
-                ))
+              {line && line.addOns.some((a) => !a.required) ? (
+                line.addOns
+                  .filter((a) => !a.required)
+                  .map((a) => (
+                    <div key={a.id} className="flex justify-between gap-4 py-1.5">
+                      <dt className="min-w-0 text-ink-soft">
+                        {a.qty > 1 ? `${a.qty} x ` : ''}
+                        {a.label}
+                        {a.value && (
+                          <span className="block truncate text-xs text-ink-faint">{a.value}</span>
+                        )}
+                      </dt>
+                      <dd className="shrink-0 tabular-nums text-patina">
+                        +{formatUSD(a.priceCents)}
+                      </dd>
+                    </div>
+                  ))
               ) : (
-                <p className="py-2 text-ink-faint">No options yet. The piece ships as described.</p>
+                <p className="py-2 text-ink-faint">
+                  No options yet. The piece ships as described.
+                </p>
               )}
             </dl>
 
@@ -351,13 +359,19 @@ export default function Configurator({ product }: { product: Product }) {
 
               <button
                 onClick={addToCart}
-                disabled={wordMissing}
+                disabled={blocked}
                 className="mt-5 w-full rounded-sm bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-brass-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
               >
                 Add to cart
               </button>
 
-              {added && (
+              {blocked && (
+                <p className="mt-2.5 text-center text-sm text-flag">
+                  {preview.missingRequired[0]?.split(': ')[1] ?? 'Finish the spec first.'}
+                </p>
+              )}
+
+              {added && !blocked && (
                 <button
                   onClick={() => router.push('/cart')}
                   className="mt-3 w-full rounded-sm border border-ink px-5 py-3 text-sm transition-colors hover:bg-ink hover:text-bench"

@@ -45,6 +45,8 @@ export type PricedAddOn = {
   qty: number;
   value: string;
   priceCents: number;
+  /** Part of the core spec rather than an option. Priced at 0. */
+  required?: boolean;
 };
 
 export type PricedLine = {
@@ -62,7 +64,10 @@ export type PricedCart = {
   lines: PricedLine[];
   subtotalCents: number;
   totalWeightOz: number;
+  /** Ids the catalog did not recognise. Silently excluded from the total. */
   dropped: string[];
+  /** Required specs left blank. Blocks checkout on both client and server. */
+  missingRequired: string[];
 };
 
 export const PRODUCTS: Product[] = catalog.PRODUCTS;
