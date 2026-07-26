@@ -50,11 +50,19 @@ export function usePalette() {
 }
 
 /**
- * A jeweler's bench rather than a showroom: one broad soft source overhead
- * standing in for the daylight lamp, a warm strip either side for the edge
- * highlights that make a filed edge legible, and an ink surround so the metal
- * has something dark to reflect. Polished metal with nothing dark in its
- * environment reads as plastic, which is the failure mode this is avoiding.
+ * A jeweler's bench rather than a showroom.
+ *
+ * The thing to understand about a metalness-1 surface is that it has no colour
+ * of its own to fall back on: every pixel of it is a mirror, so the picture is
+ * entirely a picture of the room. A face pointed at the camera reflects
+ * whatever is behind the camera, which means the panels below are not lighting
+ * the piece so much as being the piece. Skip the front panels and the flat of
+ * every letter reflects the dark surround and the word reads as cast iron.
+ *
+ * So: a broad daylight lamp overhead, two unequal panels filling the space the
+ * viewer is standing in, warm strips either side for the edge highlights that
+ * make a filed edge legible, and an ink surround behind it all. The dark is
+ * load-bearing too. Metal with nothing dark to reflect reads as plastic.
  *
  * `frames={1}` bakes the cube map once at mount. Nothing in here moves.
  */
@@ -78,10 +86,28 @@ export function BenchEnvironment() {
         position={[0, 5, 2.5]}
         scale={[10, 5, 1]}
       />
+      {/* The near side of the room, which is what the faces of the letters are
+          actually showing. Two panels rather than one, at different sizes and
+          brightnesses, so the reflection has somewhere to travel as the piece
+          turns instead of sitting there evenly lit. */}
+      <Lightformer
+        form="rect"
+        intensity={1.9}
+        color={palette.bench}
+        position={[-3.4, 1.6, 7]}
+        scale={[8, 9, 1]}
+      />
+      <Lightformer
+        form="rect"
+        intensity={2.8}
+        color={palette.paper}
+        position={[3.6, -0.8, 6.5]}
+        scale={[6, 7, 1]}
+      />
       {/* Bench top bouncing light back up into the underside of the piece. */}
       <Lightformer
         form="rect"
-        intensity={0.9}
+        intensity={1.1}
         color={palette.paper}
         position={[0, -4, 2]}
         scale={[8, 4, 1]}
@@ -90,14 +116,14 @@ export function BenchEnvironment() {
           turns, so they are the whole reason the rotation is worth having. */}
       <Lightformer
         form="rect"
-        intensity={2.6}
+        intensity={3.2}
         color={palette.brass}
         position={[-5, 1, 1]}
         scale={[2, 6, 1]}
       />
       <Lightformer
         form="rect"
-        intensity={2.2}
+        intensity={2.8}
         color={palette.brass}
         position={[5, 0, 1]}
         scale={[2, 6, 1]}
@@ -105,10 +131,10 @@ export function BenchEnvironment() {
       {/* A small hot spot dead front, for the specular catch on the bevels. */}
       <Lightformer
         form="circle"
-        intensity={2.0}
+        intensity={3.4}
         color={palette.paper}
-        position={[1.2, 2, 6]}
-        scale={2.4}
+        position={[1.2, 2.4, 6]}
+        scale={2.2}
       />
     </Environment>
   );
