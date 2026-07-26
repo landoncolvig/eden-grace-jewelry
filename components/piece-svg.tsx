@@ -80,7 +80,10 @@ export function NecklaceSvg({ word, muted, color }: NecklaceSvgProps) {
       className="h-full w-full"
       role="img"
       aria-label={`A beaded necklace with mother-of-pearl letter discs spelling ${word}`}
-      opacity={muted ? 0.42 : 1}
+      // Matches the 3D placeholder. Both used to sit near 0.4, which on the
+      // state every visitor lands on read as a half-loaded asset rather than
+      // as a stand-in word.
+      opacity={muted ? 0.92 : 1}
       style={{ transition: 'opacity 220ms ease' }}
     >
       <defs>

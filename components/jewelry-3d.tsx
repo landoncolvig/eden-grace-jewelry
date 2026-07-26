@@ -182,7 +182,11 @@ export function BeadMaterial({ color = '#ffffff' }: { color?: string }) {
       clearcoat={0.5}
       clearcoatRoughness={0.1}
       ior={1.55}
-      envMapIntensity={0.85}
+      // Low, deliberately. The environment is bright and near-neutral, so a
+      // strong reflection contribution drains the bead's own colour toward
+      // grey. Under-lighting them and letting the body colour dominate reads
+      // more like stone than a higher value does.
+      envMapIntensity={0.5}
     />
   );
 }
@@ -218,6 +222,12 @@ export function NacreMaterial({
       map={map ?? null}
       roughnessMap={roughnessMap ?? null}
       metalness={0}
+      // Against a dark panel a plain white diffuse reads as concrete. Shell is
+      // luminous because light enters, scatters under the surface, and comes
+      // back out; sheen approximates that without a full subsurface pass.
+      sheen={0.6}
+      sheenColor="#ffe9d2"
+      sheenRoughness={0.4}
       // Nacre is glossy, but a mirror finish here blew out the stamped letters
       // on the disc faces. Backed off far enough to keep them legible while
       // still reading as shell rather than plastic.

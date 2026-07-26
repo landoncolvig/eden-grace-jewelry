@@ -177,7 +177,16 @@ function Stack({
   flat: ReactNode;
   scene: ReactNode;
   ready: boolean;
-  /** Dims the whole piece while it is standing in for a word nobody typed. */
+  /**
+   * Slightly recedes the piece while it stands in for a word nobody typed.
+   *
+   * Kept gentle on purpose. This is the state every visitor lands on, since
+   * the input starts empty, so it is the hero's first impression. An earlier
+   * value of 0.45 was faint enough to read as a rendering fault rather than as
+   * a placeholder, and on a dark panel it looked like the piece had failed to
+   * load. The placeholder is already signalled by the word itself and by the
+   * "set your word" label; the opacity only needs to hint.
+   */
   muted?: boolean;
   className?: string;
 }) {
@@ -198,7 +207,7 @@ function Stack({
         <div
           aria-hidden
           className="absolute inset-0 transition-opacity duration-700"
-          style={{ opacity: ready ? (muted ? 0.45 : 1) : 0 }}
+          style={{ opacity: ready ? (muted ? 0.92 : 1) : 0 }}
         >
           {scene}
         </div>
