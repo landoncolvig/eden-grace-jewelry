@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
+/*
+  Jeweler's bench, not a jewelry ad.
+  The palette comes from the workbench rather than the display case: a cool
+  grey polishing cloth, oxidized silver, raw brass, and the verdigris that
+  turns up on copper alloys. Deliberately not the warm-cream-and-terracotta
+  every jewelry site reaches for, which would bury the actual metal tones.
+
+  The storefront commits to one look. No dark-mode variant: product photos and
+  metal colors have to read consistently, and a shop that inverts itself based
+  on OS settings shows the customer two different pieces of jewelry.
+*/
+
+@theme {
+  --color-bench: #edeeea; /* page ground, cool grey */
+  --color-paper: #fbfbf9; /* cards, raised surfaces */
+  --color-ink: #1b2a33; /* text and dark surfaces, oxidized silver */
+  --color-ink-soft: #56646d; /* secondary text */
+  --color-ink-faint: #8b969d; /* captions, disabled */
+  --color-brass: #b08d57; /* metal accent: price, active, focus */
+  --color-brass-deep: #8a6d3f; /* brass on hover */
+  --color-patina: #4a7c74; /* verdigris: added/included states */
+  --color-rule: #d3d6d0; /* hairlines */
+  --color-flag: #a4442f; /* errors only */
+
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-inter);
+  --font-script: var(--font-pinyon);
+  --font-mono: var(--font-plex-mono);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-bench);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bench);
+  color: var(--color-ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fraunces ships variable optical-size, softness, and wonk axes. Dialing in
+   a little wonk gives the display face the slightly irregular character of
+   hand-cut letterforms, which is literally what the product is. */
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-variation-settings: "SOFT" 20, "WONK" 1;
+  letter-spacing: -0.015em;
+}
+
+/* Used in exactly one place: rendering the buyer's own name as the piece.
+   Restraint is the point. If this face shows up in headings it stops reading
+   as the product and starts reading as decoration. */
+.font-script {
+  font-family: var(--font-script), cursive;
+}
+
+.font-spec {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-feature-settings: "tnum";
+}
+
+/* Tabular figures everywhere money appears, so column totals line up and
+   prices do not jitter as they change. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* One focus treatment for the whole site. Brass, thick enough to see against
+   both the bench ground and the ink surfaces. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* The hairline that separates spec rows. Drawn as a border rather than an hr
+   so it can sit inside grid cells without disturbing the row box. */
+.rule {
+  border-color: var(--color-rule);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

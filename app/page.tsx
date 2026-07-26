@@ -1,65 +1,102 @@
-import Image from "next/image";
+import Link from 'next/link';
+import NamePreview from '@/components/name-preview';
+import { PRODUCTS, formatUSD } from '@/lib/shop';
+
+// The three steps are a real sequence with real waiting in between, which is
+// why they are numbered. Order carries information here: the buyer is being
+// told when they can still change their mind (before step two).
+const STEPS = [
+  {
+    n: '01',
+    title: 'You set the spec',
+    body: 'Pick the piece, then the options. Engraving, chain length, stones. The order sheet builds itself as you go, so you see the exact piece and the exact price before you pay.',
+  },
+  {
+    n: '02',
+    title: 'Jenna cuts it',
+    body: 'Every letter is pierced and filed by hand from a single sheet. This is the point of no return, which is why made-to-order pieces stop being returnable once it starts.',
+  },
+  {
+    n: '03',
+    title: 'It ships USPS',
+    body: 'Finished, polished, boxed, and sent Ground Advantage with tracking. Shipping is quoted to your ZIP at checkout, and it is free over $150.',
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <>
+      <NamePreview />
+
+      <section id="pieces" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <div className="flex items-baseline justify-between gap-6 border-b border-rule pb-4">
+          <h2 className="font-display text-2xl sm:text-3xl">Two pieces</h2>
+          <p className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
+            Both made to order
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="mt-10 grid gap-8 sm:grid-cols-2 sm:gap-10">
+          {PRODUCTS.map((product) => (
+            <Link
+              key={product.slug}
+              href={`/product/${product.slug}`}
+              className="group block"
+            >
+              <article className="flex h-full flex-col rounded-sm border border-rule bg-paper p-7 transition-colors hover:border-brass">
+                {/* Each piece gets its own metal, drawn rather than photographed
+                    so the demo does not depend on product photos existing yet.
+                    Swap this block for an Image once Jenna has shots. */}
+                <div
+                  className="mb-7 flex h-40 items-center justify-center rounded-sm"
+                  style={{ background: `${product.swatch}14` }}
+                >
+                  <span
+                    className="font-script text-5xl"
+                    style={{ color: product.swatch }}
+                  >
+                    {product.slug === 'name-necklace' ? 'Jenna' : '• • •'}
+                  </span>
+                </div>
+
+                <h3 className="font-display text-xl">{product.name}</h3>
+                <p className="mt-1 text-sm text-ink-soft">{product.tagline}</p>
+
+                <p className="mt-4 flex-1 text-sm leading-relaxed text-ink-soft">
+                  {product.description}
+                </p>
+
+                <div className="mt-6 flex items-baseline justify-between border-t border-rule pt-4">
+                  <span className="font-spec text-sm tabular-nums">
+                    {formatUSD(product.priceCents)}
+                  </span>
+                  <span className="text-sm text-ink-soft transition-colors group-hover:text-brass">
+                    Configure &rarr;
+                  </span>
+                </div>
+              </article>
+            </Link>
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section id="how" className="border-t border-rule bg-paper">
+        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+          <h2 className="font-display text-2xl sm:text-3xl">How it&rsquo;s made</h2>
+
+          <ol className="mt-10 grid gap-8 sm:grid-cols-3 sm:gap-10">
+            {STEPS.map((step) => (
+              <li key={step.n}>
+                <span className="font-spec text-[0.62rem] tracking-[0.22em] text-brass">
+                  {step.n}
+                </span>
+                <h3 className="mt-3 font-display text-lg">{step.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">{step.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    </>
   );
 }
