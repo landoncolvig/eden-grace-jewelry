@@ -30,7 +30,21 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      # npm install, not npm ci, and that is a deliberate trade.
+      #
+      # @tailwindcss/oxide-wasm32-wasi declares @emnapi/core and @emnapi/runtime
+      # as dependencies, but npm on macOS never records them in the lockfile
+      # because that wasm package is not installed on darwin-arm64. On a Linux
+      # runner npm resolves them, finds nothing in the lockfile, and npm ci
+      # refuses the tree. Regenerating the lockfile does not fix it, including
+      # with --os=linux --cpu=x64.
+      #
+      # The cost is that CI resolves versions at build time rather than pinning
+      # them. For a static two-product storefront that risk is small. If this
+      # ever ships something a lockfile would have caught, the fix is to
+      # generate the lockfile on Linux (a container or a CI job) and commit
+      # that, then switch this back to npm ci.
+      - run: npm install
 
       - name: Build static export
         # .env files are gitignored, so the API base comes from a repo variable:
