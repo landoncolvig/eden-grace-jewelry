@@ -98,7 +98,7 @@ export default function Configurator({ product }: { product: Product }) {
       <div className="mt-8 grid gap-12 lg:grid-cols-[1fr_400px] lg:gap-16">
         {/* Left: the piece and its specification */}
         <div>
-          <div className="overflow-hidden rounded-sm border border-rule bg-paper">
+          <div className="overflow-hidden rounded-xl border border-rule bg-paper">
             <Image
               src={photo(shot)}
               alt={`${product.name}, ${product.tagline.toLowerCase()}`}
@@ -118,7 +118,7 @@ export default function Configurator({ product }: { product: Product }) {
                   onClick={() => setShot(g)}
                   aria-label={`View ${g.replace(/-/g, ' ')}`}
                   aria-pressed={shot === g}
-                  className={`shrink-0 overflow-hidden rounded-sm border transition-colors ${
+                  className={`shrink-0 overflow-hidden rounded-xl border transition-colors ${
                     shot === g ? 'border-ink' : 'border-rule hover:border-ink-faint'
                   }`}
                 >
@@ -170,7 +170,7 @@ export default function Configurator({ product }: { product: Product }) {
                           setRequired((prev) => ({ ...prev, [spec.id]: choice }));
                           setAdded(false);
                         }}
-                        className={`rounded-sm border px-4 py-2 text-sm transition-colors ${
+                        className={`rounded-xl border px-4 py-2 text-sm transition-colors ${
                           active
                             ? 'border-ink bg-ink text-bench'
                             : 'border-rule bg-paper text-ink-soft hover:border-ink hover:text-ink'
@@ -230,9 +230,9 @@ export default function Configurator({ product }: { product: Product }) {
                       aria-checked={active}
                       aria-label={addOn.label}
                       onClick={() => toggle(addOn)}
-                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-[3px] border transition-colors ${
+                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
                         active
-                          ? 'border-patina bg-patina text-paper'
+                          ? 'border-sage bg-sage text-paper'
                           : 'border-ink-faint hover:border-ink'
                       }`}
                     >
@@ -268,7 +268,7 @@ export default function Configurator({ product }: { product: Product }) {
                           <span className="font-spec text-[0.62rem] uppercase tracking-[0.2em] text-ink-faint">
                             How many
                           </span>
-                          <div className="flex items-center rounded-sm border border-rule">
+                          <div className="flex items-center rounded-xl border border-rule">
                             <button
                               type="button"
                               aria-label={`One fewer ${addOn.label}`}
@@ -315,7 +315,7 @@ export default function Configurator({ product }: { product: Product }) {
                           placeholder={addOn.input.placeholder}
                           aria-label={`${addOn.label} detail`}
                           autoComplete="off"
-                          className="mt-3 w-full rounded-sm border border-rule bg-paper px-3 py-2 text-sm outline-none placeholder:text-ink-faint focus:border-brass"
+                          className="mt-3 w-full rounded-xl border border-rule bg-paper px-3 py-2 text-sm outline-none placeholder:text-ink-faint focus:border-rose"
                         />
                       )}
                     </div>
@@ -328,7 +328,7 @@ export default function Configurator({ product }: { product: Product }) {
 
         {/* Right: the work order, which writes itself */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-sm border border-ink bg-paper">
+          <div className="rounded-xl border border-ink bg-paper">
             <div className="border-b border-rule px-6 py-4">
               <h2 className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
                 Order sheet
@@ -346,7 +346,16 @@ export default function Configurator({ product }: { product: Product }) {
                   <dt className="text-ink-soft">{spec.label}</dt>
                   <dd className="min-w-0 text-right">
                     {required[spec.id]?.trim() ? (
-                      <span className="font-script text-xl break-words text-brass">
+                      // The script face is reserved for the buyer's own word.
+                      // A stone name or a length set in cursive reads as a
+                      // styling mistake rather than as the personal thing.
+                      <span
+                        className={
+                          spec.choices
+                            ? 'break-words text-ink'
+                            : 'font-script break-words text-xl text-rose'
+                        }
+                      >
                         {required[spec.id].trim()}
                       </span>
                     ) : (
@@ -373,7 +382,7 @@ export default function Configurator({ product }: { product: Product }) {
                           <span className="block truncate text-xs text-ink-faint">{a.value}</span>
                         )}
                       </dt>
-                      <dd className="shrink-0 tabular-nums text-patina">
+                      <dd className="shrink-0 tabular-nums text-sage">
                         +{formatUSD(a.priceCents)}
                       </dd>
                     </div>
@@ -390,7 +399,7 @@ export default function Configurator({ product }: { product: Product }) {
                 <span className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
                   Quantity
                 </span>
-                <div className="flex items-center rounded-sm border border-rule">
+                <div className="flex items-center rounded-xl border border-rule">
                   <button
                     type="button"
                     aria-label="One fewer"
@@ -430,7 +439,7 @@ export default function Configurator({ product }: { product: Product }) {
               <button
                 onClick={addToCart}
                 disabled={blocked}
-                className="mt-5 w-full rounded-sm bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-brass-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
+                className="mt-5 w-full rounded-xl bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
               >
                 Add to cart
               </button>
@@ -444,7 +453,7 @@ export default function Configurator({ product }: { product: Product }) {
               {added && !blocked && (
                 <button
                   onClick={() => router.push('/cart')}
-                  className="mt-3 w-full rounded-sm border border-ink px-5 py-3 text-sm transition-colors hover:bg-ink hover:text-bench"
+                  className="mt-3 w-full rounded-xl border border-ink px-5 py-3 text-sm transition-colors hover:bg-ink hover:text-bench"
                 >
                   Added. Go to cart &rarr;
                 </button>

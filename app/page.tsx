@@ -40,7 +40,7 @@ export default function Home() {
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 sm:gap-10">
           {PRODUCTS.map((product) => (
             <Link key={product.slug} href={`/product/${product.slug}`} className="group block">
-              <article className="flex h-full flex-col overflow-hidden rounded-sm border border-rule bg-paper transition-colors hover:border-brass">
+              <article className="flex h-full flex-col overflow-hidden rounded-xl border border-rule bg-paper transition-colors hover:border-rose">
                 <Image
                   src={photo(product.image, 'sm')}
                   alt={`${product.name}, ${product.tagline.toLowerCase()}`}
@@ -61,7 +61,7 @@ export default function Home() {
                     <span className="font-spec text-sm tabular-nums">
                       {formatUSD(product.priceCents)}
                     </span>
-                    <span className="text-sm text-ink-soft transition-colors group-hover:text-brass">
+                    <span className="text-sm text-ink-soft transition-colors group-hover:text-rose">
                       Make one &rarr;
                     </span>
                   </div>
@@ -79,7 +79,7 @@ export default function Home() {
           <ol className="mt-10 grid gap-8 sm:grid-cols-3 sm:gap-10">
             {STEPS.map((step) => (
               <li key={step.n}>
-                <span className="font-spec text-[0.62rem] tracking-[0.22em] text-brass">
+                <span className="font-spec text-[0.62rem] tracking-[0.22em] text-rose">
                   {step.n}
                 </span>
                 <h3 className="mt-3 font-display text-lg">{step.title}</h3>

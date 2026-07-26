@@ -27,7 +27,7 @@ type Quote = {
  * quote it here first and pass the result into the session. The alternative,
  * embedded checkout, supports live recalculation but turns off Apple Pay and
  * Google Pay, which costs more in abandoned mobile carts than the rate
- * precision is worth on a $68 order.
+ * precision is worth on a $48 order.
  */
 export default function CartView() {
   const { lines, priced, setQty, removeLine, ready } = useCart();
@@ -98,7 +98,7 @@ export default function CartView() {
         </p>
         <Link
           href="/#pieces"
-          className="mt-8 inline-block rounded-sm bg-ink px-6 py-3.5 text-sm text-bench transition-colors hover:bg-brass-deep"
+          className="mt-8 inline-block rounded-xl bg-ink px-6 py-3.5 text-sm text-bench transition-colors hover:bg-rose-deep"
         >
           See the pieces
         </Link>
@@ -133,7 +133,7 @@ export default function CartView() {
                           {a.qty > 1 ? `${a.qty} x ` : ''}
                           {a.label}
                         </dt>
-                        <dd className={a.required ? 'text-brass' : 'text-ink-soft'}>
+                        <dd className={a.required ? 'text-rose' : 'text-ink-soft'}>
                           {a.value || '—'}
                         </dd>
                       </div>
@@ -144,7 +144,7 @@ export default function CartView() {
                   </dl>
 
                   <div className="mt-4 flex items-center gap-5">
-                    <div className="flex items-center rounded-sm border border-rule">
+                    <div className="flex items-center rounded-xl border border-rule">
                       <button
                         aria-label={`One fewer ${line.name}`}
                         onClick={() => raw && setQty(raw.key, line.qty - 1)}
@@ -177,7 +177,7 @@ export default function CartView() {
         </section>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-sm border border-ink bg-paper">
+          <div className="rounded-xl border border-ink bg-paper">
             <div className="border-b border-rule px-6 py-4">
               <h2 className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
                 Shipping
@@ -202,12 +202,12 @@ export default function CartView() {
                   inputMode="numeric"
                   placeholder="ZIP code"
                   autoComplete="postal-code"
-                  className="min-w-0 flex-1 rounded-sm border border-rule bg-bench px-3 py-2 font-spec text-sm tabular-nums outline-none placeholder:text-ink-faint focus:border-brass"
+                  className="min-w-0 flex-1 rounded-xl border border-rule bg-bench px-3 py-2 font-spec text-sm tabular-nums outline-none placeholder:text-ink-faint focus:border-rose"
                 />
                 <button
                   onClick={getQuote}
                   disabled={!zipValid || quoting}
-                  className="shrink-0 rounded-sm border border-ink px-4 py-2 text-sm transition-colors hover:bg-ink hover:text-bench disabled:cursor-not-allowed disabled:border-rule disabled:text-ink-faint disabled:hover:bg-transparent"
+                  className="shrink-0 rounded-xl border border-ink px-4 py-2 text-sm transition-colors hover:bg-ink hover:text-bench disabled:cursor-not-allowed disabled:border-rule disabled:text-ink-faint disabled:hover:bg-transparent"
                 >
                   {quoting ? 'Checking' : 'Quote'}
                 </button>
@@ -219,7 +219,7 @@ export default function CartView() {
                     <span className="text-ink-soft">{quote.service}</span>
                     <span className="tabular-nums">
                       {shipping?.free ? (
-                        <span className="text-patina">Free</span>
+                        <span className="text-sage">Free</span>
                       ) : (
                         formatUSD(quote.cents)
                       )}
@@ -227,7 +227,7 @@ export default function CartView() {
                   </div>
                   <p className="mt-1 text-xs text-ink-faint">{quote.estimate}</p>
                   {shipping?.free && (
-                    <p className="mt-1 text-xs text-patina">
+                    <p className="mt-1 text-xs text-sage">
                       Covered, this order is over {formatUSD(FREE_SHIPPING_THRESHOLD_CENTS ?? 0)}.
                     </p>
                   )}
@@ -260,7 +260,7 @@ export default function CartView() {
               <button
                 onClick={checkout}
                 disabled={!quote || checkingOut || priced.missingRequired.length > 0}
-                className="mt-5 w-full rounded-sm bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-brass-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
+                className="mt-5 w-full rounded-xl bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
               >
                 {checkingOut ? 'Opening checkout…' : 'Check out'}
               </button>

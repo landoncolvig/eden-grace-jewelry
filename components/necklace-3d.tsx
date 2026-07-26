@@ -1,135 +1,273 @@
 'use client';
 
 /**
- * The name necklace as an actual object.
+ * The name necklace as an actual object: a strung strand with a mother-of-pearl
+ * letter disc hanging off it for every character the buyer types.
  *
- * The flat version of this hero showed the buyer their word set in a script
- * face. This one shows them the piece: the same word extruded and bevelled
- * into 14k gold fill, hung off a chain of interlocking links, turning slowly
- * enough that the rim lights walk across the letterforms. What sells a name
- * necklace is the metal catching light on a filed edge, and that is the one
- * thing flat type cannot do.
+ * The flat version of this hero showed the word as type. This one shows the
+ * piece, because what the buyer is deciding is not whether their name looks
+ * good set in a face, it is whether three little discs of nacre spell it
+ * nicely across the front of a strand. Nacre is also the one material on the
+ * site that a photograph struggles with and a renderer does not: the colour
+ * shift across it moves when the piece moves, so it only reads as itself once
+ * it is turning.
  *
  * Client-only by construction. There is no server-side WebGL, so this module
  * must never be imported directly by a page. Go through components/piece-3d.
  */
 
 import * as THREE from 'three';
-import { Suspense, useEffect, useLayoutEffect, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { Text3D, useFont } from '@react-three/drei';
-import { BenchEnvironment, Chain, FitToViewport, GoldMaterial, useIdleTurn } from './jewelry-3d';
+import {
+  BenchEnvironment,
+  FitToViewport,
+  GoldMaterial,
+  NacreMaterial,
+  Strand,
+  catenary,
+  useIdleTurn,
+  usePalette,
+} from './jewelry-3d';
 
 /**
- * Pinyon Script, converted to three's typeface JSON by scripts/make-typeface.
- * Served from /public rather than bundled: it is 200 KB of outline data that
- * would otherwise sit inside a JS chunk the parser has to walk.
+ * The four strand colours the configurator offers, keyed by the exact strings
+ * in the catalog's `base` choices so the two cannot drift apart. Values come
+ * from the product swatches and the theme tokens rather than being picked by
+ * eye: pale blue and green are the swatches on the two products that use them,
+ * cream and black are the paper and ink tokens.
  */
-const FONT = '/fonts/pinyon-script.typeface.json';
+export const STRAND_COLORS: Record<string, string> = {
+  'Pale blue': '#7fa9c4',
+  Cream: '#fbfbf9',
+  'Black onyx': '#1b2a33',
+  'Green aventurine': '#4a7c74',
+};
 
-// Kick the fetch off as soon as this chunk lands so the font and the rest of
-// the scene are not two round trips in sequence.
-useFont.preload(FONT);
+export const DEFAULT_STRAND = 'Pale blue';
 
-// Design space. The scene is authored against this box and then fitted to
-// whatever the canvas turns out to be, so the numbers below never have to know
-// about breakpoints.
-const DESIGN_W = 5.2;
-const DESIGN_H = 2.7;
-const CLASP_Y = 0.9;
-const HANG_Y = 0.8;
+// Design space. The scene is authored against this and then fitted to whatever
+// the canvas turns out to be, so nothing below has to know about breakpoints.
+const DESIGN_H = 1.42;
+const MIN_DESIGN_W = 4.4;
+const STRAND_Y = 0.62;
+const SAG = 9;
 
-// How much room the word gets. The height cap is what stops a two-letter name
-// from rendering at billboard size, the width cap is what keeps a twelve-letter
-// one inside the frame.
-const WORD_W = 3.7;
-const WORD_H = 1.4;
-const WORD_MAX_SCALE = 1.3;
+const BEAD_R = 0.05;
+const DISC_R = 0.26;
+const DISC_DEPTH = 0.055;
+const DISC_GAP = 0.045;
+const RING_R = 0.062;
+
+/** The catalog caps the word at ten characters. */
+const MAX_LETTERS = 10;
+
+const TEXTURE_PX = 256;
+
+/**
+ * Each letter is drawn to a canvas and used as the face of its disc, rather
+ * than modelled as geometry.
+ *
+ * That is not a shortcut, it is what the object is. The letters on the real
+ * piece are stamped into flat nacre and filled dark; they have no relief to
+ * model. A texture also means the disc face can use the storefront's own
+ * display serif, which extruded text could not without shipping a second copy
+ * of the font as outline data.
+ */
+function drawLetter(char: string, family: string, face: string, ink: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = TEXTURE_PX;
+  canvas.height = TEXTURE_PX;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  ctx.fillStyle = face;
+  ctx.fillRect(0, 0, TEXTURE_PX, TEXTURE_PX);
+
+  ctx.fillStyle = ink;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `500 ${Math.round(TEXTURE_PX * 0.5)}px ${family}`;
+  // Optical rather than metric centring: cap-height glyphs sit high in the
+  // em box, so a mathematically centred letter reads as floating.
+  ctx.fillText(char, TEXTURE_PX / 2, TEXTURE_PX * 0.545);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  return texture;
+}
+
+/**
+ * Builds one texture per distinct character and hands back the per-letter list.
+ *
+ * Waits for the webfont before drawing. next/font loads Fraunces with
+ * `display: swap`, so drawing on first paint would bake the fallback serif into
+ * the texture permanently: unlike DOM text, a canvas does not repaint itself
+ * when the real face arrives.
+ */
+function useLetterTextures(word: string) {
+  const palette = usePalette();
+  const invalidate = useThree((state) => state.invalidate);
+  const [fontsReady, setFontsReady] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    document.fonts.ready.then(() => {
+      if (live) setFontsReady(true);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const textures = useMemo(() => {
+    const family =
+      getComputedStyle(document.documentElement).getPropertyValue('--font-fraunces').trim() ||
+      'Georgia, serif';
+
+    const cache = new Map<string, THREE.Texture | null>();
+    return Array.from(word.toUpperCase()).map((char) => {
+      if (!cache.has(char)) cache.set(char, drawLetter(char, family, palette.paper, palette.ink));
+      return cache.get(char) ?? null;
+    });
+    // fontsReady is a redraw trigger, not data. Once the real face lands every
+    // texture has to be rebuilt against it.
+  }, [word, palette, fontsReady]);
+
+  useEffect(() => {
+    invalidate();
+    // Canvas textures hold a GPU allocation each. Nothing else will free them
+    // when the buyer edits the word, and they edit it a character at a time.
+    return () => {
+      const seen = new Set<THREE.Texture>();
+      textures.forEach((texture) => {
+        if (texture && !seen.has(texture)) {
+          seen.add(texture);
+          texture.dispose();
+        }
+      });
+    };
+  }, [textures, invalidate]);
+
+  return textures;
+}
+
+/**
+ * One letter: a nacre disc in a gold-tone surround, hanging off its own jump
+ * ring. The ring is what fixes it to the strand, so the whole assembly pivots
+ * there, which is where a real one swings from.
+ */
+function Letter({
+  texture,
+  x,
+  animate,
+  phase,
+  opacity,
+}: {
+  texture: THREE.Texture | null;
+  x: number;
+  animate: boolean;
+  phase: number;
+  opacity: number;
+}) {
+  const pivot = useRef<THREE.Group>(null);
+  useIdleTurn(pivot, { enabled: animate, amplitude: 0.34, speed: 0.42, phase });
+
+  // The strand is a curve, so the discs toward the ends of a long word hang
+  // from a point slightly higher than the ones in the middle. Following it
+  // costs one cosh and is the difference between a row of charms and a row of
+  // stickers.
+  const attachY = catenary(x, SAG, STRAND_Y) - BEAD_R - RING_R;
+
+  return (
+    <group ref={pivot} position={[x, attachY, 0]}>
+      <mesh>
+        <torusGeometry args={[RING_R, 0.014, 8, 24]} />
+        <GoldMaterial opacity={opacity} />
+      </mesh>
+
+      <group position={[0, -RING_R - DISC_R + 0.03, 0]}>
+        {/* Body. Gold-tone, and only its rim and back are ever seen: the face
+            is covered by the nacre disc below. */}
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[DISC_R, DISC_R, DISC_DEPTH, 44]} />
+          <GoldMaterial opacity={opacity} />
+        </mesh>
+        {/* The nacre face, inset far enough to leave the gold showing as a
+            rim, with the letter mapped onto it. */}
+        <mesh position={[0, 0, DISC_DEPTH / 2 + 0.001]}>
+          <circleGeometry args={[DISC_R * 0.87, 44]} />
+          <NacreMaterial map={texture} opacity={opacity} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
 
 function Piece({
   word,
+  strand,
   muted,
   animate,
   onReady,
 }: {
   word: string;
+  strand: string;
   muted: boolean;
   animate: boolean;
   onReady?: () => void;
 }) {
-  const pivot = useRef<THREE.Group>(null);
-  const fit = useRef<THREE.Group>(null);
-  const mesh = useRef<THREE.Mesh>(null);
-  const invalidate = useThree((state) => state.invalidate);
+  const sway = useRef<THREE.Group>(null);
+  useIdleTurn(sway, { enabled: animate, amplitude: 0.1, speed: 0.24 });
 
-  useIdleTurn(pivot, { enabled: animate });
+  const letters = Array.from(word).slice(0, MAX_LETTERS);
+  const textures = useLetterTextures(letters.join(''));
 
-  // Size and hang the word off its own measurements rather than off character
-  // count. A script face varies enough between letters that counting them gets
-  // "Wm" and "iiii" badly wrong.
-  useLayoutEffect(() => {
-    const target = mesh.current;
-    const group = fit.current;
-    if (!target || !group) return;
+  const pitch = DISC_R * 2 + DISC_GAP;
+  const firstX = -((letters.length - 1) * pitch) / 2;
 
-    target.geometry.computeBoundingBox();
-    const box = target.geometry.boundingBox;
-    if (!box) return;
-
-    const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
-    const scale = Math.min(WORD_W / size.x, WORD_H / size.y, WORD_MAX_SCALE);
-
-    // Centre the glyph run on its own bounding box, then drop the group so the
-    // top edge of the word sits just under the jump ring. The pivot stays at
-    // the ring, which is where a pendant actually turns from.
-    target.position.set(-center.x, -center.y, -center.z);
-    group.scale.setScalar(scale);
-    group.position.y = -0.06 - (size.y * scale) / 2;
-
-    invalidate();
-  }, [word, invalidate]);
+  // A ten-character word is physically most of the front of a 16 inch strand,
+  // so the frame widens to hold it rather than the letters shrinking on the
+  // wire. The piece gets smaller on screen, which is what a photograph of the
+  // real thing would do.
+  const designWidth = Math.max(MIN_DESIGN_W, letters.length * pitch + 2.4);
+  const opacity = muted ? 0.42 : 1;
 
   useEffect(() => {
     onReady?.();
   }, [onReady]);
 
   return (
-    <FitToViewport width={DESIGN_W} height={DESIGN_H}>
-      <Chain y={CLASP_Y} halfWidth={5} sag={9} />
+    <FitToViewport width={designWidth} height={DESIGN_H}>
+      {/* The piece hangs in the top half of its own design box: the strand is
+          up at STRAND_Y and the discs come down off it. Lifting the whole
+          thing by the midpoint of that span is what centres it in the frame. */}
+      <group ref={sway} position={[0, -0.47, 0]}>
+        <Strand
+          y={STRAND_Y}
+          sag={SAG}
+          // Just past the edge of the frame. Any further and the strand is
+          // paying for beads nobody sees.
+          halfWidth={designWidth * 0.85}
+          radius={BEAD_R}
+          color={STRAND_COLORS[strand] ?? STRAND_COLORS[DEFAULT_STRAND]}
+          opacity={opacity}
+        />
 
-      {/* Clasp ring at the low point of the chain, and the jump ring through
-          it that the word hangs from. The jump ring turns with the piece. */}
-      <mesh position={[0, CLASP_Y, 0]}>
-        <torusGeometry args={[0.085, 0.018, 10, 28]} />
-        <GoldMaterial roughness={0.2} />
-      </mesh>
-
-      <group ref={pivot} position={[0, HANG_Y, 0]}>
-        <mesh rotation={[0, Math.PI / 2, 0]}>
-          <torusGeometry args={[0.072, 0.016, 10, 28]} />
-          <GoldMaterial roughness={0.2} />
-        </mesh>
-
-        <group ref={fit}>
-          <Text3D
-            ref={mesh}
-            font={FONT}
-            size={1}
-            height={0.2}
-            curveSegments={4}
-            bevelEnabled
-            bevelThickness={0.022}
-            bevelSize={0.016}
-            bevelOffset={0}
-            bevelSegments={2}
-          >
-            {word}
-            {/* An unset name is shown as a ghost of the piece, the same way the
-                flat version dims it, so a placeholder never reads as an order. */}
-            <GoldMaterial opacity={muted ? 0.4 : 1} />
-          </Text3D>
-        </group>
+        {letters.map((char, i) => (
+          <Letter
+            key={`${char}-${i}`}
+            texture={textures[i] ?? null}
+            x={firstX + i * pitch}
+            animate={animate}
+            // A sixth of a turn between neighbours, so the light walks along
+            // the row instead of flashing across all of it at once.
+            phase={i * 0.55}
+            opacity={opacity}
+          />
+        ))}
       </group>
     </FitToViewport>
   );
@@ -137,11 +275,14 @@ function Piece({
 
 export default function Necklace3D({
   word,
+  strand = DEFAULT_STRAND,
   muted,
   animate,
   onReady,
 }: {
   word: string;
+  /** One of the catalog's `base` choices. Anything else falls back to blue. */
+  strand?: string;
   muted: boolean;
   animate: boolean;
   onReady?: () => void;
@@ -151,17 +292,17 @@ export default function Necklace3D({
       // Demand rendering when the idle turn is off: with nothing moving, a
       // continuous 60fps loop is pure battery for an identical picture.
       frameloop={animate ? 'always' : 'demand'}
-      // Retina is worth paying for on a bevelled edge. Anything past 2x is not.
+      // Retina is worth paying for on a stamped letter. Past 2x it is not.
       dpr={[1, 2]}
       camera={{ position: [0, 0, 7], fov: 26 }}
       gl={{ antialias: true, alpha: true }}
       style={{ background: 'transparent' }}
     >
       <BenchEnvironment />
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[3, 5, 6]} intensity={1.1} />
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[3, 5, 6]} intensity={1.2} />
       <Suspense fallback={null}>
-        <Piece word={word} muted={muted} animate={animate} onReady={onReady} />
+        <Piece word={word} strand={strand} muted={muted} animate={animate} onReady={onReady} />
       </Suspense>
     </Canvas>
   );

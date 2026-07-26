@@ -8,133 +8,161 @@
  * the canvas has.
  *
  * They also carry the accessible name. The canvas is aria-hidden, so this is
- * the only description of the piece a screen reader ever reads.
+ * the only description of the piece a screen reader ever gets.
  */
 
+/** The strand hangs in the same curve here as it does in 3D, plotted rather
+ *  than eyeballed, so the flat piece and the rendered one agree on the shape.
+ *  y = sag * (cosh(x / sag) - 1), in viewBox units. */
+const VIEW_W = 640;
+const VIEW_H = 260;
+const SAG = 620;
+const STRAND_Y = 96;
+
+/**
+ * Every coordinate below goes through this.
+ *
+ * `Math.cosh` is not required to be correctly rounded, and Node and V8 in the
+ * browser disagree in the last two digits. React serialises the number
+ * verbatim, so the prerendered HTML said cy="189.19176853256215" and hydration
+ * computed 189.191768532562, and React threw out the whole subtree as a
+ * mismatch on every load. Two decimal places is far below a pixel at this
+ * viewBox and identical on both sides.
+ */
+function round(n: number) {
+  return Math.round(n * 100) / 100;
+}
+
+function strandY(x: number) {
+  const dx = x - VIEW_W / 2;
+  return round(STRAND_Y + SAG * (Math.cosh(dx / SAG) - 1));
+}
+
+/** Bead centres from edge to edge, close enough to touch. */
+function beads(step: number) {
+  const out: Array<{ x: number; y: number }> = [];
+  for (let x = -step; x <= VIEW_W + step; x += step) out.push({ x, y: strandY(x) });
+  return out;
+}
+
 type NecklaceSvgProps = {
-  /** What the piece says. Already resolved, including the placeholder word. */
+  /** What the piece spells. Already resolved, including the placeholder word. */
   word: string;
   /** True when `word` is the stand-in rather than something the buyer typed. */
   muted: boolean;
+  /** Bead colour, matching the strand colour the configurator offers. */
+  color: string;
 };
 
-export function NecklaceSvg({ word, muted }: NecklaceSvgProps) {
-  // The script face runs wider per character than a text face, so long names
-  // have to be pulled in or they overrun the chain.
-  const fontSize = word.length <= 5 ? 92 : word.length <= 8 ? 74 : 58;
+export function NecklaceSvg({ word, muted, color }: NecklaceSvgProps) {
+  const letters = Array.from(word.toUpperCase()).slice(0, 10);
+
+  // Long words get smaller discs rather than a row that runs off the edge.
+  const radius = round(Math.min(26, (VIEW_W * 0.62) / (letters.length * 2.2)));
+  const pitch = round(radius * 2.18);
+  const firstX = round(VIEW_W / 2 - ((letters.length - 1) * pitch) / 2);
 
   return (
     <svg
-      viewBox="0 0 640 260"
+      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
       preserveAspectRatio="xMidYMid meet"
       className="h-full w-full"
       role="img"
-      aria-label={`A necklace reading ${word}`}
+      aria-label={`A beaded necklace with mother-of-pearl letter discs spelling ${word}`}
+      opacity={muted ? 0.42 : 1}
+      style={{ transition: 'opacity 220ms ease' }}
     >
       <defs>
-        <linearGradient id="piece-svg-chain" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#8a6d3f" />
-          <stop offset="50%" stopColor="#d8b982" />
-          <stop offset="100%" stopColor="#8a6d3f" />
-        </linearGradient>
+        <radialGradient id="piece-svg-bead" cx="35%" cy="30%" r="72%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.75" />
+          <stop offset="55%" stopColor={color} />
+          <stop offset="100%" stopColor={color} stopOpacity="0.72" />
+        </radialGradient>
+        <radialGradient id="piece-svg-nacre" cx="36%" cy="30%" r="76%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="70%" stopColor="#fbfbf9" />
+          <stop offset="100%" stopColor="#e6e3dc" />
+        </radialGradient>
       </defs>
 
-      {/* Chain: a catenary-ish curve running off both edges, so the piece reads
-          as being worn rather than laid flat. */}
-      <path
-        d="M -10 18 C 120 18, 150 132, 320 132 C 490 132, 520 18, 650 18"
-        fill="none"
-        stroke="url(#piece-svg-chain)"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      {/* Clasp ring at the low point where the pendant hangs. */}
-      <circle
-        cx="320"
-        cy="132"
-        r="5.5"
-        fill="none"
-        stroke="url(#piece-svg-chain)"
-        strokeWidth="2.5"
-      />
+      {/* The strand, drawn bead by bead rather than as a stroked path: a smooth
+          line reads as a chain, and this shop does not sell chain. */}
+      {beads(9.4).map((bead, i) => (
+        <circle key={i} cx={bead.x} cy={bead.y} r="4.7" fill="url(#piece-svg-bead)" />
+      ))}
 
-      <text
-        x="320"
-        y="212"
-        textAnchor="middle"
-        className="font-script"
-        fontSize={fontSize}
-        fill="#b08d57"
-        opacity={muted ? 0.34 : 1}
-        style={{ transition: 'opacity 220ms ease, font-size 220ms ease' }}
-      >
-        {word}
-      </text>
+      {letters.map((char, i) => {
+        const x = round(firstX + i * pitch);
+        const attachY = round(strandY(x) + 5);
+        const cy = round(attachY + 9 + radius);
+        return (
+          <g key={`${char}-${i}`}>
+            {/* Jump ring. */}
+            <circle cx={x} cy={round(attachY + 5)} r="5" fill="none" stroke="#b08d57" strokeWidth="2" />
+            {/* Gold-tone body with a nacre face inset, leaving a rim. */}
+            <circle cx={x} cy={cy} r={radius} fill="#b08d57" />
+            <circle cx={x} cy={cy} r={round(radius * 0.87)} fill="url(#piece-svg-nacre)" />
+            <text
+              x={x}
+              y={cy}
+              textAnchor="middle"
+              dominantBaseline="central"
+              className="font-display"
+              fontSize={round(radius * 1.05)}
+              fill="#1b2a33"
+            >
+              {char}
+            </text>
+          </g>
+        );
+      })}
     </svg>
   );
 }
 
-type PendantSvgProps = {
-  /** How many stones sit on the disc. The disc widens to hold them. */
-  stones: number;
+type StrandSvgProps = {
+  /** Bead colour. Pearls pass their own near-white. */
+  color: string;
+  /** Draws the pearl and gold accent beads the add-on adds. */
+  accents?: boolean;
 };
 
-export function PendantSvg({ stones }: PendantSvgProps) {
-  const count = Math.max(1, Math.min(stones, 9));
-  // Same rule the 3D disc uses: the disc grows with the count so a row of
-  // stones reads as a row rather than a cluster.
-  const radius = 56 + count * 7;
-  const spacing = 20;
-  const firstX = 320 - ((count - 1) * spacing) / 2;
-
+export function StrandSvg({ color, accents = false }: StrandSvgProps) {
   return (
     <svg
-      viewBox="0 0 640 260"
+      viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
       preserveAspectRatio="xMidYMid meet"
       className="h-full w-full"
       role="img"
-      aria-label={`A brushed disc pendant set with ${count} ${count === 1 ? 'stone' : 'stones'}`}
+      aria-label={accents ? 'A beaded strand with pearl and gold accents' : 'A beaded strand'}
     >
       <defs>
-        <linearGradient id="piece-svg-silver" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fbfbf9" />
-          <stop offset="55%" stopColor="#d3d6d0" />
-          <stop offset="100%" stopColor="#8b969d" />
-        </linearGradient>
+        <radialGradient id="strand-svg-bead" cx="35%" cy="30%" r="72%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.75" />
+          <stop offset="55%" stopColor={color} />
+          <stop offset="100%" stopColor={color} stopOpacity="0.72" />
+        </radialGradient>
       </defs>
 
-      <path
-        d="M -10 8 C 130 8, 160 96, 320 96 C 480 96, 510 8, 650 8"
-        fill="none"
-        stroke="url(#piece-svg-silver)"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      {/* Bail, then the disc hanging off it. */}
-      <circle cx="320" cy="104" r="7" fill="none" stroke="url(#piece-svg-silver)" strokeWidth="3" />
-
-      <circle
-        cx="320"
-        cy={116 + radius}
-        r={radius}
-        fill="url(#piece-svg-silver)"
-        stroke="#8b969d"
-        strokeWidth="1.5"
-      />
-
-      {Array.from({ length: count }, (_, i) => (
-        <g key={i}>
-          <circle
-            cx={firstX + i * spacing}
-            cy={116 + radius}
-            r="7.5"
-            fill="none"
-            stroke="#8b969d"
-            strokeWidth="2"
-          />
-          <circle cx={firstX + i * spacing} cy={116 + radius} r="5" fill="#4a7c74" />
-        </g>
+      {beads(10.6).map((bead, i) => (
+        <circle key={i} cx={bead.x} cy={round(bead.y + 30)} r="5.3" fill="url(#strand-svg-bead)" />
       ))}
+
+      {accents
+        ? [-1, -0.62, -0.3, 0.3, 0.62, 1].map((offset, i) => {
+            const x = round(VIEW_W / 2 + offset * 140);
+            return (
+              <circle
+                key={offset}
+                cx={x}
+                cy={round(strandY(x) + 30)}
+                r={i % 2 === 1 ? 5.6 : 6.6}
+                fill={i % 2 === 1 ? '#b08d57' : '#fbfbf9'}
+                stroke={i % 2 === 1 ? 'none' : '#e6e3dc'}
+              />
+            );
+          })
+        : null}
     </svg>
   );
 }

@@ -29,29 +29,29 @@ export default function SuccessView() {
         your inbox, and you&rsquo;ll get a tracking number the day it ships.
       </p>
 
-      <div className="mx-auto mt-10 max-w-sm rounded-sm border border-rule bg-paper p-6 text-left">
+      <div className="mx-auto mt-10 max-w-sm rounded-xl border border-rule bg-paper p-6 text-left">
         <h2 className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
           What happens next
         </h2>
         <ol className="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
           <li>
-            <span className="font-spec text-brass">01</span> &nbsp;She cuts and finishes
-            the piece by hand.
+            <span className="font-spec text-rose">01</span> &nbsp;She lays out the
+            beads and strings the piece by hand.
           </li>
           <li>
-            <span className="font-spec text-brass">02</span> &nbsp;It ships USPS Ground
+            <span className="font-spec text-rose">02</span> &nbsp;It ships USPS Ground
             Advantage with tracking.
           </li>
           <li>
-            <span className="font-spec text-brass">03</span> &nbsp;Reply to your receipt
-            if anything needs changing before cutting starts.
+            <span className="font-spec text-rose">03</span> &nbsp;Reply to your receipt
+            if anything needs changing before she starts.
           </li>
         </ol>
       </div>
 
       <Link
         href="/"
-        className="mt-10 inline-block rounded-sm border border-ink px-6 py-3 text-sm transition-colors hover:bg-ink hover:text-bench"
+        className="mt-10 inline-block rounded-xl border border-ink px-6 py-3 text-sm transition-colors hover:bg-ink hover:text-bench"
       >
         Back to the shop
       </Link>

@@ -177,8 +177,12 @@ const PRODUCTS = [
     material: 'Mother-of-pearl letters on a glass or gemstone strand',
     leadTime: 'Ships in 7 to 10 days',
     swatch: '#7FA9C4',
-    image: 'letter-necklace',
-    gallery: ['amazonite', 'onyx-pearl-1'],
+    // The one photograph of a finished letter necklace showed a real person's
+    // initials, so it is not in the catalog. These show the strand and clasp
+    // this piece is built on; a stand-in shot spelling a non-personal word is
+    // the outstanding asset here.
+    image: 'amazonite',
+    gallery: ['onyx-pearl-1', 'pearl-cream'],
     addOns: [
       {
         // What the necklace says is the order, not an extra. It costs nothing
@@ -190,7 +194,7 @@ const PRODUCTS = [
         priceCents: 0,
         weightOz: 0,
         required: true,
-        input: { placeholder: 'MAV', maxLength: 10 },
+        input: { placeholder: 'ROSE', maxLength: 10 },
       },
       {
         id: 'base',

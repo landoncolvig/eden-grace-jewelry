@@ -15,4 +15,4 @@
  */
 
 export { default as Necklace3D } from './necklace-3d';
-export { default as Pendant3D } from './pendant-3d';
+export { default as Strand3D } from './strand-3d';

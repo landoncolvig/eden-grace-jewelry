@@ -11,7 +11,7 @@ export default function SiteHeader() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 py-4 sm:px-8">
         <Link href="/" className="group flex items-baseline gap-2.5">
           <span className="font-display text-xl tracking-tight sm:text-2xl">Jenna&rsquo;s</span>
-          <span className="font-spec text-[0.6rem] uppercase tracking-[0.22em] text-ink-faint transition-colors group-hover:text-brass">
+          <span className="font-spec text-[0.6rem] uppercase tracking-[0.22em] text-ink-faint transition-colors group-hover:text-rose">
             Jewelry
           </span>
         </Link>
@@ -25,13 +25,13 @@ export default function SiteHeader() {
           </Link>
           <Link
             href="/cart"
-            className="relative rounded-sm border border-ink px-3.5 py-1.5 text-sm transition-colors hover:bg-ink hover:text-bench"
+            className="relative rounded-xl border border-ink px-3.5 py-1.5 text-sm transition-colors hover:bg-ink hover:text-bench"
           >
             Cart
             {/* Suppressed until localStorage is read, otherwise the badge
                 renders 0 on the server and pops to the real count on hydrate. */}
             {ready && count > 0 && (
-              <span className="ml-1.5 font-spec tabular-nums text-brass">{count}</span>
+              <span className="ml-1.5 font-spec tabular-nums text-rose">{count}</span>
             )}
           </Link>
         </nav>

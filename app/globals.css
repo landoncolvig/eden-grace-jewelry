@@ -1,33 +1,58 @@
 @import "tailwindcss";
 
 /*
-  Jeweler's bench, not a jewelry ad.
-  The palette comes from the workbench rather than the display case: a cool
-  grey polishing cloth, oxidized silver, raw brass, and the verdigris that
-  turns up on copper alloys. Deliberately not the warm-cream-and-terracotta
-  every jewelry site reaches for, which would bury the actual metal tones.
+  Warm cream and dusty rose.
 
-  The storefront commits to one look. No dark-mode variant: product photos and
-  metal colors have to read consistently, and a shop that inverts itself based
-  on OS settings shows the customer two different pieces of jewelry.
+  The palette is built around what the pieces actually are: small, soft,
+  handmade, usually a gift. A cool grey ground made them look like specimens.
+  A warm cream ground lets the stones supply the colour and makes the shop feel
+  like someone's table rather than a case.
+
+  Sage is not decoration: it is pulled from the green aventurine she strings, so
+  the site's second colour is a colour she actually sells. Rose carries the
+  interactive states. Brass is reserved for the gold-tone findings.
+
+  Deliberately not the cream-plus-terracotta that every handmade shop defaults
+  to. The ground is peachy rather than beige, the text is cocoa rather than
+  black, and the accent is a muted rose that stays adult next to a $58 pearl
+  strand instead of tipping into candy.
+
+  Every value below was solved for contrast against the cream ground rather
+  than picked by eye, because the first pass at this palette looked right and
+  failed six ways. Measured on #fdf7f2: ink 10.0, ink-soft 5.0, ink-faint 4.5,
+  rose 4.5, flag 5.6 (all clear 4.5 for text); sage 3.0 and brass 3.0 (clear
+  3.0 for non-text UI). rose-deep is 6.7, kept well clear of rose so a hover
+  reads as a state change rather than a rendering artefact. Darkening any of
+  these is safe; lightening them is not.
+
+  --color-bench must stay in sync with BENCH in the photo pipeline
+  (scratchpad/process_rembg.py). The product cutouts are composited onto this
+  exact value, which is why they read as sitting on the page. Change one
+  without the other and every photo becomes a coloured box.
 */
 
 @theme {
-  --color-bench: #edeeea; /* page ground, cool grey */
-  --color-paper: #fbfbf9; /* cards, raised surfaces */
-  --color-ink: #1b2a33; /* text and dark surfaces, oxidized silver */
-  --color-ink-soft: #56646d; /* secondary text */
-  --color-ink-faint: #8b969d; /* captions, disabled */
-  --color-brass: #b08d57; /* metal accent: price, active, focus */
-  --color-brass-deep: #8a6d3f; /* brass on hover */
-  --color-patina: #4a7c74; /* verdigris: added/included states */
-  --color-rule: #d3d6d0; /* hairlines */
-  --color-flag: #a4442f; /* errors only */
+  --color-bench: #fdf7f2; /* page ground, warm cream */
+  --color-paper: #ffffff; /* cards, raised surfaces */
+  --color-ink: #4a3b38; /* text, warm cocoa rather than cold near-black */
+  --color-ink-soft: #7a6862; /* secondary text */
+  --color-ink-faint: #846e64; /* captions, disabled */
+  --color-rose: #b55557; /* interactive: prices, active, focus */
+  --color-rose-deep: #8f3f42; /* rose on hover */
+  --color-sage: #729981; /* included/added states, from her aventurine */
+  --color-brass: #ba863f; /* the gold-tone findings */
+  --color-rule: #dbc2b1; /* hairlines, warm */
+  --color-flag: #a8443c; /* errors only */
 
   --font-display: var(--font-fraunces);
   --font-body: var(--font-inter);
   --font-script: var(--font-pinyon);
   --font-mono: var(--font-plex-mono);
+
+  /* Softened geometry. Most of the friendliness comes from here rather than
+     from colour: the same palette on square corners still reads editorial. */
+  --radius-card: 16px;
+  --radius-control: 12px;
 }
 
 :root {
@@ -46,18 +71,18 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Fraunces ships variable optical-size, softness, and wonk axes. Dialing in
-   a little wonk gives the display face the slightly irregular character of
-   hand-cut letterforms, which is literally what the product is. */
+/* Fraunces ships variable optical-size, softness, and wonk axes. Pushing SOFT
+   up and keeping a little WONK gives the display face rounded terminals and a
+   slight irregularity, which is where the warmth in the headings comes from. */
 .font-display {
   font-family: var(--font-display), Georgia, serif;
-  font-variation-settings: "SOFT" 20, "WONK" 1;
-  letter-spacing: -0.015em;
+  font-variation-settings: "SOFT" 60, "WONK" 1;
+  letter-spacing: -0.012em;
 }
 
-/* Used in exactly one place: rendering the buyer's own name as the piece.
-   Restraint is the point. If this face shows up in headings it stops reading
-   as the product and starts reading as decoration. */
+/* Used in exactly one place: rendering the buyer's own word. Restraint is the
+   point. Once this face shows up in headings it stops reading as the personal
+   thing and starts reading as decoration. */
 .font-script {
   font-family: var(--font-script), cursive;
 }
@@ -73,18 +98,12 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* One focus treatment for the whole site. Brass, thick enough to see against
-   both the bench ground and the ink surfaces. */
+/* One focus treatment for the whole site, in rose so it is visible against
+   both the cream ground and the cocoa surfaces. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-brass);
+  outline: 2px solid var(--color-rose);
   outline-offset: 2px;
-  border-radius: 2px;
-}
-
-/* The hairline that separates spec rows. Drawn as a border rather than an hr
-   so it can sit inside grid cells without disturbing the row box. */
-.rule {
-  border-color: var(--color-rule);
+  border-radius: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * The parts both 3D pieces share: the room they are lit in, the two metals,
- * the fit-to-viewport rule, and the idle motion.
+ * The parts both 3D pieces share: the room they are lit in, the materials, the
+ * strand itself, the fit-to-viewport rule, and the idle motion.
  *
  * Two constraints shape all of it.
  *
@@ -14,9 +14,9 @@
  * render at mount and nothing after.
  *
  * The palette is the storefront's, read off the CSS custom properties that
- * globals.css already defines. A hardcoded gold here would drift the moment
- * someone retunes the brass token, and the whole point of the piece is that it
- * is the same metal the prices and the focus rings are drawn in.
+ * globals.css already defines. Hardcoding the gold here would drift the moment
+ * someone retunes the brass token, and the findings on the piece should be the
+ * same metal the prices and the focus rings are drawn in.
  */
 
 import * as THREE from 'three';
@@ -38,13 +38,16 @@ function token(name: string, fallback: string) {
 export function usePalette() {
   return useMemo(
     () => ({
-      brass: token('--color-brass', '#b08d57'),
-      brassDeep: token('--color-brass-deep', '#8a6d3f'),
-      ink: token('--color-ink', '#1b2a33'),
-      inkFaint: token('--color-ink-faint', '#8b969d'),
-      bench: token('--color-bench', '#edeeea'),
-      paper: token('--color-paper', '#fbfbf9'),
-      patina: token('--color-patina', '#4a7c74'),
+      // Fallbacks must track globals.css. When a token is renamed the
+      // fallback is what silently ships, so a stale one here reinstates the
+      // old palette inside the canvas while the rest of the page moves on.
+      brass: token('--color-brass', '#ba863f'),
+      brassDeep: token('--color-rose-deep', '#8f3f42'),
+      ink: token('--color-ink', '#4a3b38'),
+      inkFaint: token('--color-ink-faint', '#846e64'),
+      bench: token('--color-bench', '#fdf7f2'),
+      paper: token('--color-paper', '#ffffff'),
+      patina: token('--color-sage', '#729981'),
     }),
     []
   );
@@ -53,17 +56,15 @@ export function usePalette() {
 /**
  * A jeweler's bench rather than a showroom.
  *
- * The thing to understand about a metalness-1 surface is that it has no colour
- * of its own to fall back on: every pixel of it is a mirror, so the picture is
- * entirely a picture of the room. A face pointed at the camera reflects
- * whatever is behind the camera, which means the panels below are not lighting
- * the piece so much as being the piece. Skip the front panels and the flat of
- * every letter reflects the dark surround and the word reads as cast iron.
+ * Every material on these pieces is glossy, and a gloss is a mirror: what you
+ * see on a bead is a picture of the room, not a picture of the bead. The two
+ * panels sitting where the viewer stands are doing most of the work. Take them
+ * out and every bead reflects the dark surround and the strand goes to slate.
  *
- * So: a broad daylight lamp overhead, two unequal panels filling the space the
- * viewer is standing in, warm strips either side for the edge highlights that
- * make a filed edge legible, and an ink surround behind it all. The dark is
- * load-bearing too. Metal with nothing dark to reflect reads as plastic.
+ * So: a broad daylight lamp overhead, two unequal panels filling the near side,
+ * warm strips either side to put an edge on the gold findings, and an ink
+ * surround behind it all. The dark is load-bearing too. A gloss with nothing
+ * dark to reflect has no shape.
  *
  * `frames={1}` bakes the cube map once at mount. Nothing in here moves.
  */
@@ -72,7 +73,7 @@ export function BenchEnvironment() {
 
   return (
     <Environment resolution={256} frames={1}>
-      {/* The room itself. Without this the surround is black and the metal
+      {/* The room itself. Without this the surround is black and everything
           goes muddy in the shadows. */}
       <mesh scale={60}>
         <sphereGeometry args={[1, 16, 12]} />
@@ -87,7 +88,7 @@ export function BenchEnvironment() {
         position={[0, 5, 2.5]}
         scale={[10, 5, 1]}
       />
-      {/* The near side of the room, which is what the faces of the letters are
+      {/* The near side of the room, which is what the front of every bead is
           actually showing. Two panels rather than one, at different sizes and
           brightnesses, so the reflection has somewhere to travel as the piece
           turns instead of sitting there evenly lit. */}
@@ -113,8 +114,7 @@ export function BenchEnvironment() {
         position={[0, -4, 2]}
         scale={[8, 4, 1]}
       />
-      {/* Warm rims. These are what travel across the letterforms as the piece
-          turns, so they are the whole reason the rotation is worth having. */}
+      {/* Warm rims, for the edge highlights on the findings. */}
       <Lightformer
         form="rect"
         intensity={3.2}
@@ -129,26 +129,26 @@ export function BenchEnvironment() {
         position={[5, 0, 1]}
         scale={[2, 6, 1]}
       />
-      {/* A small hot spot dead front, for the specular catch on the bevels. */}
+      {/* A small hot spot dead front. This is the pinpoint catchlight that sits
+          on the top left of every bead and does most of the work of saying the
+          beads are round and polished. */}
       <Lightformer
         form="circle"
-        intensity={3.4}
+        intensity={3.6}
         color={palette.paper}
-        position={[1.2, 2.4, 6]}
-        scale={2.2}
+        position={[-1.6, 2.4, 6]}
+        scale={2}
       />
     </Environment>
   );
 }
 
 /**
- * 14k gold fill. metalness 1 and a low roughness means effectively all of its
- * colour comes from the environment above; `envMapIntensity` is the exposure
- * dial on that. The clearcoat is the polish, and it is what separates this
- * from raw cast metal.
+ * Gold-tone findings: the jump rings the letters hang from, and the accent
+ * rounds. The only actual metal on the piece.
  */
 export function GoldMaterial({
-  roughness = 0.15,
+  roughness = 0.18,
   opacity = 1,
 }: {
   roughness?: number;
@@ -166,62 +166,77 @@ export function GoldMaterial({
       envMapIntensity={1.4}
       transparent={faded}
       opacity={opacity}
-      // Script letterforms overlap constantly. Writing depth while translucent
-      // makes the overlaps fight each other and the word flickers as it turns;
-      // not writing it renders the whole run as one even ghost.
       depthWrite={!faded}
     />
   );
 }
 
 /**
- * Sterling with a hand-brushed face. Rougher than the gold, and anisotropic,
- * so the highlight smears in one direction the way a brushed surface does
- * instead of pooling into a point.
+ * Polished stone or glass. Not metal: a bead has a body colour of its own plus
+ * a hard clear surface over it, which is what the clearcoat is. Metalness here
+ * would delete the colour and leave a chrome ball.
  *
- * Drawn off the faint-ink token rather than the near-white bench one. Silver
- * is physically almost a perfect mirror, and a near-white mirror in a room
- * this bright comes out as a white disc on a light page: no edge, no piece.
- * Taking the base down a step buys back the contrast that reads as metal.
+ * Left white by default because the strand colours the beads per instance.
  */
-export function SilverMaterial({
-  roughness = 0.34,
-  anisotropy = 0.8,
+export function BeadMaterial({
+  color = '#ffffff',
+  opacity = 1,
 }: {
-  roughness?: number;
-  anisotropy?: number;
+  color?: string;
+  opacity?: number;
 }) {
-  const palette = usePalette();
+  const faded = opacity < 1;
   return (
     <meshPhysicalMaterial
-      color={palette.inkFaint}
-      metalness={1}
-      roughness={roughness}
-      anisotropy={anisotropy}
-      anisotropyRotation={Math.PI / 2}
-      envMapIntensity={1.35}
+      color={color}
+      metalness={0}
+      roughness={0.16}
+      clearcoat={1}
+      clearcoatRoughness={0.06}
+      ior={1.55}
+      envMapIntensity={1.1}
+      transparent={faded}
+      opacity={opacity}
+      depthWrite={!faded}
     />
   );
 }
 
 /**
- * A faceted stone. Not transmissive: real refraction needs a second render
- * pass per frame, which is a poor trade on a phone for a 3mm object. Flat
- * shading on a low-poly solid plus a hard clearcoat gets the same read.
+ * Nacre: mother of pearl, and freshwater pearl, which are the same material.
+ *
+ * The iridescence layer is the whole point. Nacre is stacked aragonite
+ * platelets a few hundred nanometres thick, and the colour shift across a
+ * pearl is thin-film interference in those layers, not pigment. three models
+ * exactly that, so the thickness range below is doing physics rather than
+ * faking a rainbow gradient. Without it a pearl renders as a white ball.
  */
-export function StoneMaterial() {
+export function NacreMaterial({
+  color,
+  map,
+  opacity = 1,
+}: {
+  color?: string;
+  map?: THREE.Texture | null;
+  opacity?: number;
+}) {
   const palette = usePalette();
+  const faded = opacity < 1;
   return (
     <meshPhysicalMaterial
-      color={palette.patina}
+      color={color ?? palette.paper}
+      map={map ?? null}
       metalness={0}
-      roughness={0.04}
+      roughness={0.13}
       clearcoat={1}
-      clearcoatRoughness={0}
-      ior={2.4}
-      reflectivity={1}
-      envMapIntensity={2.2}
-      flatShading
+      clearcoatRoughness={0.04}
+      iridescence={0.6}
+      iridescenceIOR={1.6}
+      iridescenceThicknessRange={[120, 420]}
+      envMapIntensity={1.25}
+      transparent={faded}
+      opacity={opacity}
+      depthWrite={!faded}
     />
   );
 }
@@ -238,7 +253,7 @@ export function StoneMaterial() {
 export function FitToViewport({
   width,
   height,
-  margin = 0.92,
+  margin = 0.94,
   children,
 }: {
   width: number;
@@ -252,111 +267,158 @@ export function FitToViewport({
 }
 
 /**
- * The idle. A piece on a chain does not spin, it turns a little way and comes
- * back, which is also the only motion that keeps the letterforms legible the
- * whole time. Two sine waves at unrelated speeds so the turn never lands in
- * the same place twice.
+ * The idle. A necklace lying on a surface does not spin, it settles and turns
+ * a little way back and forth, which is also the only motion that keeps a
+ * stamped letter readable the whole time. Two sines at unrelated speeds so the
+ * turn never lands in the same place twice, and a phase offset so a row of
+ * letters catches the light one after another rather than in lockstep.
  *
  * When motion is off this still applies a fixed three-quarter angle: the point
  * of reduced motion is to stop the movement, not to flatten the object back
  * into the 2D version the buyer was already shown.
  */
-const RESTING_ANGLE = 0.24;
+const RESTING_ANGLE = 0.2;
 
 export function useIdleTurn<T extends THREE.Object3D>(
   ref: RefObject<T | null>,
-  { enabled, amplitude = 0.32, speed = 0.38 }: { enabled: boolean; amplitude?: number; speed?: number }
+  {
+    enabled,
+    amplitude = 0.3,
+    speed = 0.38,
+    phase = 0,
+  }: { enabled: boolean; amplitude?: number; speed?: number; phase?: number }
 ) {
   useLayoutEffect(() => {
     if (!ref.current) return;
-    if (!enabled) {
-      ref.current.rotation.set(0, RESTING_ANGLE, 0);
-    }
+    if (!enabled) ref.current.rotation.set(0, RESTING_ANGLE, 0);
   }, [ref, enabled]);
 
   useFrame((state) => {
     if (!enabled || !ref.current) return;
     const t = state.clock.elapsedTime;
-    ref.current.rotation.y = Math.sin(t * speed) * amplitude;
-    ref.current.rotation.x = Math.sin(t * speed * 0.61) * amplitude * 0.08;
+    ref.current.rotation.y = Math.sin(t * speed + phase) * amplitude;
+    ref.current.rotation.x = Math.sin(t * speed * 0.61 + phase) * amplitude * 0.07;
   });
 }
 
 /**
- * A run of interlocking links following a catenary, which is the curve a chain
- * actually hangs in. Built once into an instanced mesh: 100-odd links is one
- * draw call this way and 100 the obvious way.
- *
- * Every other link is rolled 90 degrees about the direction of travel, which
- * is the whole visual difference between a chain and a string of rings.
+ * Deterministic noise. The beads need to look hand-strung rather than
+ * extruded, and that means every one is a slightly different size and shade.
+ * Math.random would reshuffle the whole strand on every re-render, which shows
+ * up as the necklace twitching each time the buyer types a character.
  */
-export function Chain({
+function rng(seed: number) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** The curve a strand hangs in. Flatter through the middle as `sag` rises. */
+export function catenary(x: number, sag: number, y: number) {
+  return y + sag * (Math.cosh(x / sag) - 1);
+}
+
+export type Finish = 'stone' | 'pearl';
+
+/**
+ * The strand: round beads threaded end to end along a catenary.
+ *
+ * One instanced mesh, so a hundred-odd beads cost one draw call rather than a
+ * hundred. Each gets its own size and shade off the seeded noise above, which
+ * is the difference between a strung necklace and a string of identical balls.
+ * The catalog says natural stone shifts bead to bead and no two strands come
+ * out the same; this is that sentence, rendered.
+ */
+export function Strand({
   halfWidth = 5,
   sag = 9,
   y = 0,
-  linkRadius = 0.062,
-  tube = 0.016,
-  step = 0.09,
-  metal = 'gold',
+  radius = 0.05,
+  pitch = 0.104,
+  color,
+  finish = 'stone',
+  seed = 7,
+  opacity = 1,
 }: {
   halfWidth?: number;
-  /** Catenary constant. Larger is flatter through the middle. */
   sag?: number;
   /** World y of the low point of the curve. */
   y?: number;
-  linkRadius?: number;
-  tube?: number;
-  /** Arc distance between link centres. */
-  step?: number;
-  metal?: 'gold' | 'silver';
+  radius?: number;
+  /** Distance between bead centres along the curve. */
+  pitch?: number;
+  color: string;
+  finish?: Finish;
+  seed?: number;
+  opacity?: number;
 }) {
-  const ref = useRef<THREE.InstancedMesh>(null);
+  const mesh = useRef<THREE.InstancedMesh>(null);
 
-  const links = useMemo(() => {
+  const beads = useMemo(() => {
     const points: THREE.Vector3[] = [];
     for (let i = 0; i <= 160; i++) {
       const x = -halfWidth + (2 * halfWidth * i) / 160;
-      points.push(new THREE.Vector3(x, y + sag * (Math.cosh(x / sag) - 1), 0));
+      points.push(new THREE.Vector3(x, catenary(x, sag, y), 0));
     }
     const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal', 0);
-    const count = Math.max(2, Math.floor(curve.getLength() / step));
+    const count = Math.max(2, Math.floor(curve.getLength() / pitch));
 
+    const random = rng(seed);
+    const base = new THREE.Color(color);
     const axis = new THREE.Vector3(1, 0, 0);
-    const roll = new THREE.Quaternion().setFromAxisAngle(axis, Math.PI / 2);
-    const scale = new THREE.Vector3(1.5, 1, 1);
     const quaternion = new THREE.Quaternion();
 
     const matrices: THREE.Matrix4[] = [];
+    const colors: THREE.Color[] = [];
+
     for (let i = 0; i < count; i++) {
       const t = (i + 0.5) / count;
       const position = curve.getPointAt(t);
       const tangent = curve.getTangentAt(t).normalize();
       quaternion.setFromUnitVectors(axis, tangent);
-      // Post-multiplying rolls about the link's own long axis, which is the
-      // tangent, so alternating links interlock instead of stacking flat.
-      if (i % 2 === 1) quaternion.multiply(roll);
+
+      // Drilled beads are wider than they are long once they are pushed
+      // together on the wire, and no two are quite the same.
+      const jitter = 1 + (random() - 0.5) * 0.14;
+      const scale = new THREE.Vector3(radius * 0.92 * jitter, radius * jitter, radius * jitter);
       matrices.push(new THREE.Matrix4().compose(position, quaternion, scale));
+
+      const shade = base.clone();
+      shade.offsetHSL((random() - 0.5) * 0.03, (random() - 0.5) * 0.1, (random() - 0.5) * 0.09);
+      colors.push(shade);
     }
-    return matrices;
-  }, [halfWidth, sag, y, step]);
+
+    return { matrices, colors };
+  }, [halfWidth, sag, y, radius, pitch, color, seed]);
 
   useLayoutEffect(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    links.forEach((matrix, i) => mesh.setMatrixAt(i, matrix));
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.computeBoundingSphere();
-  }, [links]);
+    const target = mesh.current;
+    if (!target) return;
+    beads.matrices.forEach((matrix, i) => target.setMatrixAt(i, matrix));
+    beads.colors.forEach((shade, i) => target.setColorAt(i, shade));
+    target.instanceMatrix.needsUpdate = true;
+    if (target.instanceColor) target.instanceColor.needsUpdate = true;
+    target.computeBoundingSphere();
+  }, [beads]);
 
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, links.length]} frustumCulled={false}>
-      <torusGeometry args={[linkRadius, tube, 8, 16]} />
-      {metal === 'gold' ? (
-        <GoldMaterial roughness={0.24} />
+    <instancedMesh
+      ref={mesh}
+      args={[undefined, undefined, beads.matrices.length]}
+      frustumCulled={false}
+    >
+      <sphereGeometry args={[1, 16, 12]} />
+      {/* White, both of them: the shade of each bead rides on the instance
+          colour, and the shader multiplies the two. A tinted material here
+          would tint the whole strand a second time. */}
+      {finish === 'pearl' ? (
+        <NacreMaterial color="#ffffff" opacity={opacity} />
       ) : (
-        // No brushing on a chain: the links are small enough that an
-        // anisotropic smear erases the shape of them.
-        <SilverMaterial roughness={0.22} anisotropy={0} />
+        <BeadMaterial opacity={opacity} />
       )}
     </instancedMesh>
   );

@@ -4,11 +4,11 @@
  * The seam between the flat storefront and the 3D pieces.
  *
  * Nothing in this file may import three, drei, or fiber. It is in the first
- * bundle; they are not, and one stray import would pull half a megabyte of
+ * bundle; they are not, and one stray import would pull most of a megabyte of
  * renderer into the critical path of a page whose job is to show a price. The
  * scenes are reached only through `next/dynamic` below, with `ssr: false`,
- * which is also what keeps the static export buildable: there is no server-side
- * WebGL, so a prerendered canvas is not a thing that can exist.
+ * which is also what keeps the static export buildable: there is no
+ * server-side WebGL, so a prerendered canvas is not a thing that can exist.
  *
  * Three ways the 3D can fail to arrive, and all three land on the flat piece:
  *
@@ -18,32 +18,58 @@
  *   3. It is simply still loading. The flat piece is what is on screen until
  *      the scene says it has something to draw.
  *
- * The flat piece is not a spinner. It is the real treatment, drawn immediately,
- * that the 3D one fades in over.
+ * The flat piece is not a spinner. It is the real treatment, drawn
+ * immediately, that the 3D one fades in over.
  */
 
 import dynamic from 'next/dynamic';
 import { Component, useCallback, useEffect, useState, type ReactNode } from 'react';
-import { NecklaceSvg, PendantSvg } from './piece-svg';
+import { NecklaceSvg, StrandSvg } from './piece-svg';
 
 // Both point at the same module on purpose. See components/scenes-3d.
 const Necklace3D = dynamic(() => import('./scenes-3d').then((m) => m.Necklace3D), {
   ssr: false,
   loading: () => null,
 });
-const Pendant3D = dynamic(() => import('./scenes-3d').then((m) => m.Pendant3D), {
+const Strand3D = dynamic(() => import('./scenes-3d').then((m) => m.Strand3D), {
   ssr: false,
   loading: () => null,
 });
 
-/** Shown when the buyer has not typed anything yet. */
-export const DEFAULT_WORD = 'Jenna';
+/** Shown when the buyer has not typed anything yet. Matches the catalog. */
+export const DEFAULT_WORD = 'ROSE';
+
+/** The catalog caps the word at ten characters. */
+export const MAX_WORD_LENGTH = 10;
 
 /**
- * Rebuilding an extruded twelve-character script word costs a few milliseconds
- * of main thread. That is nothing once, and it is a stutter if it happens on
- * every keystroke, so the 3D piece trails the input by one beat. The flat
- * piece underneath it still tracks every character immediately.
+ * Kept here rather than imported from the scene module so that reading a
+ * colour does not drag the renderer into the first bundle. The keys are the
+ * catalog's `base` choices; the scene holds the matching table.
+ */
+export const STRAND_SWATCHES: Record<string, string> = {
+  'Pale blue': '#7fa9c4',
+  Cream: '#fbfbf9',
+  'Black onyx': '#1b2a33',
+  'Green aventurine': '#4a7c74',
+};
+
+export const DEFAULT_STRAND = 'Pale blue';
+
+/** Keys are the catalog's `stone` choices. The scene holds the matching table. */
+const STONE_SWATCHES: Record<string, string> = {
+  'Green aventurine': '#4a7c74',
+  'Black onyx': '#1b2a33',
+  'Pink rhodonite': '#c98a92',
+  Amazonite: '#7fb3ad',
+  'Turquoise heishi': '#5aa6a8',
+};
+
+/**
+ * Rebuilding the letter discs costs a texture upload per character. That is
+ * nothing once and a stutter on every keystroke, so the 3D piece trails the
+ * input by one beat. The flat piece underneath it still tracks every character
+ * immediately.
  */
 const SETTLE_MS = 140;
 
@@ -95,7 +121,10 @@ function useWebGL() {
   return supported;
 }
 
-class SceneBoundary extends Component<{ onError: () => void; children: ReactNode }, { failed: boolean }> {
+class SceneBoundary extends Component<
+  { onError: () => void; children: ReactNode },
+  { failed: boolean }
+> {
   state = { failed: false };
 
   static getDerivedStateFromError() {
@@ -109,6 +138,23 @@ class SceneBoundary extends Component<{ onError: () => void; children: ReactNode
   render() {
     return this.state.failed ? null : this.props.children;
   }
+}
+
+/** Everything the two wrappers do identically. */
+function usePiece() {
+  const reducedMotion = usePrefersReducedMotion();
+  const webgl = useWebGL();
+  const [failed, setFailed] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  const onReady = useCallback(() => setReady(true), []);
+  const onError = useCallback(() => {
+    setFailed(true);
+    setReady(false);
+  }, []);
+
+  const show = webgl && !failed;
+  return { animate: !reducedMotion, show, ready: ready && show, onReady, onError };
 }
 
 /**
@@ -150,35 +196,39 @@ function Stack({
   );
 }
 
-export function NecklacePiece({ name, className }: { name: string; className?: string }) {
-  const typed = name.trim();
+export function NecklacePiece({
+  name,
+  strand = DEFAULT_STRAND,
+  className,
+}: {
+  name: string;
+  /** One of the catalog's `base` choices. */
+  strand?: string;
+  className?: string;
+}) {
+  const typed = name.trim().slice(0, MAX_WORD_LENGTH);
   const settled = useSettled(typed);
-
-  const reducedMotion = usePrefersReducedMotion();
-  const webgl = useWebGL();
-  const [failed, setFailed] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  const onReady = useCallback(() => setReady(true), []);
-  const onError = useCallback(() => {
-    setFailed(true);
-    setReady(false);
-  }, []);
-
-  const show = webgl && !failed;
+  const { animate, show, ready, onReady, onError } = usePiece();
 
   return (
     <Stack
       className={className}
-      ready={ready && show}
-      flat={<NecklaceSvg word={typed || DEFAULT_WORD} muted={typed.length === 0} />}
+      ready={ready}
+      flat={
+        <NecklaceSvg
+          word={typed || DEFAULT_WORD}
+          muted={typed.length === 0}
+          color={STRAND_SWATCHES[strand] ?? STRAND_SWATCHES[DEFAULT_STRAND]}
+        />
+      }
       scene={
         show ? (
           <SceneBoundary onError={onError}>
             <Necklace3D
               word={settled || DEFAULT_WORD}
+              strand={strand}
               muted={settled.length === 0}
-              animate={!reducedMotion}
+              animate={animate}
               onReady={onReady}
             />
           </SceneBoundary>
@@ -189,34 +239,42 @@ export function NecklacePiece({ name, className }: { name: string; className?: s
 }
 
 /**
- * The birthstone pendant, ready for its product page: pass the stone count the
- * configurator is currently holding and the disc resizes to match.
+ * The plain strand, ready for the gemstone and pearl product pages: pass the
+ * stone and add-on state the configurator is currently holding and the piece
+ * follows it.
  */
-export function PendantPiece({ stones = 3, className }: { stones?: number; className?: string }) {
-  const settled = useSettled(stones);
+export function StrandPiece({
+  stone,
+  finish = 'stone',
+  accents = false,
+  className,
+}: {
+  stone?: string;
+  finish?: 'stone' | 'pearl';
+  accents?: boolean;
+  className?: string;
+}) {
+  const settledStone = useSettled(stone);
+  const { animate, show, ready, onReady, onError } = usePiece();
 
-  const reducedMotion = usePrefersReducedMotion();
-  const webgl = useWebGL();
-  const [failed, setFailed] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  const onReady = useCallback(() => setReady(true), []);
-  const onError = useCallback(() => {
-    setFailed(true);
-    setReady(false);
-  }, []);
-
-  const show = webgl && !failed;
+  const flatColor =
+    finish === 'pearl' ? '#fbfbf9' : (STONE_SWATCHES[stone ?? ''] ?? STONE_SWATCHES['Green aventurine']);
 
   return (
     <Stack
       className={className}
-      ready={ready && show}
-      flat={<PendantSvg stones={stones} />}
+      ready={ready}
+      flat={<StrandSvg color={flatColor} accents={accents} />}
       scene={
         show ? (
           <SceneBoundary onError={onError}>
-            <Pendant3D stones={settled} animate={!reducedMotion} onReady={onReady} />
+            <Strand3D
+              stone={settledStone}
+              finish={finish}
+              accents={accents}
+              animate={animate}
+              onReady={onReady}
+            />
           </SceneBoundary>
         ) : null
       }

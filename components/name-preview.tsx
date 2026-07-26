@@ -2,19 +2,22 @@
 
 import { useState, useId } from 'react';
 import { useRouter } from 'next/navigation';
-import { DEFAULT_WORD, NecklacePiece } from './piece-3d';
+import { DEFAULT_WORD, MAX_WORD_LENGTH, NecklacePiece } from './piece-3d';
 
-const MAX_CHARS = 12;
+// Ten, because that is what the catalog's `word` add-on accepts. Letting the
+// hero take more would hand the configurator a name it has to truncate.
+const MAX_CHARS = MAX_WORD_LENGTH;
 
 /**
- * The hero, and the thesis of the whole storefront: a name necklace is a
- * lettering object, so the most characteristic thing this shop can show is
- * type. Rather than photograph a finished piece, let the buyer set their own
- * word and watch it become the product.
+ * The hero, and the thesis of the whole storefront: the piece is made to order,
+ * so let the buyer place the order by making the piece. Rather than photograph
+ * a finished necklace, they set their own word and watch the discs appear on
+ * the strand.
  *
- * The piece is rendered as real geometry, extruded and lit, because the thing
- * being sold is metal rather than lettering: what a buyer is deciding is
- * whether their word looks good with an edge on it. It arrives as a lazily
+ * It is rendered as a real object rather than as type, because what is being
+ * sold is nacre and glass rather than lettering: the colour shift across a
+ * mother-of-pearl disc only exists while the piece is moving, which is exactly
+ * the thing a still photograph of it cannot show. It arrives as a lazily
  * loaded canvas over the flat treatment, which is what shows on a machine that
  * cannot draw it. See components/piece-3d.
  *
@@ -43,10 +46,10 @@ export default function NamePreview() {
           one bead at a time.
         </h1>
 
-        {/* The piece itself, hung from a chain so it reads as jewelry rather
-            than as a font sample. The height is capped rather than derived from
-            the aspect ratio: on a phone an uncapped hero pushes the input, and
-            the input is the point. */}
+        {/* The piece itself: the strand, with a letter disc hanging off it for
+            every character typed below. The height is capped rather than
+            derived from the aspect ratio, because on a phone an uncapped hero
+            pushes the input off the screen, and the input is the point. */}
         <div className="mt-12 sm:mt-16">
           <NecklacePiece
             name={name}
@@ -79,7 +82,7 @@ export default function NamePreview() {
 
             <button
               onClick={start}
-              className="mt-5 w-full rounded-sm bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-brass-deep"
+              className="mt-5 w-full rounded-xl bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-rose-deep"
             >
               Make this one
             </button>
