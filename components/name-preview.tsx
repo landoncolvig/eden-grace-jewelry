@@ -51,10 +51,18 @@ export default function NamePreview() {
             derived from the aspect ratio, because on a phone an uncapped hero
             pushes the input off the screen, and the input is the point. */}
         <div className="mt-12 sm:mt-16">
-          <NecklacePiece
-            name={name}
-            className="mx-auto h-[220px] w-full max-w-2xl sm:h-[300px]"
-          />
+          {/* The piece sits on a dark panel rather than on the page.
+              A pale strand and cream discs on a cream ground had nowhere to
+              gain contrast, and lightening the page had already been tried.
+              Putting the jewellery in front of something dark is what a
+              display case does, and it lets the gold rims and the nacre read
+              at a glance instead of dissolving into the background. */}
+          <div className="mx-auto max-w-3xl overflow-hidden rounded-[28px] bg-ink">
+            <NecklacePiece
+              name={name}
+              className="mx-auto h-[260px] w-full sm:h-[360px]"
+            />
+          </div>
 
           {/* The control sits directly under the piece and is styled as a ruled
               line rather than a boxed input, so it reads as part of the object. */}

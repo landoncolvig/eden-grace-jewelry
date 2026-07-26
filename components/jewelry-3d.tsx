@@ -174,10 +174,15 @@ export function BeadMaterial({ color = '#ffffff' }: { color?: string }) {
       color={color}
       metalness={0}
       roughness={0.16}
-      clearcoat={1}
-      clearcoatRoughness={0.06}
+      // A full clearcoat washed the bead colour out the same way it drowned
+      // the letters: the specular lobe is additive white on top of the body
+      // colour, so at 1.0 under this environment every strand trended pale
+      // regardless of the colour it was given. Half is still a hard polished
+      // surface and lets the stone read.
+      clearcoat={0.5}
+      clearcoatRoughness={0.1}
       ior={1.55}
-      envMapIntensity={1.1}
+      envMapIntensity={0.85}
     />
   );
 }

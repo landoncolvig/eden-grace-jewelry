@@ -48,10 +48,15 @@ export const MAX_WORD_LENGTH = 10;
  * catalog's `base` choices; the scene holds the matching table.
  */
 export const STRAND_SWATCHES: Record<string, string> = {
-  'Pale blue': '#8fb4cc',
-  Cream: '#fdf7f2',
-  'Black onyx': '#3a3033',
-  'Green aventurine': '#729981',
+  // Deeper than the catalog's UI swatches, deliberately. These are body
+  // colours fed to a lit, clear-coated material rather than flat fills: the
+  // specular pass lifts them several steps, so a value that looks right as a
+  // colour chip renders as a pastel on the strand. Cream in particular was
+  // set to the page background, which made that strand invisible.
+  'Pale blue': '#5b8fb0',
+  Cream: '#dcc9ad',
+  'Black onyx': '#232a30',
+  'Green aventurine': '#4c7a63',
 };
 
 export const DEFAULT_STRAND = 'Pale blue';
