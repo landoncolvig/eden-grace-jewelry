@@ -26,8 +26,15 @@ import dynamic from 'next/dynamic';
 import { Component, useCallback, useEffect, useState, type ReactNode } from 'react';
 import { NecklaceSvg, PendantSvg } from './piece-svg';
 
-const Necklace3D = dynamic(() => import('./necklace-3d'), { ssr: false, loading: () => null });
-const Pendant3D = dynamic(() => import('./pendant-3d'), { ssr: false, loading: () => null });
+// Both point at the same module on purpose. See components/scenes-3d.
+const Necklace3D = dynamic(() => import('./scenes-3d').then((m) => m.Necklace3D), {
+  ssr: false,
+  loading: () => null,
+});
+const Pendant3D = dynamic(() => import('./scenes-3d').then((m) => m.Pendant3D), {
+  ssr: false,
+  loading: () => null,
+});
 
 /** Shown when the buyer has not typed anything yet. */
 export const DEFAULT_WORD = 'Jenna';

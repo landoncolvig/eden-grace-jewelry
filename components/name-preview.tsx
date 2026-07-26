@@ -43,50 +43,15 @@ export default function NamePreview() {
           one word at a time.
         </h1>
 
-        {/* The piece itself. An SVG chain with the name hanging from it, so the
-            preview reads as jewelry rather than as a font sample. */}
+        {/* The piece itself, hung from a chain so it reads as jewelry rather
+            than as a font sample. The height is capped rather than derived from
+            the aspect ratio: on a phone an uncapped hero pushes the input, and
+            the input is the point. */}
         <div className="mt-12 sm:mt-16">
-          <div className="relative mx-auto w-full max-w-2xl">
-            <svg
-              viewBox="0 0 640 260"
-              className="w-full"
-              role="img"
-              aria-label={`A necklace reading ${shown}`}
-            >
-              <defs>
-                <linearGradient id="chain" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#8a6d3f" />
-                  <stop offset="50%" stopColor="#d8b982" />
-                  <stop offset="100%" stopColor="#8a6d3f" />
-                </linearGradient>
-              </defs>
-
-              {/* Chain: a catenary-ish curve running off both edges, so the
-                  piece reads as being worn rather than laid flat. */}
-              <path
-                d="M -10 18 C 120 18, 150 132, 320 132 C 490 132, 520 18, 650 18"
-                fill="none"
-                stroke="url(#chain)"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              {/* Clasp ring at the low point where the pendant hangs. */}
-              <circle cx="320" cy="132" r="5.5" fill="none" stroke="url(#chain)" strokeWidth="2.5" />
-
-              <text
-                x="320"
-                y="212"
-                textAnchor="middle"
-                className="font-script"
-                fontSize={fontSize}
-                fill="#b08d57"
-                opacity={isPlaceholder ? 0.34 : 1}
-                style={{ transition: 'opacity 220ms ease, font-size 220ms ease' }}
-              >
-                {shown}
-              </text>
-            </svg>
-          </div>
+          <NecklacePiece
+            name={name}
+            className="mx-auto h-[220px] w-full max-w-2xl sm:h-[300px]"
+          />
 
           {/* The control sits directly under the piece and is styled as a ruled
               line rather than a boxed input, so it reads as part of the object. */}
@@ -103,7 +68,7 @@ export default function NamePreview() {
                 value={name}
                 onChange={(e) => setName(e.target.value.slice(0, MAX_CHARS))}
                 maxLength={MAX_CHARS}
-                placeholder="Jenna"
+                placeholder={DEFAULT_WORD}
                 autoComplete="off"
                 className="min-w-0 flex-1 bg-transparent font-display text-2xl outline-none placeholder:text-ink-faint"
               />
