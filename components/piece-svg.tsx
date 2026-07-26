@@ -1,3 +1,7 @@
+'use client';
+
+import { useId } from 'react';
+
 /**
  * The flat treatments of both pieces.
  *
@@ -55,6 +59,13 @@ type NecklaceSvgProps = {
 };
 
 export function NecklaceSvg({ word, muted, color }: NecklaceSvgProps) {
+  // Gradient ids have to be unique per instance. SVG resolves url(#id) against
+  // the whole document, so two of these on one page with different bead
+  // colours would both paint with whichever def came first.
+  const id = useId();
+  const beadFill = `bead-${id}`;
+  const nacreFill = `nacre-${id}`;
+
   const letters = Array.from(word.toUpperCase()).slice(0, 10);
 
   // Long words get smaller discs rather than a row that runs off the edge.
@@ -73,22 +84,25 @@ export function NecklaceSvg({ word, muted, color }: NecklaceSvgProps) {
       style={{ transition: 'opacity 220ms ease' }}
     >
       <defs>
-        <radialGradient id="piece-svg-bead" cx="35%" cy="30%" r="72%">
+        <radialGradient id={beadFill} cx="35%" cy="30%" r="72%">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0.75" />
           <stop offset="55%" stopColor={color} />
           <stop offset="100%" stopColor={color} stopOpacity="0.72" />
         </radialGradient>
-        <radialGradient id="piece-svg-nacre" cx="36%" cy="30%" r="76%">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="70%" stopColor="#fbfbf9" />
-          <stop offset="100%" stopColor="#e6e3dc" />
+        {/* Theme tokens rather than literals. `var()` does not parse in an SVG
+            presentation attribute, but it does in the style property, which is
+            how these stay tied to globals.css. */}
+        <radialGradient id={nacreFill} cx="36%" cy="30%" r="76%">
+          <stop offset="0%" style={{ stopColor: 'var(--color-paper)' }} />
+          <stop offset="70%" style={{ stopColor: 'var(--color-bench)' }} />
+          <stop offset="100%" style={{ stopColor: 'var(--color-rule)' }} />
         </radialGradient>
       </defs>
 
       {/* The strand, drawn bead by bead rather than as a stroked path: a smooth
           line reads as a chain, and this shop does not sell chain. */}
       {beads(9.4).map((bead, i) => (
-        <circle key={i} cx={bead.x} cy={bead.y} r="4.7" fill="url(#piece-svg-bead)" />
+        <circle key={i} cx={bead.x} cy={bead.y} r="4.7" fill={`url(#${beadFill})`} />
       ))}
 
       {letters.map((char, i) => {
@@ -98,18 +112,24 @@ export function NecklaceSvg({ word, muted, color }: NecklaceSvgProps) {
         return (
           <g key={`${char}-${i}`}>
             {/* Jump ring. */}
-            <circle cx={x} cy={round(attachY + 5)} r="5" fill="none" stroke="#b08d57" strokeWidth="2" />
+            <circle
+              cx={x}
+              cy={round(attachY + 5)}
+              r="5"
+              fill="none"
+              className="stroke-brass"
+              strokeWidth="2"
+            />
             {/* Gold-tone body with a nacre face inset, leaving a rim. */}
-            <circle cx={x} cy={cy} r={radius} fill="#b08d57" />
-            <circle cx={x} cy={cy} r={round(radius * 0.87)} fill="url(#piece-svg-nacre)" />
+            <circle cx={x} cy={cy} r={radius} className="fill-brass" />
+            <circle cx={x} cy={cy} r={round(radius * 0.87)} fill={`url(#${nacreFill})`} />
             <text
               x={x}
               y={cy}
               textAnchor="middle"
               dominantBaseline="central"
-              className="font-display"
+              className="font-display fill-ink"
               fontSize={round(radius * 1.05)}
-              fill="#1b2a33"
             >
               {char}
             </text>
@@ -128,6 +148,9 @@ type StrandSvgProps = {
 };
 
 export function StrandSvg({ color, accents = false }: StrandSvgProps) {
+  const id = useId();
+  const beadFill = `strand-${id}`;
+
   return (
     <svg
       viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
@@ -137,7 +160,7 @@ export function StrandSvg({ color, accents = false }: StrandSvgProps) {
       aria-label={accents ? 'A beaded strand with pearl and gold accents' : 'A beaded strand'}
     >
       <defs>
-        <radialGradient id="strand-svg-bead" cx="35%" cy="30%" r="72%">
+        <radialGradient id={beadFill} cx="35%" cy="30%" r="72%">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0.75" />
           <stop offset="55%" stopColor={color} />
           <stop offset="100%" stopColor={color} stopOpacity="0.72" />
@@ -145,7 +168,7 @@ export function StrandSvg({ color, accents = false }: StrandSvgProps) {
       </defs>
 
       {beads(10.6).map((bead, i) => (
-        <circle key={i} cx={bead.x} cy={round(bead.y + 30)} r="5.3" fill="url(#strand-svg-bead)" />
+        <circle key={i} cx={bead.x} cy={round(bead.y + 30)} r="5.3" fill={`url(#${beadFill})`} />
       ))}
 
       {accents
@@ -157,8 +180,7 @@ export function StrandSvg({ color, accents = false }: StrandSvgProps) {
                 cx={x}
                 cy={round(strandY(x) + 30)}
                 r={i % 2 === 1 ? 5.6 : 6.6}
-                fill={i % 2 === 1 ? '#b08d57' : '#fbfbf9'}
-                stroke={i % 2 === 1 ? 'none' : '#e6e3dc'}
+                className={i % 2 === 1 ? 'fill-brass' : 'fill-paper stroke-rule'}
               />
             );
           })

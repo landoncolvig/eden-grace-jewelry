@@ -38,10 +38,10 @@ import {
  * cream and black are the paper and ink tokens.
  */
 export const STRAND_COLORS: Record<string, string> = {
-  'Pale blue': '#7fa9c4',
-  Cream: '#fbfbf9',
-  'Black onyx': '#1b2a33',
-  'Green aventurine': '#4a7c74',
+  'Pale blue': '#8fb4cc',
+  Cream: '#fdf7f2',
+  'Black onyx': '#3a3033',
+  'Green aventurine': '#729981',
 };
 
 export const DEFAULT_STRAND = 'Pale blue';
@@ -74,6 +74,17 @@ const TEXTURE_PX = 256;
  * display serif, which extruded text could not without shipping a second copy
  * of the font as outline data.
  */
+/**
+ * Near black, and it has to be.
+ *
+ * The map multiplies into the diffuse term before lighting, so under this
+ * scene's environment a mid-tone texel gets scaled back up and reads grey.
+ * Only a value close to zero survives the multiply at any light intensity.
+ * Measured against the lit disc face, not against the page, which is why this
+ * is not --color-ink.
+ */
+const LETTER_INK = '#0b0807';
+
 function drawLetter(char: string, family: string, face: string, ink: string) {
   const canvas = document.createElement('canvas');
   canvas.width = TEXTURE_PX;
@@ -88,7 +99,7 @@ function drawLetter(char: string, family: string, face: string, ink: string) {
   ctx.fillStyle = ink;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = `500 ${Math.round(TEXTURE_PX * 0.5)}px ${family}`;
+  ctx.font = `700 ${Math.round(TEXTURE_PX * 0.52)}px ${family}`;
   // Optical rather than metric centring: cap-height glyphs sit high in the
   // em box, so a mathematically centred letter reads as floating.
   ctx.fillText(char, TEXTURE_PX / 2, TEXTURE_PX * 0.545);
@@ -129,7 +140,11 @@ function useLetterTextures(word: string) {
 
     const cache = new Map<string, THREE.Texture | null>();
     return Array.from(word.toUpperCase()).map((char) => {
-      if (!cache.has(char)) cache.set(char, drawLetter(char, family, palette.paper, palette.ink));
+      // Not palette.ink. The nacre material is glossy and sits under a bright
+      // environment, and the specular wash lifts a mid-tone letter until it is
+      // unreadable at hero size. The stamped letters on the real piece are
+      // near-black for the same reason, so this is also what the object does.
+      if (!cache.has(char)) cache.set(char, drawLetter(char, family, palette.paper, LETTER_INK));
       return cache.get(char) ?? null;
     });
     // fontsReady is a redraw trigger, not data. Once the real face lands every
@@ -173,7 +188,10 @@ function Letter({
   opacity: number;
 }) {
   const pivot = useRef<THREE.Group>(null);
-  useIdleTurn(pivot, { enabled: animate, amplitude: 0.34, speed: 0.42, phase });
+  // Small enough that the letter stays readable at the extremes. Past about
+  // a third of a radian a disc turns far enough to show its gold back, and the
+  // buyer momentarily cannot read their own name.
+  useIdleTurn(pivot, { enabled: animate, amplitude: 0.24, speed: 0.42, phase });
 
   // The strand is a curve, so the discs toward the ends of a long word hang
   // from a point slightly higher than the ones in the middle. Following it
@@ -248,9 +266,10 @@ function Piece({
         <Strand
           y={STRAND_Y}
           sag={SAG}
-          // Just past the edge of the frame. Any further and the strand is
-          // paying for beads nobody sees.
-          halfWidth={designWidth * 0.85}
+          // Past the edge of the frame on both sides. A strand that stops
+          // exactly at the crop reads as a broken necklace lying on a table;
+          // running it off says the rest of it carries on around a neck.
+          halfWidth={designWidth * 1.1}
           radius={BEAD_R}
           color={STRAND_COLORS[strand] ?? STRAND_COLORS[DEFAULT_STRAND]}
           opacity={opacity}
@@ -299,8 +318,10 @@ export default function Necklace3D({
       style={{ background: 'transparent' }}
     >
       <BenchEnvironment />
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[3, 5, 6]} intensity={1.2} />
+      {/* Pulled down from 0.4/1.2. The environment already carries most of the
+          light, and the extra fill was flattening the disc faces. */}
+      <ambientLight intensity={0.25} />
+      <directionalLight position={[3, 5, 6]} intensity={0.85} />
       <Suspense fallback={null}>
         <Piece word={word} strand={strand} muted={muted} animate={animate} onReady={onReady} />
       </Suspense>

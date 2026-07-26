@@ -82,7 +82,7 @@ export default function NamePreview() {
 
             <button
               onClick={start}
-              className="mt-5 w-full rounded-xl bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-rose-deep"
+              className="mt-5 w-full rounded-xl bg-rose px-5 py-3.5 text-sm text-white transition-colors hover:bg-rose-deep"
             >
               Make this one
             </button>

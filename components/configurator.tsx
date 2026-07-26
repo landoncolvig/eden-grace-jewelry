@@ -439,7 +439,7 @@ export default function Configurator({ product }: { product: Product }) {
               <button
                 onClick={addToCart}
                 disabled={blocked}
-                className="mt-5 w-full rounded-xl bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
+                className="mt-5 w-full rounded-xl bg-rose px-5 py-3.5 text-sm text-white transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
               >
                 Add to cart
               </button>

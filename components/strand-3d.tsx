@@ -35,11 +35,11 @@ import {
  * the rest are the stones themselves, which are what they are.
  */
 export const STONE_COLORS: Record<string, string> = {
-  'Green aventurine': '#4a7c74',
-  'Black onyx': '#1b2a33',
+  'Green aventurine': '#729981',
+  'Black onyx': '#3a3033',
   'Pink rhodonite': '#c98a92',
-  Amazonite: '#7fb3ad',
-  'Turquoise heishi': '#5aa6a8',
+  Amazonite: '#87b3ae',
+  'Turquoise heishi': '#5fa6a4',
 };
 
 export const DEFAULT_STONE = 'Green aventurine';
@@ -111,7 +111,7 @@ function Piece({
         <Strand
           y={STRAND_Y}
           sag={SAG}
-          halfWidth={3.9}
+          halfWidth={DESIGN_W * 1.1}
           radius={BEAD_R}
           pitch={0.114}
           color={color}

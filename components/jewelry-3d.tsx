@@ -227,10 +227,13 @@ export function NacreMaterial({
       color={color ?? palette.paper}
       map={map ?? null}
       metalness={0}
-      roughness={0.13}
-      clearcoat={1}
-      clearcoatRoughness={0.04}
-      iridescence={0.6}
+      // Nacre is glossy, but a mirror finish here blew out the stamped letters
+      // on the disc faces. Backed off far enough to keep them legible while
+      // still reading as shell rather than plastic.
+      roughness={0.22}
+      clearcoat={0.55}
+      clearcoatRoughness={0.12}
+      iridescence={0.35}
       iridescenceIOR={1.6}
       iridescenceThicknessRange={[120, 420]}
       envMapIntensity={1.25}

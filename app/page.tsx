@@ -41,6 +41,12 @@ export default function Home() {
           {PRODUCTS.map((product) => (
             <Link key={product.slug} href={`/product/${product.slug}`} className="group block">
               <article className="flex h-full flex-col overflow-hidden rounded-xl border border-rule bg-paper transition-colors hover:border-rose">
+                {/* A band of the piece's own stone across the top of each
+                    card. An earlier attempt tinted the photo itself with a
+                    multiply blend, which muddied the beads: the photo's cream
+                    background multiplied down and the whole strand went hazy.
+                    The colour belongs next to the product, not on top of it. */}
+                <div className="h-1.5 w-full" style={{ backgroundColor: product.swatch }} />
                 <Image
                   src={photo(product.image, 'sm')}
                   alt={`${product.name}, ${product.tagline.toLowerCase()}`}
@@ -58,7 +64,7 @@ export default function Home() {
                   </p>
 
                   <div className="mt-6 flex items-baseline justify-between border-t border-rule pt-4">
-                    <span className="font-spec text-sm tabular-nums">
+                    <span className="font-spec text-sm tabular-nums text-rose">
                       {formatUSD(product.priceCents)}
                     </span>
                     <span className="text-sm text-ink-soft transition-colors group-hover:text-rose">
@@ -72,14 +78,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="how" className="border-t border-rule bg-paper">
+      <section id="how" className="border-t border-rule bg-sage/12">
         <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
           <h2 className="font-display text-2xl sm:text-3xl">How it&rsquo;s made</h2>
 
           <ol className="mt-10 grid gap-8 sm:grid-cols-3 sm:gap-10">
             {STEPS.map((step) => (
               <li key={step.n}>
-                <span className="font-spec text-[0.62rem] tracking-[0.22em] text-rose">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-rose font-spec text-[0.62rem] text-white">
                   {step.n}
                 </span>
                 <h3 className="mt-3 font-display text-lg">{step.title}</h3>

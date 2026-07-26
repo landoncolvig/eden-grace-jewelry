@@ -48,21 +48,21 @@ export const MAX_WORD_LENGTH = 10;
  * catalog's `base` choices; the scene holds the matching table.
  */
 export const STRAND_SWATCHES: Record<string, string> = {
-  'Pale blue': '#7fa9c4',
-  Cream: '#fbfbf9',
-  'Black onyx': '#1b2a33',
-  'Green aventurine': '#4a7c74',
+  'Pale blue': '#8fb4cc',
+  Cream: '#fdf7f2',
+  'Black onyx': '#3a3033',
+  'Green aventurine': '#729981',
 };
 
 export const DEFAULT_STRAND = 'Pale blue';
 
 /** Keys are the catalog's `stone` choices. The scene holds the matching table. */
 const STONE_SWATCHES: Record<string, string> = {
-  'Green aventurine': '#4a7c74',
-  'Black onyx': '#1b2a33',
+  'Green aventurine': '#729981',
+  'Black onyx': '#3a3033',
   'Pink rhodonite': '#c98a92',
-  Amazonite: '#7fb3ad',
-  'Turquoise heishi': '#5aa6a8',
+  Amazonite: '#87b3ae',
+  'Turquoise heishi': '#5fa6a4',
 };
 
 /**
@@ -257,8 +257,12 @@ export function StrandPiece({
   const settledStone = useSettled(stone);
   const { animate, show, ready, onReady, onError } = usePiece();
 
+  // Pearls are near-white whatever the stone picker says; the gradient is what
+  // gives them shape against the cream ground.
   const flatColor =
-    finish === 'pearl' ? '#fbfbf9' : (STONE_SWATCHES[stone ?? ''] ?? STONE_SWATCHES['Green aventurine']);
+    finish === 'pearl'
+      ? '#ffffff'
+      : (STONE_SWATCHES[stone ?? ''] ?? STONE_SWATCHES['Green aventurine']);
 
   return (
     <Stack

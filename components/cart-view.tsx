@@ -98,7 +98,7 @@ export default function CartView() {
         </p>
         <Link
           href="/#pieces"
-          className="mt-8 inline-block rounded-xl bg-ink px-6 py-3.5 text-sm text-bench transition-colors hover:bg-rose-deep"
+          className="mt-8 inline-block rounded-xl bg-rose px-6 py-3.5 text-sm text-white transition-colors hover:bg-rose-deep"
         >
           See the pieces
         </Link>
@@ -260,7 +260,7 @@ export default function CartView() {
               <button
                 onClick={checkout}
                 disabled={!quote || checkingOut || priced.missingRequired.length > 0}
-                className="mt-5 w-full rounded-xl bg-ink px-5 py-3.5 text-sm text-bench transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
+                className="mt-5 w-full rounded-xl bg-rose px-5 py-3.5 text-sm text-white transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
               >
                 {checkingOut ? 'Opening checkout…' : 'Check out'}
               </button>
