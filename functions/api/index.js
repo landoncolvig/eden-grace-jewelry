@@ -37,11 +37,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-03-31.basil',
 });
 
-// Falls back to the pre-rebrand domain on purpose: that is what currently
-// resolves and serves. Flip this, public/CNAME, and deploy.sh together the
-// moment edengracejewelry.com is registered and pointing at Pages. Changing
-// one without the others takes the store offline.
-const SITE = process.env.SITE_URL || 'https://jennasjewelry.com';
+const SITE = process.env.SITE_URL || 'https://edengracejewelry.com';
 const SHIPPO_TOKEN = process.env.SHIPPO_TOKEN || '';
 // This function's own public URL, used to build the signed buy-label link that
 // goes into Jenna's order email.
