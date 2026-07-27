@@ -28,8 +28,8 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 /**
- * Two Custom Name Necklaces engraved with different dates are different
- * things to make, so they cannot share a cart line. The key is derived from
+ * Two monograms with different initials are different things to make, so
+ * they cannot share a cart line. The key is derived from
  * the full specification, which means adding an identical configuration
  * twice correctly merges into one line at quantity two.
  */

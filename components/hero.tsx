@@ -17,7 +17,7 @@ import { photo } from '@/lib/shop';
  * storefront the product should be the loudest element, and this is the shot
  * that makes that true.
  *
- * The word entry that used to live here has moved to the Name Necklace page.
+ * The word entry that used to live here has moved to the monogram pages.
  * A "set your word" field beside a turquoise strand asked the visitor to
  * personalise a piece that is not personalised; the configurator is where that
  * question actually belongs.
@@ -51,10 +51,10 @@ export default function Hero() {
                 See the pieces
               </Link>
               <Link
-                href="/product/name-necklace"
+                href="/product/the-delicate-monogram"
                 className="rounded-xl border border-ink px-7 py-3.5 text-sm transition-colors hover:bg-ink hover:text-bench"
               >
-                Put a name on one
+                Add a monogram
               </Link>
             </div>
 

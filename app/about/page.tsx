@@ -69,10 +69,10 @@ export default function AboutPage() {
               See the pieces
             </Link>
             <Link
-              href="/product/name-necklace"
+              href="/product/the-delicate-monogram"
               className="rounded-xl border border-ink px-7 py-3.5 text-sm transition-colors hover:bg-ink hover:text-bench"
             >
-              Put a name on one
+              Add a monogram
             </Link>
           </div>
         </div>

@@ -26,13 +26,33 @@ export default function SiteFooter() {
           </h2>
           <ul className="mt-3 space-y-2">
             <li>
-              <Link href="/product/gemstone-strand" className="text-bench/75 hover:text-bench">
-                Gemstone Strand
+              <Link href="/product/the-eden" className="text-bench/75 hover:text-bench">
+                The Eden
               </Link>
             </li>
             <li>
-              <Link href="/product/name-necklace" className="text-bench/75 hover:text-bench">
-                Name Necklace
+              <Link href="/product/the-rowan" className="text-bench/75 hover:text-bench">
+                The Rowan
+              </Link>
+            </li>
+            <li>
+              <Link href="/product/the-emmy" className="text-bench/75 hover:text-bench">
+                The Emmy
+              </Link>
+            </li>
+            <li>
+              <Link href="/product/the-blair" className="text-bench/75 hover:text-bench">
+                The Blair
+              </Link>
+            </li>
+            <li>
+              <Link href="/product/the-delicate-monogram" className="text-bench/75 hover:text-bench">
+                The Delicate Monogram
+              </Link>
+            </li>
+            <li>
+              <Link href="/product/the-chunky-monogram" className="text-bench/75 hover:text-bench">
+                The Chunky Monogram
               </Link>
             </li>
             <li>

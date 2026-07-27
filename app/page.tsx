@@ -31,7 +31,7 @@ export default function Home() {
 
       <section id="pieces" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
         <div className="flex items-baseline justify-between gap-6 border-b border-rule pb-4">
-          <h2 className="font-display text-2xl sm:text-3xl">Two ways to wear it</h2>
+          <h2 className="font-display text-2xl sm:text-3xl">The pieces</h2>
           <p className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
             All made to order
           </p>

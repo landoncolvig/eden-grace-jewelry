@@ -13,15 +13,20 @@
  *
  * Prices are in cents. Weights are in ounces, including box and mailer.
  *
- * PRICING BASIS (2026-07-26, provisional until Jenna signs off): set from live
- * Etsy listings filtered to sellers with real review volume, not from listing
- * averages, which are dragged down by imported strands. Gemstone $48 sits on
- * the $42-55 high-review median for gold-tone hardware. Pearl $58 reflects the
- * ~$13 premium genuine freshwater carries in every channel measured, while
- * staying under the $65-91 cluster that is all 14k gold-filled. Name necklace
- * $42 clears the crowded $22-25 median on made-to-order, and her letters are
- * mother-of-pearl rather than acrylic, which is what supports the top of that
- * band.
+ * ── NAMES AND DESCRIPTIONS ARE JENNA'S, VERBATIM (2026-07-27) ──
+ * She sent the six-piece line by text. The names and the wording of what each
+ * piece is are hers and should not be "improved". Every one of them offers
+ * colour and length of the buyer's choice, which is why those are required
+ * pickers on all six rather than an option on one.
+ *
+ * ── PRICES ARE PROVISIONAL ──
+ * She named the pieces; she did not price them. These are scaled from live
+ * Etsy comps (high-review sellers, gold-tone hardware) by how much material
+ * each piece actually uses: dainty < original < chunky, with pearl carrying
+ * the premium it carries in every channel measured, and the monograms above
+ * their plain equivalents because they are made to order and mother-of-pearl
+ * letters cost more than beads. Every one needs her sign-off before this
+ * shop takes real money at these numbers.
  */
 
 /**
@@ -40,7 +45,7 @@
  * @property {string[]} [choices] When present the value must be one of these,
  *                                enforced server-side. Renders as a picker.
  * @property {{placeholder: string, maxLength: number}} [input]
- *           Present when the buyer has to type something (a name, a date).
+ *           Present when the buyer has to type something.
  */
 
 /**
@@ -60,6 +65,42 @@
  */
 
 /**
+ * Colour, offered on every piece because Jenna offers it on every piece.
+ *
+ * The list is the stones and glass she actually strings, taken from her own
+ * photographs. Adding a colour here without adding the beads to the bench
+ * sells something that cannot be made.
+ */
+const COLOUR = {
+  id: 'colour',
+  label: 'Colour',
+  note: 'Which colour should it be?',
+  priceCents: 0,
+  weightOz: 0,
+  required: true,
+  choices: [
+    'Green aventurine',
+    'Black onyx',
+    'Pink rhodonite',
+    'Amazonite',
+    'Cream and ivory',
+    'Turquoise',
+    'Gold and hematite',
+  ],
+};
+
+/** @type {AddOn} */
+const LENGTH = {
+  id: 'length',
+  label: 'Length',
+  note: 'Pick a length. They all cost the same.',
+  priceCents: 0,
+  weightOz: 0,
+  required: true,
+  choices: ['16 inches', '18 inches', '20 inches'],
+};
+
+/**
  * Shared options.
  *
  * Two things are deliberately absent, both from market research into
@@ -67,7 +108,7 @@
  *
  *   Length upcharge. Nobody in this price tier charges for a longer strand.
  *   Every comparable listing checked priced all lengths the same, and it costs
- *   pennies of wire. Length is a free choice below, and the extender covers
+ *   pennies of wire. Length is a free choice above, and the extender covers
  *   anyone who wants to adjust after the fact.
  *
  *   Rush processing. No comparable shop sells queue priority as a line item,
@@ -103,113 +144,121 @@ const GIFT_WRAP = {
   input: { placeholder: 'What should the card say?', maxLength: 120 },
 };
 
-/** @type {AddOn} */
-const LENGTH = {
-  id: 'length',
-  label: 'Length',
-  note: 'Pick a length. They all cost the same.',
+/**
+ * The monogram itself.
+ *
+ * Capped at three characters, because a monogram is initials. The earlier
+ * build allowed ten, which is a name necklace and a different product; Jenna
+ * named these "Monogram" specifically.
+ *
+ * @type {AddOn}
+ */
+const MONOGRAM = {
+  id: 'monogram',
+  label: 'Monogram',
+  note: 'Which initials?',
   priceCents: 0,
   weightOz: 0,
   required: true,
-  choices: ['16 inches', '18 inches', '20 inches'],
+  input: { placeholder: 'EGC', maxLength: 3 },
 };
 
 /** @type {Product[]} */
 const PRODUCTS = [
   {
-    slug: 'gemstone-strand',
-    name: 'Gemstone Strand',
-    tagline: 'One stone, strung end to end',
+    slug: 'the-eden',
+    name: 'The Eden',
+    tagline: 'Our original style',
     description:
-      'Round gemstone beads strung by hand on nylon-coated steel wire, finished with a gold-tone lobster clasp. The stones are natural, so colour shifts bead to bead and no two strands come out the same.',
+      'Small and medium sized beads spaced out with small spacers. Colour and length of your choice.',
     priceCents: 4800,
     weightOz: 2.4,
     material: 'Natural gemstone on gold-tone findings',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#4A7C74',
     image: 'aventurine-1',
-    gallery: ['aventurine-2', 'aventurine-3', 'amazonite', 'coral-1', 'turquoise-heishi'],
-    addOns: [
-      {
-        id: 'stone',
-        label: 'Stone',
-        note: 'Which stone should it be?',
-        priceCents: 0,
-        weightOz: 0,
-        required: true,
-        choices: [
-          'Green aventurine',
-          'Black onyx',
-          'Pink rhodonite',
-          'Amazonite',
-          'Turquoise heishi',
-        ],
-      },
-      LENGTH,
-      ACCENTS,
-      EXTENDER,
-      GIFT_WRAP,
-    ],
+    gallery: ['aventurine-2', 'aventurine-3', 'coral-1', 'onyx-pearl-1'],
+    addOns: [COLOUR, LENGTH, ACCENTS, EXTENDER, GIFT_WRAP],
   },
   {
-    slug: 'pearl-strand',
-    name: 'Freshwater Pearl Strand',
-    tagline: 'Real pearls, nothing else',
+    slug: 'the-rowan',
+    name: 'The Rowan',
+    tagline: 'Pearls, with small spacers',
     description:
-      'Genuine cultured freshwater pearls, small and slightly irregular the way real ones are, on a gold-tone clasp. Wears with everything and does not read as costume.',
+      'Pearl beaded necklace with small spacers. Colour and length of your choice.',
     priceCents: 5800,
     weightOz: 2.2,
     material: 'Cultured freshwater pearl on gold-tone findings',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#B08D57',
     image: 'pearl-cream',
-    gallery: ['pearl-butter', 'gold-strand', 'hematite-gold'],
-    addOns: [LENGTH, EXTENDER, GIFT_WRAP],
+    gallery: ['pearl-butter', 'aventurine-pearl'],
+    addOns: [COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
   },
   {
-    slug: 'name-necklace',
-    name: 'Name Necklace',
-    tagline: 'Your word, spelled in mother of pearl',
+    slug: 'the-emmy',
+    name: 'The Emmy',
+    tagline: 'Our delicate style',
     description:
-      'A beaded strand with mother-of-pearl letter discs set into the front. Up to ten characters. Most people order a name, a set of initials, or a birth year.',
+      'Small dainty beads with colour and length of your choice.',
     priceCents: 4200,
-    weightOz: 2.3,
-    material: 'Mother-of-pearl letters on a glass or gemstone strand',
-    leadTime: 'Ships in 7 to 10 days',
+    weightOz: 2.0,
+    material: 'Small gemstone beads on gold-tone findings',
+    leadTime: 'Ships in 5 to 7 days',
     swatch: '#7FA9C4',
-    // The one photograph of a finished letter necklace showed a real person's
-    // initials, so it is not in the catalog. These show the strand and clasp
-    // this piece is built on; a stand-in shot spelling a non-personal word is
-    // the outstanding asset here.
     image: 'amazonite',
-    gallery: ['onyx-pearl-1', 'pearl-cream'],
-    addOns: [
-      {
-        // What the necklace says is the order, not an extra. It costs nothing
-        // and cannot be turned off, but it has to travel with the line all the
-        // way to the Stripe metadata or Jenna does not know what to string.
-        id: 'word',
-        label: 'Reads',
-        note: 'What should it say?',
-        priceCents: 0,
-        weightOz: 0,
-        required: true,
-        input: { placeholder: 'ROSE', maxLength: 10 },
-      },
-      {
-        id: 'base',
-        label: 'Strand colour',
-        note: 'The beads either side of the letters.',
-        priceCents: 0,
-        weightOz: 0,
-        required: true,
-        choices: ['Pale blue', 'Cream', 'Black onyx', 'Green aventurine'],
-      },
-      LENGTH,
-      ACCENTS,
-      EXTENDER,
-      GIFT_WRAP,
-    ],
+    gallery: ['onyx-pearl-2', 'gold-strand'],
+    addOns: [COLOUR, LENGTH, ACCENTS, EXTENDER, GIFT_WRAP],
+  },
+  {
+    slug: 'the-blair',
+    name: 'The Blair',
+    tagline: 'Chunky beads with a statement',
+    description:
+      'Our chunky beaded necklace. Chunky beads with a statement. Colour and length of your choice.',
+    priceCents: 5600,
+    weightOz: 3.2,
+    material: 'Chunky gemstone and heishi on gold-tone findings',
+    leadTime: 'Ships in 5 to 7 days',
+    swatch: '#3AA6A8',
+    image: 'turquoise-heishi',
+    gallery: ['coral-2', 'hematite-gold'],
+    addOns: [COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
+  },
+  {
+    slug: 'the-delicate-monogram',
+    name: 'The Delicate Monogram',
+    tagline: 'Initials on a dainty strand',
+    description:
+      'Our monogram necklace with the colour and length of your choice, on our delicate strand.',
+    priceCents: 4600,
+    weightOz: 2.1,
+    material: 'Mother-of-pearl letters on small gemstone beads',
+    leadTime: 'Ships in 7 to 10 days',
+    swatch: '#9BB7C9',
+    // NO PHOTO YET. The only shot of a finished monogram piece showed a real
+    // person's initials and was deleted at Landon's request. This stands in
+    // with the strand it is built on. A replacement spelling something
+    // non-personal is the outstanding asset.
+    image: 'amazonite',
+    gallery: ['onyx-pearl-2'],
+    addOns: [MONOGRAM, COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
+  },
+  {
+    slug: 'the-chunky-monogram',
+    name: 'The Chunky Monogram',
+    tagline: 'Initials, with more presence',
+    description:
+      'Our monogram necklace with the colour and length of your choice, on our chunky strand.',
+    priceCents: 5200,
+    weightOz: 3.0,
+    material: 'Mother-of-pearl letters on chunky gemstone beads',
+    leadTime: 'Ships in 7 to 10 days',
+    swatch: '#2E8F91',
+    // Same missing-photo caveat as the delicate monogram.
+    image: 'turquoise-heishi',
+    gallery: ['coral-2'],
+    addOns: [MONOGRAM, COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
   },
 ];
 
