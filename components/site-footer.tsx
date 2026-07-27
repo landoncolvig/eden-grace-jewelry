@@ -12,7 +12,7 @@ export default function SiteFooter() {
         <div>
           <div className="flex items-center gap-3">
             <Logo size={28} className="text-bench/85" />
-            <p className="font-display text-lg">Jenna&rsquo;s Jewelry</p>
+            <p className="font-display text-lg">Eden Grace Jewelry Co.</p>
           </div>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-bench/65">
             Made to order at the bench. Every strand is laid out, strung, and
@@ -62,7 +62,7 @@ export default function SiteFooter() {
       <div className="border-t border-bench/12">
         <div className="mx-auto max-w-6xl px-5 py-5 sm:px-8">
           <p className="font-spec text-[0.65rem] tracking-wide text-bench/45">
-            &copy; {new Date().getFullYear()} Jenna&rsquo;s Jewelry
+            &copy; {new Date().getFullYear()} Eden Grace Jewelry Co.
           </p>
         </div>
       </div>

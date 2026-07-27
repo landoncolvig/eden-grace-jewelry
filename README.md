@@ -1,10 +1,10 @@
-# Jenna's Jewelry
+# Eden Grace Jewelry Co.
 
 Storefront for custom-made necklaces. Static site on GitHub Pages, one Cloud
 Function for anything that needs a secret.
 
 ```
-jennasjewelry.com          GitHub Pages, static export of this Next.js app
+edengracejewelry.com          GitHub Pages, static export of this Next.js app
 <function URL>             Cloud Function gen2: Stripe, USPS rating, order email
 ```
 
@@ -25,7 +25,7 @@ import it:
 The browser sends item ids and a ZIP, never a price. `shared/pricing.js`
 re-derives every amount server-side, so editing `localStorage` changes what you
 see, not what you pay. Verified: a cart claiming the necklace costs 1 cent
-produces a Stripe session charging $68.00.
+produces a Stripe session charging $48.00.
 
 `shared/` is copied into `functions/api/shared/` at deploy time (see
 `deploy.sh`) because gcloud only uploads the source directory. That copy is
@@ -49,7 +49,7 @@ no server callback to recalculate shipping after the customer types an address.
 The alternative (embedded checkout with `permissions.update_shipping_details`)
 does support live recalculation but silently disables Apple Pay and Google Pay,
 which costs more in abandoned mobile carts than the rate precision is worth on a
-$68 order.
+$48 order.
 
 If Shippo is slow or down, the function falls back to a flat rate rather than
 blocking the sale. The fallback is set above the zone-8 price so it is never a
@@ -102,9 +102,8 @@ USPS commercial rates active immediately. Take the **live** token, not the test
 one: Shippo's test mode returns mock rates for some USPS services. Rating is
 about 1c per call; you are not charged for labels until one is bought.
 
-Then fill in `ORIGIN` in `shared/catalog.js` with the real ship-from address.
-It is blank right now, and the origin ZIP is what determines the zone, so rates
-are wrong until it is set.
+The ship-from address is already set, as the `jj-origin` secret. It is not in
+this repo: the repo is public and the origin is a private residence.
 
 ### 2. Gmail sending
 
@@ -152,7 +151,7 @@ push. Register the same URL + `/webhook` as a Stripe webhook endpoint for
 ### 4. DNS
 
 Do this **last**, after Pages is serving. Records go in
-`hpanel.hostinger.com` → Domains → jennasjewelry.com → DNS. The registrar panel
+`hpanel.hostinger.com` → Domains → edengracejewelry.com → DNS. The registrar panel
 is the only place that takes effect.
 
 ## Layout

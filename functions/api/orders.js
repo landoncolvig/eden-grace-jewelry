@@ -259,7 +259,7 @@ async function emailTrackingToCustomer({ session, label }) {
 <tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#fbfbf9;border:1px solid #1b2a33;">
   <tr><td style="padding:28px 28px 8px;">
-    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8b969d;">Jenna&rsquo;s Jewelry</div>
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#8b969d;">Eden Grace Jewelry Co.</div>
     <div style="margin-top:10px;font-size:24px;color:#1b2a33;">Your piece is on its way</div>
   </td></tr>
   <tr><td style="padding:8px 28px 24px;font-size:15px;line-height:1.6;color:#56646d;">

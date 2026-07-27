@@ -25,9 +25,9 @@ export default function SiteHeader() {
         <Link href="/" className="group flex items-center gap-3">
           <Logo size={30} className="text-bench/85 transition-colors group-hover:text-bench" />
           <span className="flex items-baseline gap-2.5">
-            <span className="font-display text-xl tracking-tight sm:text-2xl">Jenna&rsquo;s</span>
+            <span className="font-display text-xl tracking-tight sm:text-2xl">Eden Grace</span>
             <span className="font-spec text-[0.6rem] uppercase tracking-[0.22em] text-bench/55 transition-colors group-hover:text-brass">
-              Jewelry
+              Jewelry Co.
             </span>
           </span>
         </Link>

@@ -38,17 +38,17 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://jennasjewelry.com'),
+  metadataBase: new URL('https://edengracejewelry.com'),
   title: {
-    default: "Jenna's Jewelry | Beaded necklaces, strung by hand",
-    template: "%s | Jenna's Jewelry",
+    default: "Eden Grace Jewelry Co. | Beaded necklaces, strung by hand",
+    template: "%s | Eden Grace Jewelry Co.",
   },
   description:
     'Gemstone and freshwater pearl necklaces, strung by hand and made to order. Natural stone varies, so no two strands come out the same.',
   openGraph: {
     type: 'website',
-    siteName: "Jenna's Jewelry",
-    title: "Jenna's Jewelry",
+    siteName: "Eden Grace Jewelry Co.",
+    title: "Eden Grace Jewelry Co.",
     description:
       'Gemstone strands, freshwater pearl necklaces, and mother-of-pearl name necklaces, made to order.',
   },

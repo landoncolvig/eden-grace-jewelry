@@ -44,7 +44,7 @@ export default function Logo({
       fill="none"
       className={className}
       role="img"
-      aria-label="Jenna's Jewelry"
+      aria-label="Eden Grace Jewelry Co."
     >
       {Array.from({ length: beads }, (_, i) => {
         const angle = start + (sweep * i) / (beads - 1);

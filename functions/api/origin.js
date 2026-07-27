@@ -8,7 +8,7 @@
  * return address, so it is injected as a secret at deploy time.
  *
  * Set it with:
- *   printf '{"name":"Jenna'"'"'s Jewelry","street1":"...","city":"...","state":"TX","zip":"76021"}' \
+ *   printf '{"name":"Eden Grace Jewelry Co.","street1":"...","city":"...","state":"TX","zip":"76021"}' \
  *     | gcloud secrets create jj-origin --data-file=-
  *
  * and wire it in deploy.sh as ORIGIN_JSON=jj-origin:latest.

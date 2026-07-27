@@ -1,5 +1,5 @@
 /**
- * jennasjewelry.com API — GCP Cloud Function (gen2, Node 22).
+ * edengracejewelry.com API — GCP Cloud Function (gen2, Node 22).
  *
  * The storefront is a static export on GitHub Pages, which cannot hold a
  * secret. This function is the only place the Stripe key and the Shippo token
@@ -37,6 +37,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2025-03-31.basil',
 });
 
+// Falls back to the pre-rebrand domain on purpose: that is what currently
+// resolves and serves. Flip this, public/CNAME, and deploy.sh together the
+// moment edengracejewelry.com is registered and pointing at Pages. Changing
+// one without the others takes the store offline.
 const SITE = process.env.SITE_URL || 'https://jennasjewelry.com';
 const SHIPPO_TOKEN = process.env.SHIPPO_TOKEN || '';
 // This function's own public URL, used to build the signed buy-label link that
@@ -44,6 +48,10 @@ const SHIPPO_TOKEN = process.env.SHIPPO_TOKEN || '';
 const API_BASE = (process.env.API_BASE_URL || '').replace(/\/$/, '');
 
 const ALLOWED_ORIGINS = new Set([
+  'https://edengracejewelry.com',
+  'https://www.edengracejewelry.com',
+  // The pre-rebrand domain still resolves and 301s here, but a browser
+  // that lands on it mid-redirect can still send this Origin.
   'https://jennasjewelry.com',
   'https://www.jennasjewelry.com',
   'http://localhost:3000',

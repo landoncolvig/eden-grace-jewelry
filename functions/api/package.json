@@ -1,8 +1,8 @@
 {
-  "name": "jennas-jewelry-api",
+  "name": "eden-grace-api",
   "version": "1.0.0",
   "private": true,
-  "description": "Stripe checkout and USPS rating for jennasjewelry.com",
+  "description": "Stripe checkout and USPS rating for edengracejewelry.com",
   "main": "index.js",
   "engines": {
     "node": ">=22"
