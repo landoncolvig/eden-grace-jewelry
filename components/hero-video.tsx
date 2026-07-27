@@ -74,7 +74,11 @@ export default function HeroVideo({ className }: { className?: string }) {
       loop
       playsInline
       autoPlay
-      preload="metadata"
+      // auto, not metadata. This is the hero: it should be moving by the time
+      // anyone looks at it, and metadata-only leaves autoplay waiting on a
+      // buffer it has not started filling. At 261 KB of WebM the eager fetch
+      // is cheaper than the stall.
+      preload="auto"
       onError={() => setFailed(true)}
       aria-label="A green aventurine and freshwater pearl strand, turning slowly"
       className={className}

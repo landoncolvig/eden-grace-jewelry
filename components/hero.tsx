@@ -1,26 +1,24 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
-import { photo } from '@/lib/shop';
+import HeroVideo from './hero-video';
 
 /**
- * The hero.
+ * The hero: four seconds of a real strand turning in the light.
  *
- * An earlier version rendered a procedurally modelled necklace in WebGL and
- * let the visitor type a word onto it. The idea was sound and the execution
- * was not: next to photographs of real strung beads, generated geometry reads
- * as a diagram. Real product photography wins, so the hero is a photograph.
+ * Third version, and the first one that works. The first rendered a
+ * procedurally modelled necklace in WebGL, which reads as a diagram next to
+ * photographs of real strung beads. The second was a still photograph, honest
+ * but motionless. Jenna then filmed an actual strand rotating against a wall,
+ * which is exactly what the WebGL version was reaching for and could not fake:
+ * the piece moving, catching light, at the scale of a hand.
  *
- * The turquoise heishi piece specifically, because it is the most saturated
- * thing in the catalog and the page around it is deliberately quiet. On a
- * storefront the product should be the loudest element, and this is the shot
- * that makes that true.
+ * Encoding and the autoplay and reduced-motion rules live in
+ * components/hero-video.
  *
- * The word entry that used to live here has moved to the monogram pages.
- * A "set your word" field beside a turquoise strand asked the visitor to
- * personalise a piece that is not personalised; the configurator is where that
- * question actually belongs.
+ * The word entry that used to live here has moved to the monogram pages. A
+ * "set your word" field beside a strand that is not personalised asked the
+ * wrong question in the wrong place; the configurator is where it belongs.
  */
 export default function Hero() {
   return (
@@ -64,14 +62,7 @@ export default function Hero() {
           </div>
 
           <div className="overflow-hidden rounded-[28px] bg-paper ring-1 ring-rule">
-            <Image
-              src={photo('turquoise-heishi')}
-              alt="A heishi disc necklace in turquoise, teal, pink and red, with gold spacers"
-              width={1500}
-              height={1500}
-              priority
-              className="w-full"
-            />
+            <HeroVideo className="w-full" />
           </div>
         </div>
       </div>
