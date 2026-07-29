@@ -2,7 +2,7 @@
   "name": "eden-grace-api",
   "version": "1.0.0",
   "private": true,
-  "description": "Stripe checkout and USPS rating for edengracejewelry.com",
+  "description": "Square checkout and USPS rating for edengracejewelry.com",
   "main": "index.js",
   "engines": {
     "node": ">=22"
@@ -12,7 +12,6 @@
     "dev": "functions-framework --target=api --port=8080"
   },
   "dependencies": {
-    "@google-cloud/functions-framework": "^4.0.0",
-    "stripe": "^22.3.2"
+    "@google-cloud/functions-framework": "^4.0.0"
   }
 }

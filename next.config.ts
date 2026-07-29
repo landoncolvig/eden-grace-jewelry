@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // GitHub Pages serves files, not a Node server. Everything here has to be
-  // pre-rendered at build time into ./out. The Stripe and USPS calls live in
+  // pre-rendered at build time into ./out. The Square and USPS calls live in
   // the Cloud Function under ./functions/api, not in this app.
   output: 'export',
 

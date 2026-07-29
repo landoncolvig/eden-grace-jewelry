@@ -8,15 +8,17 @@ import { useCart } from './cart-context';
 export default function SuccessView() {
   const params = useSearchParams();
   const { clear } = useCart();
-  const sessionId = params.get('session_id');
+  const orderId = params.get('orderId');
+  const transactionId = params.get('transactionId');
+  const receiptId = orderId || transactionId || params.get('checkoutId');
 
-  // Emptying the cart is safe here because Stripe only ever redirects to this
-  // URL after a completed payment. Fulfillment does not depend on this page
+  // Emptying the cart is safe here because Square only redirects to this URL
+  // after a completed payment. Fulfillment does not depend on this page
   // being reached, though: the webhook is what tells Jenna to start cutting,
   // so closing the tab at the wrong moment cannot lose an order.
   useEffect(() => {
-    if (sessionId) clear();
-  }, [sessionId, clear]);
+    if (receiptId) clear();
+  }, [receiptId, clear]);
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-24 text-center sm:px-8">
@@ -56,9 +58,9 @@ export default function SuccessView() {
         Back to the shop
       </Link>
 
-      {sessionId && (
+      {receiptId && (
         <p className="mt-8 font-spec text-[0.65rem] text-ink-faint">
-          {sessionId.slice(0, 28)}…
+          {receiptId.slice(0, 28)}…
         </p>
       )}
     </div>

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Deploy the jennasjewelry.com API to Cloud Functions gen2.
+# Deploy the Eden Grace Jewelry API to Cloud Functions gen2.
 #
 # shared/ is the single source of prices and is imported by both the storefront
 # and this function. gcloud only uploads the source directory, so it gets copied
@@ -15,6 +15,10 @@ NAME="${NAME:-jennas-jewelry-api}"
 # The active gcloud account flips between terminals, so pin it per invocation
 # rather than trusting whatever is currently configured.
 ACCOUNT="${GCLOUD_ACCOUNT:-colviglandon@gmail.com}"
+# The service URL is stable for this deployed function. Supplying it here keeps
+# Square's signed webhook URL exact across deployments.
+API_BASE_URL="${API_BASE_URL:-https://jennas-jewelry-api-qrowd7xcqq-uc.a.run.app}"
+SQUARE_WEBHOOK_URL="${SQUARE_WEBHOOK_URL:-${API_BASE_URL}/webhook}"
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$HERE"
@@ -38,8 +42,8 @@ gcloud functions deploy "$NAME" \
   --timeout=30s \
   --min-instances=0 \
   --max-instances=10 \
-  --set-env-vars="SITE_URL=https://edengracejewelry.com,API_BASE_URL=${API_BASE_URL:-}" \
-  --set-secrets="STRIPE_SECRET_KEY=jj-stripe-secret-key:latest,STRIPE_WEBHOOK_SECRET=jj-stripe-webhook-secret:latest,SHIPPO_TOKEN=jj-shippo-token:latest,GMAIL_OAUTH=jj-gmail-oauth:latest,LABEL_SIGNING_KEY=jj-label-signing-key:latest,ORIGIN_JSON=jj-origin:latest"
+  --set-env-vars="SITE_URL=https://edengracejewelry.com,API_BASE_URL=${API_BASE_URL},SQUARE_WEBHOOK_URL=${SQUARE_WEBHOOK_URL},SQUARE_LOCATION_ID=L9TN6YV1BZ8MF" \
+  --set-secrets="SQUARE_ACCESS_TOKEN=jj-square-access-token:latest,SQUARE_WEBHOOK_SIGNATURE_KEY=jj-square-webhook-signature-key:latest,SHIPPO_TOKEN=jj-shippo-token:latest,GMAIL_OAUTH=jj-gmail-oauth:latest,LABEL_SIGNING_KEY=jj-label-signing-key:latest,ORIGIN_JSON=jj-origin:latest"
 
 echo
 echo "==> Deployed. Endpoint:"

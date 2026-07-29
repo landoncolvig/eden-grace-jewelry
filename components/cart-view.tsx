@@ -19,9 +19,9 @@ type Quote = {
 };
 
 /**
- * The cart collects the destination ZIP before handing off to Stripe.
+ * The cart collects the destination ZIP before handing off to Square.
  *
- * That ordering is deliberate. Stripe's hosted checkout page cannot call back
+ * That ordering is deliberate. Square's hosted checkout page cannot call back
  * to a server to recalculate shipping after the customer types an address, so
  * the only way to charge a real USPS rate and still use the hosted page is to
  * quote it here first and pass the result into the session. The alternative,
@@ -69,14 +69,14 @@ export default function CartView() {
     setCheckingOut(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/create-checkout-session`, {
+      const res = await fetch(`${API_BASE}/create-payment-link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ zip, cart: lines }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? `checkout failed: ${res.status}`);
-      // Stripe hosts the payment page; leaving the site here is expected.
+      // Square hosts the payment page; leaving the site here is expected.
       window.location.href = data.url;
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Checkout could not start.');
@@ -280,7 +280,7 @@ export default function CartView() {
               {error && <p className="mt-2.5 text-center text-sm text-flag">{error}</p>}
 
               <p className="mt-4 text-center text-xs leading-relaxed text-ink-faint">
-                Payment is handled by Stripe. Card details never touch this site.
+                Payment is handled by Square. Card details never touch this site.
               </p>
             </div>
           </div>

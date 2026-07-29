@@ -1,7 +1,7 @@
 name: Deploy to GitHub Pages
 
 # The storefront is a static export. Nothing secret is built into it: the
-# Stripe key and Shippo token live in the Cloud Function, and the only value
+# Square access token and Shippo token live in the Cloud Function, and the only value
 # baked in here is the public API base URL.
 on:
   push:

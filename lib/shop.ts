@@ -102,5 +102,5 @@ export const applyShippingRules = pricing.applyShippingRules as (
   quotedCents: number,
 ) => { chargedCents: number; free: boolean; quotedCents: number };
 
-/** Base URL of the Cloud Function that holds the Stripe and Shippo keys. */
+/** Base URL of the Cloud Function that holds the Square and Shippo keys. */
 export const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? '').replace(/\/$/, '');

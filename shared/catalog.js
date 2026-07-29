@@ -4,7 +4,7 @@
  * Both the storefront and the Cloud Function import this file. The storefront
  * uses it to render; the function uses it to price. That matters: the browser
  * only ever sends item ids and add-on ids, and the function re-derives every
- * amount from this file when it builds the Stripe Checkout Session. Somebody
+ * amount from this file when it builds the Square payment link. Somebody
  * editing localStorage changes what they see, not what they are charged.
  *
  * Plain JS with JSDoc rather than TypeScript so the function can require() it

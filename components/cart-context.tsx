@@ -98,7 +98,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clear = useCallback(() => setLines([]), []);
 
   // Priced with the same module the Cloud Function uses, so what the customer
-  // sees here and what Stripe charges are computed by identical code.
+  // sees here and what Square charges are computed by identical code.
   const priced = useMemo(() => priceCart(lines), [lines]);
 
   const count = useMemo(() => lines.reduce((n, l) => n + l.qty, 0), [lines]);

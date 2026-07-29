@@ -21,7 +21,7 @@ import { useCart } from './cart-context';
  * that writes itself as the buyer toggles options: what gets made and what it
  * costs, visible before anything is added to the cart. That transparency is
  * the reason to configure here rather than to discover the real total on the
- * Stripe page.
+ * Square checkout page.
  */
 export default function Configurator({ product }: { product: Product }) {
   const search = useSearchParams();
@@ -70,7 +70,7 @@ export default function Configurator({ product }: { product: Product }) {
   );
 
   // Priced by the same module the Cloud Function uses, so this figure and the
-  // Stripe charge come from one implementation. missingRequired is the same
+  // Square charges come from one implementation. missingRequired is the same
   // check the server will run, so the button disables for exactly the reason
   // the server would refuse.
   const preview = useMemo(
