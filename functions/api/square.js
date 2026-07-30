@@ -92,8 +92,9 @@ function buildPaymentLinkPayload({
         // The note is the bench-ready custom specification.
         note: line.description.slice(0, 2_000),
       })),
-      // Metadata is private to this Square application. It contains no buyer
-      // data and leaves room for the fulfillment and label state below.
+      // Metadata is private to this Square application and contains no buyer
+      // data. Square adds the SHIPMENT fulfillment when checkout collects the
+      // buyer's shipping address.
       metadata: {
         storefront: STORE_FRONT,
         weight_oz: priced.totalWeightOz.toFixed(2),
@@ -256,20 +257,6 @@ function isStorefrontOrder(order) {
   return Boolean(order && order.metadata && order.metadata.storefront === STORE_FRONT);
 }
 
-async function getCompletedPaymentForOrder(order) {
-  const paymentIds = [...new Set(
-    (order.tenders || [])
-      .map((tender) => tender.payment_id || tender.id)
-      .filter(Boolean),
-  )];
-
-  for (const paymentId of paymentIds) {
-    const payment = await retrievePayment(paymentId);
-    if (payment.status === 'COMPLETED' && payment.order_id === order.id) return payment;
-  }
-  return null;
-}
-
 function recipientFor(order) {
   const fulfillment = (order.fulfillments || []).find(
     (entry) => entry.type === 'SHIPMENT' && entry.shipment_details,
@@ -331,6 +318,5 @@ module.exports = {
   mergeOrderMetadata,
   verifyWebhookSignature,
   isStorefrontOrder,
-  getCompletedPaymentForOrder,
   normalizeSquareSale,
 };

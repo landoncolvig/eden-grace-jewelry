@@ -32,6 +32,7 @@ test('buildPaymentLinkPayload uses server-priced items and a USPS fee', () => {
   assert.equal(payload.order.location_id, 'LOCATION');
   assert.equal(payload.order.line_items[0].quantity, '2');
   assert.equal(payload.order.line_items[0].base_price_money.amount, 5600);
+  assert.equal(payload.checkout_options.ask_for_shipping_address, true);
   assert.equal(payload.checkout_options.shipping_fee.charge.amount, 695);
   assert.equal(payload.checkout_options.redirect_url, 'https://edengracejewelry.com/success/');
   assert.equal(payload.order.metadata.shipping_quote, '76021|695|live');
@@ -63,7 +64,7 @@ test('verifyWebhookSignature accepts only Square’s exact URL and raw body', ()
   assert.equal(verifyWebhookSignature(Buffer.from(`${raw} `), signature, { signatureKey, notificationUrl }), false);
 });
 
-test('normalizeSquareSale maps paid Square shipping details into a label-ready sale', () => {
+test('normalizeSquareSale maps paid Square shipping details into a work order', () => {
   const sale = normalizeSquareSale(
     {
       id: 'ORDER',

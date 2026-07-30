@@ -42,8 +42,8 @@ gcloud functions deploy "$NAME" \
   --timeout=30s \
   --min-instances=0 \
   --max-instances=10 \
-  --set-env-vars="SITE_URL=https://edengracejewelry.com,API_BASE_URL=${API_BASE_URL},SQUARE_WEBHOOK_URL=${SQUARE_WEBHOOK_URL},SQUARE_LOCATION_ID=L9TN6YV1BZ8MF" \
-  --set-secrets="SQUARE_ACCESS_TOKEN=jj-square-access-token:latest,SQUARE_WEBHOOK_SIGNATURE_KEY=jj-square-webhook-signature-key:latest,SHIPPO_TOKEN=jj-shippo-token:latest,GMAIL_OAUTH=jj-gmail-oauth:latest,LABEL_SIGNING_KEY=jj-label-signing-key:latest,ORIGIN_JSON=jj-origin:latest"
+  --set-env-vars="SITE_URL=https://edengracejewelry.com,SQUARE_WEBHOOK_URL=${SQUARE_WEBHOOK_URL},SQUARE_LOCATION_ID=L9TN6YV1BZ8MF" \
+  --set-secrets="SQUARE_ACCESS_TOKEN=jj-square-access-token:latest,SQUARE_WEBHOOK_SIGNATURE_KEY=jj-square-webhook-signature-key:latest,SHIPPO_TOKEN=jj-shippo-token:latest,GMAIL_OAUTH=jj-gmail-oauth:latest,ORIGIN_JSON=jj-origin:latest"
 
 echo
 echo "==> Deployed. Endpoint:"

@@ -4,6 +4,8 @@
  * GitHub Pages hosts a static storefront. This function keeps Square and
  * Shippo credentials server-side, re-prices every cart item from the shared
  * catalog, creates Square-hosted checkout links, and handles paid orders.
+ * Shippo is used only to quote postage. Square owns shipment fulfillment,
+ * label purchase, and customer tracking notifications.
  */
 
 const functions = require('@google-cloud/functions-framework');
@@ -20,22 +22,13 @@ const {
   mergeOrderMetadata,
   verifyWebhookSignature,
   isStorefrontOrder,
-  getCompletedPaymentForOrder,
   normalizeSquareSale,
 } = require('./square.js');
-const {
-  verifyOrder,
-  escapeHtml,
-  emailOrderToOwner,
-  buyLabel,
-  retrieveLabel,
-  findLabelForOrder,
-  emailTrackingToCustomer,
-} = require('./orders.js');
+const { emailOrderToOwner } = require('./orders.js');
 
 const SITE = process.env.SITE_URL || 'https://edengracejewelry.com';
-const API_BASE = (process.env.API_BASE_URL || '').replace(/\/$/, '');
 const SHIPPO_TOKEN = process.env.SHIPPO_TOKEN || '';
+const SQUARE_SHIPMENTS_URL = 'https://app.squareup.com/dashboard/orders/shipments/to-do';
 
 const ALLOWED_ORIGINS = new Set([
   'https://edengracejewelry.com',
@@ -165,7 +158,9 @@ async function api(req, res) {
   const route = routeName(req);
   try {
     if (route === 'webhook') return await handleWebhook(req, res);
-    if (route === 'label') return await handleLabel(req, res);
+    // Preserve old order-email links without retaining a second label-buying
+    // system. Square requires authentication before showing the shipment.
+    if (route === 'label') return res.redirect(302, SQUARE_SHIPMENTS_URL);
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
     if (route === 'shipping-quote') return await handleQuote(req, res);
     // Leave the legacy route live during the deployment transition. It calls
@@ -272,10 +267,8 @@ async function fulfillPayment(paymentId) {
     });
   }
 
-  if (!API_BASE) throw new Error('API_BASE_URL is not configured');
-
   try {
-    await emailOrderToOwner({ sale, apiBase: API_BASE });
+    await emailOrderToOwner({ sale });
     await mergeOrderMetadata(sale.id, { owner_email_state: 'sent' });
   } catch (err) {
     // Keep the order in the visible Square dashboard and log a clear failure.
@@ -328,201 +321,6 @@ async function handleWebhook(req, res) {
 
   await fulfillPayment(payment.id);
   return res.status(200).end();
-}
-
-/* ------------------------------------------------------------------ *
- * Label purchase, clicked from Jenna's signed order email
- * ------------------------------------------------------------------ */
-
-function labelPage({ title, body, primary, primaryHref }) {
-  return `<!doctype html><html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title></head>
-<body style="margin:0;background:#edeeea;font-family:system-ui,sans-serif;color:#1b2a33;">
-<div style="max-width:460px;margin:0 auto;padding:48px 20px;"><div style="background:#fbfbf9;border:1px solid #1b2a33;padding:28px;">
-<h1 style="margin:0 0 14px;font-size:22px;font-weight:600;">${escapeHtml(title)}</h1>
-<div style="font-size:15px;line-height:1.6;color:#56646d;">${body}</div>
-${primary ? `<a href="${escapeHtml(primaryHref)}" style="display:block;margin-top:22px;background:#1b2a33;color:#edeeea;text-decoration:none;padding:14px;text-align:center;font-size:16px;">${escapeHtml(primary)}</a>` : ''}
-</div></div></body></html>`;
-}
-
-function sendLabelPage(res, page, status = 200) {
-  res.set('Content-Type', 'text/html; charset=utf-8');
-  return res.status(status).send(page);
-}
-
-function labelResultPage({ title, label, alreadyBought = false }) {
-  return labelPage({
-    title,
-    body: `${alreadyBought ? 'Postage was already purchased, so this click did not charge anything.<br><br>' : ''}Tracking <strong>${escapeHtml(label.tracking || 'unknown')}</strong>${label.cost ? ` &middot; ${escapeHtml(label.cost)}` : ''}<br><br>${alreadyBought ? '' : 'The customer has been emailed the tracking number. '}Print on a 4x6 label or on paper and tape it down.`,
-    primary: 'Open the label PDF',
-    primaryHref: label.labelPdf,
-  });
-}
-
-async function recoverBuyingLabel(order) {
-  try {
-    const label = await findLabelForOrder(order.id);
-    if (!label) return null;
-    await mergeOrderMetadata(order.id, {
-      label_state: 'bought',
-      label_tx: label.transactionId,
-      label_tracking: label.tracking,
-      label_lock_at: null,
-    }).catch((err) => console.error('could not persist recovered label', { orderId: order.id, error: err.message }));
-    return label;
-  } catch (err) {
-    console.error('could not check Shippo for an in-progress label', { orderId: order.id, error: err.message });
-    return null;
-  }
-}
-
-async function handleLabel(req, res) {
-  const orderId = String(req.query.order || '');
-  const token = String(req.query.token || '');
-
-  if (!orderId) {
-    const oldSession = String(req.query.session || '');
-    return sendLabelPage(
-      res,
-      labelPage({
-        title: oldSession ? 'This old label link needs review' : 'That link is not valid',
-        body: oldSession
-          ? 'This order was created before the Square checkout switch. Check it in the old payment dashboard before buying postage.'
-          : 'Open the complete link from the order email.',
-      }),
-      403,
-    );
-  }
-  if (!verifyOrder(orderId, token)) {
-    return sendLabelPage(
-      res,
-      labelPage({
-        title: 'That link is not valid',
-        body: 'The link signature did not match. Open the complete link from the order email.',
-      }),
-      403,
-    );
-  }
-
-  let order = await retrieveOrder(orderId);
-  if (!isStorefrontOrder(order)) {
-    return sendLabelPage(res, labelPage({ title: 'That order is not available', body: 'Check the Square dashboard before buying postage.' }), 403);
-  }
-
-  const payment = await getCompletedPaymentForOrder(order);
-  if (!payment) {
-    return sendLabelPage(res, labelPage({ title: 'This order is not paid', body: 'No label was bought. Check the Square order before shipping anything.' }), 409);
-  }
-
-  // Try twice only. A version conflict means another browser opened the same
-  // signed link, and the refreshed order tells this request which one won.
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const metadata = order.metadata || {};
-    if (metadata.label_tx) {
-      try {
-        const label = await retrieveLabel(metadata.label_tx);
-        return sendLabelPage(res, labelResultPage({ title: 'Label already bought', label, alreadyBought: true }));
-      } catch {
-        return sendLabelPage(
-          res,
-          labelPage({
-            title: 'Label needs a quick check',
-            body: `A label transaction is already recorded for this order. Open Shippo and search for order <code>${escapeHtml(order.id)}</code> before buying another one.`,
-          }),
-          409,
-        );
-      }
-    }
-
-    if (metadata.label_state === 'buying' || metadata.label_state === 'bought') {
-      const recovered = await recoverBuyingLabel(order);
-      if (recovered) {
-        return sendLabelPage(res, labelResultPage({ title: 'Label already bought', label: recovered, alreadyBought: true }));
-      }
-      return sendLabelPage(
-        res,
-        labelPage({
-          title: 'A label request is pending',
-          body: `This order is already reserved for a label purchase. Check Shippo for order <code>${escapeHtml(order.id)}</code> before trying again, so postage is never charged twice.`,
-        }),
-        409,
-      );
-    }
-
-    if (order.state !== 'OPEN') {
-      return sendLabelPage(
-        res,
-        labelPage({
-          title: 'This Square order is closed',
-          body: 'Square will not let this order record a label safely. Buy the label from the Shippo dashboard after checking the paid order.',
-        }),
-        409,
-      );
-    }
-
-    let claimed;
-    try {
-      claimed = await updateOrderMetadata(order, {
-        label_state: 'buying',
-        label_lock_at: new Date().toISOString(),
-      });
-    } catch (err) {
-      if (err instanceof SquareApiError && err.code === 'VERSION_MISMATCH') {
-        order = await retrieveOrder(orderId);
-        continue;
-      }
-      throw err;
-    }
-
-    const sale = normalizeSquareSale(claimed, payment);
-    let label;
-    try {
-      label = await buyLabel(sale);
-    } catch (err) {
-      console.error('label purchase failed', { orderId, error: err.message });
-      await mergeOrderMetadata(orderId, { label_state: 'ready', label_lock_at: null }).catch((updateError) =>
-        console.error('could not release label claim', { orderId, error: updateError.message }),
-      );
-      return sendLabelPage(
-        res,
-        labelPage({
-          title: 'Could not buy the label',
-          body: `USPS or Shippo refused the purchase. Nothing was charged. You can buy this one by hand in the Shippo dashboard.<br><br><code style="font-size:13px;color:#a4442f;">${escapeHtml(String(err.message).slice(0, 200))}</code>`,
-        }),
-        502,
-      );
-    }
-
-    await mergeOrderMetadata(orderId, {
-      label_state: 'bought',
-      label_tx: label.transactionId,
-      label_tracking: label.tracking,
-      label_lock_at: null,
-    }).catch((err) =>
-      // The pre-purchase claim stays in Square. If this write fails after a
-      // successful Shippo charge, a later click searches Shippo by order id
-      // instead of buying a second label.
-      console.error('could not persist bought label', { orderId, error: err.message }),
-    );
-
-    try {
-      await emailTrackingToCustomer({ sale, label });
-    } catch (err) {
-      console.error('tracking email failed', { orderId, error: err.message });
-    }
-
-    console.log('LABEL BOUGHT', { orderId, tracking: label.tracking, cost: label.cost });
-    return sendLabelPage(res, labelResultPage({ title: 'Label bought', label }));
-  }
-
-  return sendLabelPage(
-    res,
-    labelPage({
-      title: 'A label request is already open',
-      body: 'Refresh once. If this page remains, check Shippo before buying another label.',
-    }),
-    409,
-  );
 }
 
 functions.http('api', api);

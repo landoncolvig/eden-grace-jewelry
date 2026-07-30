@@ -5,7 +5,7 @@ single Cloud Function keeps payment and shipping credentials private.
 
 ```
 edengracejewelry.com   GitHub Pages static export
-functions/api/         Square checkout, Shippo rate and label workflow
+functions/api/         Square checkout, Shippo USPS rate, work-order email
 shared/                catalog and server-side pricing rules
 ```
 
@@ -28,11 +28,11 @@ Shippo supplies a live USPS Ground Advantage rate from the buyer ZIP. A quote
 is cached by ZIP3 for 12 hours. If Shippo is unavailable, checkout uses the
 catalog's conservative fallback rate instead of blocking a sale.
 
-Postage is bought only when Jenna finishes a piece. Her order email includes a
-signed label link. Before Shippo is called, the function writes a label claim
-to the open Square order. The claim prevents a second browser click from buying
-another label. The completed Shippo transaction ID is stored back on that order
-and later clicks retrieve the existing label.
+Square creates each paid checkout as a shipment order. Jenna's work-order email
+links to Square Dashboard > Orders > Shipments > To-do. When the piece is boxed,
+she creates and buys the USPS label there through the Shippo account connected
+to Square. Square marks the order shipped and emails tracking to the customer.
+The website does not purchase labels directly.
 
 The ship-from address is held in Secret Manager as `jj-origin`. It is never
 committed to this public repository.
@@ -50,8 +50,8 @@ SQUARE_ACCESS_TOKEN=replace-me \
 SQUARE_LOCATION_ID=replace-me \
 SQUARE_WEBHOOK_SIGNATURE_KEY=replace-me \
 SQUARE_WEBHOOK_URL=http://localhost:8080/webhook \
-LABEL_SIGNING_KEY=dev-only-key \
-API_BASE_URL=http://localhost:8080 \
+SHIPPO_TOKEN=replace-me \
+ORIGIN_JSON='{"name":"...","street1":"...","city":"...","state":"...","zip":"...","country":"US"}' \
 SITE_URL=http://localhost:3000 \
 npm run dev
 ```
@@ -67,7 +67,6 @@ The function deployment binds these secrets:
 - `jj-square-webhook-signature-key`
 - `jj-shippo-token`
 - `jj-gmail-oauth`
-- `jj-label-signing-key`
 - `jj-origin`
 
 The production Square location ID and the exact webhook URL are ordinary
@@ -93,6 +92,6 @@ The GitHub Actions workflow publishes the static export on each push to
 shared/            catalog.js, pricing.js
 app/               static routes
 components/        storefront UI
-functions/api/     Cloud Function, Square, Shippo, mail
+functions/api/     Cloud Function, Square, Shippo rating, mail
 .github/workflows/ GitHub Pages deployment
 ```
