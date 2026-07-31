@@ -100,6 +100,15 @@ const LENGTH = {
   choices: ['16 inches', '18 inches', '20 inches'],
 };
 
+/** @type {AddOn} */
+const TOGGLE_CLASP = {
+  id: 'toggle-clasp',
+  label: 'Toggle clasp',
+  note: 'A toggle clasp instead of the regular clasp.',
+  priceCents: 300,
+  weightOz: 0,
+};
+
 /**
  * Shared options.
  *
@@ -178,7 +187,7 @@ const PRODUCTS = [
     swatch: '#4A7C74',
     image: 'eden-ivory',
     gallery: ['aventurine-1', 'aventurine-2', 'aventurine-3', 'coral-1', 'onyx-pearl-1'],
-    addOns: [COLOUR, LENGTH, ACCENTS, EXTENDER, GIFT_WRAP],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS, EXTENDER, GIFT_WRAP],
   },
   {
     slug: 'the-rowan',
@@ -193,7 +202,7 @@ const PRODUCTS = [
     swatch: '#B08D57',
     image: 'rowan-gold-pearl',
     gallery: ['pearl-cream', 'pearl-butter', 'aventurine-pearl'],
-    addOns: [COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, EXTENDER, GIFT_WRAP],
   },
   {
     slug: 'the-emmy',
@@ -208,7 +217,7 @@ const PRODUCTS = [
     swatch: '#7FA9C4',
     image: 'emmy-jewel-tone',
     gallery: ['amazonite', 'onyx-pearl-2', 'gold-strand'],
-    addOns: [COLOUR, LENGTH, ACCENTS, EXTENDER, GIFT_WRAP],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS, EXTENDER, GIFT_WRAP],
   },
   {
     slug: 'the-blair',
@@ -223,7 +232,7 @@ const PRODUCTS = [
     swatch: '#3AA6A8',
     image: 'blair-mint-pearl',
     gallery: ['turquoise-heishi', 'coral-2', 'hematite-gold'],
-    addOns: [COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, EXTENDER, GIFT_WRAP],
   },
   {
     slug: 'the-delicate-monogram',
@@ -238,7 +247,7 @@ const PRODUCTS = [
     swatch: '#9BB7C9',
     image: 'delicate-monogram-aqua',
     gallery: ['amazonite', 'onyx-pearl-2'],
-    addOns: [MONOGRAM, COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
+    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP, EXTENDER, GIFT_WRAP],
   },
   {
     slug: 'the-chunky-monogram',
@@ -255,7 +264,7 @@ const PRODUCTS = [
     // keeps the chunky strand reference until she supplies one.
     image: 'turquoise-heishi',
     gallery: ['coral-2'],
-    addOns: [MONOGRAM, COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
+    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP, EXTENDER, GIFT_WRAP],
   },
 ];
 
