@@ -155,7 +155,7 @@ function drawLetterRoughness(char: string, family: string) {
 /**
  * Builds one texture per distinct character and hands back the per-letter list.
  *
- * Waits for the webfont before drawing. next/font loads Fraunces with
+ * Waits for the webfont before drawing. next/font loads Cormorant with
  * `display: swap`, so drawing on first paint would bake the fallback serif into
  * the texture permanently: unlike DOM text, a canvas does not repaint itself
  * when the real face arrives.
@@ -179,7 +179,7 @@ function useLetterTextures(word: string): LetterMaps[] {
 
   const textures = useMemo(() => {
     const family =
-      getComputedStyle(document.documentElement).getPropertyValue('--font-fraunces').trim() ||
+      getComputedStyle(document.documentElement).getPropertyValue('--font-cormorant').trim() ||
       'Georgia, serif';
 
     const cache = new Map<string, LetterMaps>();

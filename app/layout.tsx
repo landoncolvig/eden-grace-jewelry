@@ -1,23 +1,24 @@
 import type { Metadata } from 'next';
-import { Fraunces, Inter, Pinyon_Script, IBM_Plex_Mono } from 'next/font/google';
+import { Cormorant_Garamond, Manrope, Pinyon_Script } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/components/cart-context';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
 
-// Fraunces carries the personality: a variable serif with optical-size,
-// softness, and "wonk" axes that give it the slight irregularity of hand-cut
-// letters. Loaded with the axes it actually uses so the file stays small.
-const fraunces = Fraunces({
-  variable: '--font-fraunces',
+// Cormorant gives the wordmark and display type the fine, high-contrast strokes
+// found in jewelry editorial without turning small interface copy decorative.
+const cormorant = Cormorant_Garamond({
+  variable: '--font-cormorant',
   subsets: ['latin'],
-  axes: ['SOFT', 'WONK', 'opsz'],
+  weight: 'variable',
   display: 'swap',
 });
 
-const inter = Inter({
-  variable: '--font-inter',
+// One humanist sans handles body copy, controls, prices, and utility labels.
+const manrope = Manrope({
+  variable: '--font-manrope',
   subsets: ['latin'],
+  weight: 'variable',
   display: 'swap',
 });
 
@@ -26,14 +27,6 @@ const pinyon = Pinyon_Script({
   variable: '--font-pinyon',
   subsets: ['latin'],
   weight: '400',
-  display: 'swap',
-});
-
-// The spec sheet. A work order should look like a work order.
-const plexMono = IBM_Plex_Mono({
-  variable: '--font-plex-mono',
-  subsets: ['latin'],
-  weight: ['400', '500'],
   display: 'swap',
 });
 
@@ -60,7 +53,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} ${pinyon.variable} ${plexMono.variable} h-full`}
+      className={`${cormorant.variable} ${manrope.variable} ${pinyon.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-bench text-ink">
         <CartProvider>

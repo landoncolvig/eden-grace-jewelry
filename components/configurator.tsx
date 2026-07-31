@@ -90,7 +90,7 @@ export default function Configurator({ product }: { product: Product }) {
     <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
       <button
         onClick={() => router.push('/')}
-        className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint hover:text-ink"
+        className="text-sm font-medium text-ink-soft hover:text-ink"
       >
         &larr; All pieces
       </button>
@@ -119,7 +119,7 @@ export default function Configurator({ product }: { product: Product }) {
                   aria-label={`View ${g.replace(/-/g, ' ')}`}
                   aria-pressed={shot === g}
                   className={`shrink-0 overflow-hidden rounded-xl border transition-colors ${
-                    shot === g ? 'border-ink' : 'border-rule hover:border-ink-faint'
+                    shot === g ? 'border-ink' : 'border-control hover:border-ink'
                   }`}
                 >
                   <Image
@@ -155,7 +155,7 @@ export default function Configurator({ product }: { product: Product }) {
               // they are the interesting decision on the page, so hiding them
               // behind a select would bury the thing the buyer came to choose.
               <fieldset key={spec.id} className="mt-10">
-                <legend className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
+                <legend className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
                   {spec.note}
                 </legend>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -173,7 +173,7 @@ export default function Configurator({ product }: { product: Product }) {
                         className={`rounded-xl border px-4 py-2 text-sm transition-colors ${
                           active
                             ? 'border-ink bg-ink text-bench'
-                            : 'border-rule bg-paper text-ink-soft hover:border-ink hover:text-ink'
+                            : 'border-control bg-paper text-ink-soft hover:border-ink hover:text-ink'
                         }`}
                       >
                         {choice}
@@ -186,7 +186,7 @@ export default function Configurator({ product }: { product: Product }) {
               <div key={spec.id} className="mt-10">
                 <label
                   htmlFor={spec.id}
-                  className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint"
+                  className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint"
                 >
                   {spec.note}
                 </label>
@@ -212,7 +212,7 @@ export default function Configurator({ product }: { product: Product }) {
             ),
           )}
 
-          <h2 className="mt-12 font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
+          <h2 className="mt-12 font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
             Options
           </h2>
           <ul className="mt-4 divide-y divide-rule border-y border-rule">
@@ -233,7 +233,7 @@ export default function Configurator({ product }: { product: Product }) {
                       className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors ${
                         active
                           ? 'border-sage bg-sage text-paper'
-                          : 'border-ink-faint hover:border-ink'
+                          : 'border-control hover:border-ink'
                       }`}
                     >
                       {active && (
@@ -265,10 +265,10 @@ export default function Configurator({ product }: { product: Product }) {
 
                       {active && max > 1 && (
                         <div className="mt-3 flex items-center gap-3">
-                          <span className="font-spec text-[0.62rem] uppercase tracking-[0.2em] text-ink-faint">
+                          <span className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
                             How many
                           </span>
-                          <div className="flex items-center rounded-xl border border-rule">
+                          <div className="flex items-center rounded-xl border border-control">
                             <button
                               type="button"
                               aria-label={`One fewer ${addOn.label}`}
@@ -315,7 +315,7 @@ export default function Configurator({ product }: { product: Product }) {
                           placeholder={addOn.input.placeholder}
                           aria-label={`${addOn.label} detail`}
                           autoComplete="off"
-                          className="mt-3 w-full rounded-xl border border-rule bg-paper px-3 py-2 text-sm outline-none placeholder:text-ink-faint focus:border-rose"
+                          className="mt-3 w-full rounded-xl border border-control bg-paper px-3 py-2 text-sm outline-none placeholder:text-ink-faint focus:border-rose"
                         />
                       )}
                     </div>
@@ -330,7 +330,7 @@ export default function Configurator({ product }: { product: Product }) {
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-xl border border-ink bg-paper">
             <div className="border-b border-rule px-6 py-4">
-              <h2 className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
+              <h2 className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
                 Order sheet
               </h2>
             </div>
@@ -396,10 +396,10 @@ export default function Configurator({ product }: { product: Product }) {
 
             <div className="border-t border-rule px-6 py-5">
               <div className="flex items-center justify-between gap-4">
-                <span className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
+                <span className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
                   Quantity
                 </span>
-                <div className="flex items-center rounded-xl border border-rule">
+                <div className="flex items-center rounded-xl border border-control">
                   <button
                     type="button"
                     aria-label="One fewer"
@@ -439,7 +439,7 @@ export default function Configurator({ product }: { product: Product }) {
               <button
                 onClick={addToCart}
                 disabled={blocked}
-                className="mt-5 w-full rounded-xl bg-rose px-5 py-3.5 text-sm text-white transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
+                className="mt-5 w-full rounded-xl bg-rose px-5 py-3.5 text-sm font-medium text-white transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
               >
                 Add to cart
               </button>
@@ -453,7 +453,7 @@ export default function Configurator({ product }: { product: Product }) {
               {added && !blocked && (
                 <button
                   onClick={() => router.push('/cart')}
-                  className="mt-3 w-full rounded-xl border border-ink px-5 py-3 text-sm transition-colors hover:bg-ink hover:text-bench"
+                  className="mt-3 w-full rounded-xl border border-ink px-5 py-3 text-sm font-medium transition-colors hover:bg-ink hover:text-bench"
                 >
                   Added. Go to cart &rarr;
                 </button>

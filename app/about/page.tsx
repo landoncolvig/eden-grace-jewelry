@@ -32,7 +32,7 @@ export default function AboutPage() {
         </div>
 
         <div>
-          <p className="font-spec text-[0.62rem] uppercase tracking-[0.24em] text-ink-faint">
+          <p className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
             Who makes these
           </p>
           <h1 className="mt-4 font-display text-4xl leading-[1.08] sm:text-5xl">
@@ -64,13 +64,13 @@ export default function AboutPage() {
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
               href="/#pieces"
-              className="rounded-xl bg-rose px-7 py-3.5 text-sm text-white transition-colors hover:bg-rose-deep"
+              className="rounded-xl bg-rose px-7 py-3.5 text-sm font-medium text-white transition-colors hover:bg-rose-deep"
             >
               See the pieces
             </Link>
             <Link
               href="/product/the-delicate-monogram"
-              className="rounded-xl border border-ink px-7 py-3.5 text-sm transition-colors hover:bg-ink hover:text-bench"
+              className="rounded-xl border border-ink px-7 py-3.5 text-sm font-medium transition-colors hover:bg-ink hover:text-bench"
             >
               Add a monogram
             </Link>

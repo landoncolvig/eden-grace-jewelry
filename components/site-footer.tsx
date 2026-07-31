@@ -11,7 +11,7 @@ export default function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-3 sm:px-8">
         <div>
           <div className="flex items-center gap-3">
-            <Logo size={28} className="text-bench/85" />
+            <Logo size={28} className="shrink-0 text-bench/85" />
             <p className="font-display text-lg">Eden Grace Jewelry Co.</p>
           </div>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-bench/65">
@@ -21,7 +21,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="text-sm">
-          <h2 className="font-spec text-[0.6rem] uppercase tracking-[0.22em] text-bench/45">
+          <h2 className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-bench/65">
             Shop
           </h2>
           <ul className="mt-3 space-y-2">
@@ -69,7 +69,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="text-sm">
-          <h2 className="font-spec text-[0.6rem] uppercase tracking-[0.22em] text-bench/45">
+          <h2 className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-bench/65">
             Shipping
           </h2>
           <p className="mt-3 leading-relaxed text-bench/65">
@@ -81,7 +81,7 @@ export default function SiteFooter() {
 
       <div className="border-t border-bench/12">
         <div className="mx-auto max-w-6xl px-5 py-5 sm:px-8">
-          <p className="font-spec text-[0.65rem] tracking-wide text-bench/45">
+          <p className="font-spec text-[0.7rem] tracking-wide text-bench/65">
             &copy; {new Date().getFullYear()} Eden Grace Jewelry Co.
           </p>
         </div>

@@ -98,7 +98,7 @@ export default function CartView() {
         </p>
         <Link
           href="/#pieces"
-          className="mt-8 inline-block rounded-xl bg-rose px-6 py-3.5 text-sm text-white transition-colors hover:bg-rose-deep"
+          className="mt-8 inline-block rounded-xl bg-rose px-6 py-3.5 text-sm font-medium text-white transition-colors hover:bg-rose-deep"
         >
           See the pieces
         </Link>
@@ -144,7 +144,7 @@ export default function CartView() {
                   </dl>
 
                   <div className="mt-4 flex items-center gap-5">
-                    <div className="flex items-center rounded-xl border border-rule">
+                    <div className="flex items-center rounded-xl border border-control">
                       <button
                         aria-label={`One fewer ${line.name}`}
                         onClick={() => raw && setQty(raw.key, line.qty - 1)}
@@ -179,7 +179,7 @@ export default function CartView() {
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-xl border border-ink bg-paper">
             <div className="border-b border-rule px-6 py-4">
-              <h2 className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
+              <h2 className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
                 Shipping
               </h2>
             </div>
@@ -187,7 +187,7 @@ export default function CartView() {
             <div className="px-6 py-5">
               <label
                 htmlFor="zip"
-                className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint"
+                className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint"
               >
                 Where is it going
               </label>
@@ -202,7 +202,7 @@ export default function CartView() {
                   inputMode="numeric"
                   placeholder="ZIP code"
                   autoComplete="postal-code"
-                  className="min-w-0 flex-1 rounded-xl border border-rule bg-bench px-3 py-2 font-spec text-sm tabular-nums outline-none placeholder:text-ink-faint focus:border-rose"
+                  className="min-w-0 flex-1 rounded-xl border border-control bg-bench px-3 py-2 font-spec text-sm tabular-nums outline-none placeholder:text-ink-faint focus:border-rose"
                 />
                 <button
                   onClick={getQuote}
@@ -260,7 +260,7 @@ export default function CartView() {
               <button
                 onClick={checkout}
                 disabled={!quote || checkingOut || priced.missingRequired.length > 0}
-                className="mt-5 w-full rounded-xl bg-rose px-5 py-3.5 text-sm text-white transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
+                className="mt-5 w-full rounded-xl bg-rose px-5 py-3.5 text-sm font-medium text-white transition-colors hover:bg-rose-deep disabled:cursor-not-allowed disabled:bg-ink-faint"
               >
                 {checkingOut ? 'Opening checkout…' : 'Check out'}
               </button>

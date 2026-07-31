@@ -22,7 +22,7 @@ export default function SuccessView() {
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-24 text-center sm:px-8">
-      <p className="font-spec text-[0.62rem] uppercase tracking-[0.24em] text-ink-faint">
+      <p className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
         Paid
       </p>
       <h1 className="mt-4 font-display text-4xl">It&rsquo;s on the bench</h1>
@@ -32,7 +32,7 @@ export default function SuccessView() {
       </p>
 
       <div className="mx-auto mt-10 max-w-sm rounded-xl border border-rule bg-paper p-6 text-left">
-        <h2 className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
+        <h2 className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
           What happens next
         </h2>
         <ol className="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
@@ -53,13 +53,13 @@ export default function SuccessView() {
 
       <Link
         href="/"
-        className="mt-10 inline-block rounded-xl border border-ink px-6 py-3 text-sm transition-colors hover:bg-ink hover:text-bench"
+        className="mt-10 inline-block rounded-xl border border-ink px-6 py-3 text-sm font-medium transition-colors hover:bg-ink hover:text-bench"
       >
         Back to the shop
       </Link>
 
       {receiptId && (
-        <p className="mt-8 font-spec text-[0.65rem] text-ink-faint">
+        <p className="mt-8 font-spec text-[0.7rem] text-ink-faint">
           {receiptId.slice(0, 28)}…
         </p>
       )}

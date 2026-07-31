@@ -17,13 +17,9 @@
   black, and the accent is a muted rose that stays adult next to a $58 pearl
   strand instead of tipping into candy.
 
-  Every value below was solved for contrast against the cream ground rather
-  than picked by eye, because the first pass at this palette looked right and
-  failed six ways. Measured on #fdf7f2: ink 10.0, ink-soft 5.0, ink-faint 4.5,
-  rose 4.5, flag 5.6 (all clear 4.5 for text); sage 3.0 and brass 3.0 (clear
-  3.0 for non-text UI). rose-deep is 6.7, kept well clear of rose so a hover
-  reads as a state change rather than a rendering artefact. Darkening any of
-  these is safe; lightening them is not.
+  Text and control colors are solved against the cream ground. Ink is 10.0:1,
+  ink-soft 5.0:1, ink-faint 4.5:1, rose 5.9:1, sage 4.7:1, and the dedicated
+  control border 3.4:1. Brass and the light rule remain decorative accents.
 
   --color-bench must stay in sync with BENCH in the photo pipeline
   (scratchpad/process_rembg.py). The product cutouts are composited onto this
@@ -37,17 +33,17 @@
   --color-ink: #4a3b38; /* text, warm cocoa rather than cold near-black */
   --color-ink-soft: #7a6862; /* secondary text */
   --color-ink-faint: #846e64; /* captions, disabled */
-  --color-rose: #b55557; /* interactive: prices, active, focus */
-  --color-rose-deep: #8f3f42; /* rose on hover */
-  --color-sage: #729981; /* included/added states, from her aventurine */
+  --color-rose: #98474b; /* interactive: prices, active, focus */
+  --color-rose-deep: #7d393e; /* rose on hover */
+  --color-sage: #5c7563; /* included/added states, from her aventurine */
   --color-brass: #ba863f; /* the gold-tone findings */
   --color-rule: #dbc2b1; /* hairlines, warm */
+  --color-control: #9b8177; /* interactive boundaries, 3:1+ */
   --color-flag: #a8443c; /* errors only */
 
-  --font-display: var(--font-fraunces);
-  --font-body: var(--font-inter);
+  --font-display: var(--font-cormorant);
+  --font-body: var(--font-manrope);
   --font-script: var(--font-pinyon);
-  --font-mono: var(--font-plex-mono);
 
   /* Softened geometry. Most of the friendliness comes from here rather than
      from colour: the same palette on square corners still reads editorial. */
@@ -71,13 +67,11 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Fraunces ships variable optical-size, softness, and wonk axes. Pushing SOFT
-   up and keeping a little WONK gives the display face rounded terminals and a
-   slight irregularity, which is where the warmth in the headings comes from. */
+/* Display type is deliberately restrained to names and headings. */
 .font-display {
   font-family: var(--font-display), Georgia, serif;
-  font-variation-settings: "SOFT" 60, "WONK" 1;
-  letter-spacing: -0.012em;
+  font-weight: 600;
+  letter-spacing: -0.016em;
 }
 
 /* Used in exactly one place: rendering the buyer's own word. Restraint is the
@@ -88,7 +82,8 @@ body {
 }
 
 .font-spec {
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 500;
   font-feature-settings: "tnum";
 }
 

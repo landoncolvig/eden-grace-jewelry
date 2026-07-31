@@ -32,7 +32,7 @@ export default function Home() {
       <section id="pieces" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
         <div className="flex items-baseline justify-between gap-6 border-b border-rule pb-4">
           <h2 className="font-display text-2xl sm:text-3xl">The pieces</h2>
-          <p className="font-spec text-[0.62rem] uppercase tracking-[0.22em] text-ink-faint">
+          <p className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
             All made to order
           </p>
         </div>
@@ -67,7 +67,7 @@ export default function Home() {
                     <span className="font-spec text-base tabular-nums text-rose">
                       {formatUSD(product.priceCents)}
                     </span>
-                    <span className="font-spec text-[0.62rem] uppercase tracking-[0.2em] text-ink-faint transition-colors group-hover:text-rose">
+                    <span className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint transition-colors group-hover:text-rose">
                       Make one &rarr;
                     </span>
                   </div>
@@ -90,7 +90,7 @@ export default function Home() {
                     numeral on it, under the 4.5 that 10px text needs. Every
                     brass and rose combination failed the same way; a cream
                     disc is the one that clears it, at 10:1. */}
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-bench font-spec text-[0.62rem] text-ink">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-bench font-spec text-[0.7rem] text-ink">
                   {step.n}
                 </span>
                 <h3 className="mt-3 font-display text-lg">{step.title}</h3>

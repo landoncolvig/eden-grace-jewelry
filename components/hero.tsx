@@ -19,7 +19,7 @@ export default function Hero() {
       <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
           <div>
-            <p className="font-spec text-[0.62rem] uppercase tracking-[0.24em] text-ink-faint">
+            <p className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
               Made to order
             </p>
             <h1 className="mt-4 font-display text-4xl leading-[1.06] sm:text-5xl lg:text-[3.4rem]">
@@ -37,19 +37,19 @@ export default function Hero() {
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link
                 href="#pieces"
-                className="rounded-xl bg-rose px-7 py-3.5 text-sm text-white transition-colors hover:bg-rose-deep"
+                className="rounded-xl bg-rose px-7 py-3.5 text-sm font-medium text-white transition-colors hover:bg-rose-deep"
               >
                 See the pieces
               </Link>
               <Link
                 href="/product/the-delicate-monogram"
-                className="rounded-xl border border-ink px-7 py-3.5 text-sm transition-colors hover:bg-ink hover:text-bench"
+                className="rounded-xl border border-ink px-7 py-3.5 text-sm font-medium transition-colors hover:bg-ink hover:text-bench"
               >
                 Add a monogram
               </Link>
             </div>
 
-            <p className="mt-6 font-spec text-[0.62rem] uppercase tracking-[0.2em] text-ink-faint">
+            <p className="mt-6 font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
               From $42 &middot; Free shipping over $75
             </p>
           </div>

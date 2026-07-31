@@ -22,17 +22,22 @@ export default function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 bg-ink text-bench">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 py-4 sm:px-8">
-        <Link href="/" className="group flex items-center gap-3">
-          <Logo size={30} className="text-bench/85 transition-colors group-hover:text-bench" />
-          <span className="flex items-baseline gap-2.5">
-            <span className="font-display text-xl tracking-tight sm:text-2xl">Eden Grace</span>
-            <span className="font-spec text-[0.6rem] uppercase tracking-[0.22em] text-bench/55 transition-colors group-hover:text-brass">
+        <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+          <Logo
+            size={30}
+            className="shrink-0 text-bench/85 transition-colors group-hover:text-bench"
+          />
+          <span className="flex min-w-0 items-baseline gap-2.5">
+            <span className="whitespace-nowrap font-display text-xl leading-none tracking-tight sm:text-2xl">
+              Eden Grace
+            </span>
+            <span className="hidden whitespace-nowrap font-spec text-[0.7rem] uppercase tracking-[0.16em] text-bench/65 transition-colors group-hover:text-bench md:inline">
               Jewelry Co.
             </span>
           </span>
         </Link>
 
-        <nav className="flex items-center gap-5 text-sm sm:gap-7">
+        <nav className="flex shrink-0 items-center gap-4 text-sm sm:gap-7">
           <Link href="/#pieces" className="text-bench/75 transition-colors hover:text-bench">
             Pieces
           </Link>
@@ -44,7 +49,7 @@ export default function SiteHeader() {
           </Link>
           <Link
             href="/cart"
-            className="relative rounded-full bg-bench px-4 py-1.5 text-sm text-ink transition-colors hover:bg-brass hover:text-ink"
+            className="relative rounded-xl bg-bench px-4 py-2 text-sm font-medium text-ink transition-colors hover:bg-brass hover:text-ink"
           >
             Cart
             {/* Held back until localStorage is read, otherwise this renders 0
