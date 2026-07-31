@@ -1,20 +1,13 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
-import HeroVideo from './hero-video';
 
 /**
- * The hero: four seconds of a real strand turning in the light.
- *
- * Third version, and the first one that works. The first rendered a
- * procedurally modelled necklace in WebGL, which reads as a diagram next to
- * photographs of real strung beads. The second was a still photograph, honest
- * but motionless. Jenna then filmed an actual strand rotating against a wall,
- * which is exactly what the WebGL version was reaching for and could not fake:
- * the piece moving, catching light, at the scale of a hand.
- *
- * Encoding and the autoplay and reduced-motion rules live in
- * components/hero-video.
+ * The hero uses one of Jenna's finished pieces against the same warm studio
+ * background as the product grid. Keeping the whole necklace in frame matters
+ * more here than filling a taller crop, so the square source keeps its natural
+ * aspect ratio on every screen.
  *
  * The word entry that used to live here has moved to the monogram pages. A
  * "set your word" field beside a strand that is not personalised asked the
@@ -62,7 +55,15 @@ export default function Hero() {
           </div>
 
           <div className="overflow-hidden rounded-[28px] bg-paper ring-1 ring-rule">
-            <HeroVideo className="w-full" />
+            <Image
+              src="/products/eden-onyx-ivory-toggle.webp"
+              alt="A black, ivory, and gold-tone Eden necklace with a toggle clasp"
+              width={1254}
+              height={1254}
+              priority
+              sizes="(min-width: 1024px) 52vw, 100vw"
+              className="w-full"
+            />
           </div>
         </div>
       </div>
