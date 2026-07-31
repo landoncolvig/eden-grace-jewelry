@@ -13,10 +13,10 @@
  *
  * Prices are in cents. Weights are in ounces, including box and mailer.
  *
- * ── NAMES AND DESCRIPTIONS ARE JENNA'S, VERBATIM (2026-07-27) ──
- * She sent the six-piece line by text. The names and the wording of what each
+ * ── NAMES AND DESCRIPTIONS ARE JENNA'S, VERBATIM (2026-07-31) ──
+ * She updated the six-piece line in her "Necklace names" note. The names and the wording of what each
  * piece is are hers and should not be "improved". Every one of them offers
- * colour and length of the buyer's choice, which is why those are required
+ * color and length of the buyer's choice, which is why those are required
  * pickers on all six rather than an option on one.
  *
  * ── PRICES ARE PROVISIONAL ──
@@ -73,8 +73,8 @@
  */
 const COLOUR = {
   id: 'colour',
-  label: 'Colour',
-  note: 'Which colour should it be?',
+  label: 'Color',
+  note: 'Which color should it be?',
   priceCents: 0,
   weightOz: 0,
   required: true,
@@ -170,14 +170,14 @@ const PRODUCTS = [
     name: 'The Eden',
     tagline: 'Our original style',
     description:
-      'Small and medium sized beads spaced out with small spacers. Colour and length of your choice.',
+      'Our original style necklace. Has small and medium sized beads spaced out with small spacers. Color and length of your choice.',
     priceCents: 4800,
     weightOz: 2.4,
     material: 'Natural gemstone on gold-tone findings',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#4A7C74',
-    image: 'aventurine-1',
-    gallery: ['aventurine-2', 'aventurine-3', 'coral-1', 'onyx-pearl-1'],
+    image: 'eden-ivory',
+    gallery: ['aventurine-1', 'aventurine-2', 'aventurine-3', 'coral-1', 'onyx-pearl-1'],
     addOns: [COLOUR, LENGTH, ACCENTS, EXTENDER, GIFT_WRAP],
   },
   {
@@ -185,14 +185,14 @@ const PRODUCTS = [
     name: 'The Rowan',
     tagline: 'Pearls, with small spacers',
     description:
-      'Pearl beaded necklace with small spacers. Colour and length of your choice.',
+      'Pearl beaded necklace with small spacers. Color and length of your choice.',
     priceCents: 5800,
     weightOz: 2.2,
     material: 'Cultured freshwater pearl on gold-tone findings',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#B08D57',
-    image: 'pearl-cream',
-    gallery: ['pearl-butter', 'aventurine-pearl'],
+    image: 'rowan-gold-pearl',
+    gallery: ['pearl-cream', 'pearl-butter', 'aventurine-pearl'],
     addOns: [COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
   },
   {
@@ -200,14 +200,14 @@ const PRODUCTS = [
     name: 'The Emmy',
     tagline: 'Our delicate style',
     description:
-      'Small dainty beads with colour and length of your choice.',
+      'Our delicate style necklace. Small dainty beads with color and length of your choice.',
     priceCents: 4200,
     weightOz: 2.0,
     material: 'Small gemstone beads on gold-tone findings',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#7FA9C4',
-    image: 'amazonite',
-    gallery: ['onyx-pearl-2', 'gold-strand'],
+    image: 'emmy-jewel-tone',
+    gallery: ['amazonite', 'onyx-pearl-2', 'gold-strand'],
     addOns: [COLOUR, LENGTH, ACCENTS, EXTENDER, GIFT_WRAP],
   },
   {
@@ -215,14 +215,14 @@ const PRODUCTS = [
     name: 'The Blair',
     tagline: 'Chunky beads with a statement',
     description:
-      'Our chunky beaded necklace. Chunky beads with a statement. Colour and length of your choice.',
+      'Our chunky beaded necklace. Chunky beads with a statement. Color and length of your choice.',
     priceCents: 5600,
     weightOz: 3.2,
     material: 'Chunky gemstone and heishi on gold-tone findings',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#3AA6A8',
-    image: 'turquoise-heishi',
-    gallery: ['coral-2', 'hematite-gold'],
+    image: 'blair-mint-pearl',
+    gallery: ['turquoise-heishi', 'coral-2', 'hematite-gold'],
     addOns: [COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
   },
   {
@@ -230,18 +230,14 @@ const PRODUCTS = [
     name: 'The Delicate Monogram',
     tagline: 'Initials on a dainty strand',
     description:
-      'Our monogram necklace with the colour and length of your choice, on our delicate strand.',
+      'Our monogram necklace with the color and length of your choice.',
     priceCents: 4600,
     weightOz: 2.1,
     material: 'Mother-of-pearl letters on small gemstone beads',
     leadTime: 'Ships in 7 to 10 days',
     swatch: '#9BB7C9',
-    // NO PHOTO YET. The only shot of a finished monogram piece showed a real
-    // person's initials and was deleted at Landon's request. This stands in
-    // with the strand it is built on. A replacement spelling something
-    // non-personal is the outstanding asset.
-    image: 'amazonite',
-    gallery: ['onyx-pearl-2'],
+    image: 'delicate-monogram-aqua',
+    gallery: ['amazonite', 'onyx-pearl-2'],
     addOns: [MONOGRAM, COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
   },
   {
@@ -249,13 +245,14 @@ const PRODUCTS = [
     name: 'The Chunky Monogram',
     tagline: 'Initials, with more presence',
     description:
-      'Our monogram necklace with the colour and length of your choice, on our chunky strand.',
+      'Our monogram necklace with the color and length of your choice.',
     priceCents: 5200,
     weightOz: 3.0,
     material: 'Mother-of-pearl letters on chunky gemstone beads',
     leadTime: 'Ships in 7 to 10 days',
     swatch: '#2E8F91',
-    // Same missing-photo caveat as the delicate monogram.
+    // Jenna's 2026-07-31 note did not include a Chunky Monogram photo, so this
+    // keeps the chunky strand reference until she supplies one.
     image: 'turquoise-heishi',
     gallery: ['coral-2'],
     addOns: [MONOGRAM, COLOUR, LENGTH, EXTENDER, GIFT_WRAP],
