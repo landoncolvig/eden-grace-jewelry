@@ -117,8 +117,7 @@ const TOGGLE_CLASP = {
  *
  *   Length upcharge. Nobody in this price tier charges for a longer strand.
  *   Every comparable listing checked priced all lengths the same, and it costs
- *   pennies of wire. Length is a free choice above, and the extender covers
- *   anyone who wants to adjust after the fact.
+ *   pennies of wire. Length is a free choice above.
  *
  *   Rush processing. No comparable shop sells queue priority as a line item,
  *   and several state outright that paying more does not move an order up.
@@ -131,15 +130,6 @@ const ACCENTS = {
   label: 'Pearl and gold accent beads',
   note: 'Freshwater pearls and gold-tone rounds spaced through the strand.',
   priceCents: 800,
-  weightOz: 0.2,
-};
-
-/** @type {AddOn} */
-const EXTENDER = {
-  id: 'extender',
-  label: 'Add a 2 inch extender',
-  note: 'A short chain at the clasp, so one necklace sits at two lengths.',
-  priceCents: 600,
   weightOz: 0.2,
 };
 
@@ -186,15 +176,8 @@ const PRODUCTS = [
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#4A7C74',
     image: 'eden-pearl-black',
-    gallery: [
-      'eden-onyx-ivory-toggle',
-      'aventurine-1',
-      'aventurine-2',
-      'aventurine-3',
-      'coral-1',
-      'onyx-pearl-1',
-    ],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS, EXTENDER, GIFT_WRAP],
+    gallery: ['eden-onyx-ivory-toggle'],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS, GIFT_WRAP],
   },
   {
     slug: 'the-rowan',
@@ -208,14 +191,8 @@ const PRODUCTS = [
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#B08D57',
     image: 'rowan-ivory',
-    gallery: [
-      'rowan-green-ivory-front',
-      'rowan-green-ivory-angle',
-      'pearl-cream',
-      'pearl-butter',
-      'aventurine-pearl',
-    ],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, EXTENDER, GIFT_WRAP],
+    gallery: ['rowan-green-ivory-front', 'rowan-green-ivory-angle'],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, GIFT_WRAP],
   },
   {
     slug: 'the-emmy',
@@ -229,8 +206,8 @@ const PRODUCTS = [
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#7FA9C4',
     image: 'emmy-jewel-tone',
-    gallery: ['amazonite', 'onyx-pearl-2', 'gold-strand'],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS, EXTENDER, GIFT_WRAP],
+    gallery: [],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS, GIFT_WRAP],
   },
   {
     slug: 'the-blair',
@@ -244,8 +221,8 @@ const PRODUCTS = [
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#3AA6A8',
     image: 'blair-mint-pearl',
-    gallery: ['turquoise-heishi', 'coral-2', 'hematite-gold'],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, EXTENDER, GIFT_WRAP],
+    gallery: [],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, GIFT_WRAP],
   },
   {
     slug: 'the-delicate-monogram',
@@ -259,8 +236,8 @@ const PRODUCTS = [
     leadTime: 'Ships in 7 to 10 days',
     swatch: '#9BB7C9',
     image: 'delicate-monogram-aqua',
-    gallery: ['amazonite', 'onyx-pearl-2'],
-    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP, EXTENDER, GIFT_WRAP],
+    gallery: [],
+    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP, GIFT_WRAP],
   },
   {
     slug: 'the-chunky-monogram',
@@ -276,8 +253,8 @@ const PRODUCTS = [
     // Jenna's 2026-07-31 note did not include a Chunky Monogram photo, so this
     // keeps the chunky strand reference until she supplies one.
     image: 'turquoise-heishi',
-    gallery: ['coral-2'],
-    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP, EXTENDER, GIFT_WRAP],
+    gallery: [],
+    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP, GIFT_WRAP],
   },
 ];
 
