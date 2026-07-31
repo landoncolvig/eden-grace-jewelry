@@ -170,7 +170,7 @@ export default function Configurator({ product }: { product: Product }) {
                           setRequired((prev) => ({ ...prev, [spec.id]: choice }));
                           setAdded(false);
                         }}
-                        className={`rounded-xl border px-4 py-2 text-sm transition-colors ${
+                        className={`rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${
                           active
                             ? 'border-ink bg-ink text-bench'
                             : 'border-control bg-paper text-ink-soft hover:border-ink hover:text-ink'
