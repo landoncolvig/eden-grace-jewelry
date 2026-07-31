@@ -39,6 +39,13 @@ export const metadata: Metadata = {
   },
   description:
     'Gemstone and freshwater pearl necklaces, strung by hand and made to order. Natural stone varies, so no two strands come out the same.',
+  // Google Search Console. The Analytics verification method cannot be used
+  // here: gtag.js is injected on hydration, so it is not in the HTML that
+  // Google's verifier fetches. This meta tag is, because Next renders it into
+  // the static head at build time. Removing it un-verifies the property.
+  verification: {
+    google: 'Ajc8HB2F4kWdmRHPhhdzbYJ-e2XtJ1urRGUK8XVcU6g',
+  },
   openGraph: {
     type: 'website',
     siteName: "Eden Grace Jewelry Co.",
