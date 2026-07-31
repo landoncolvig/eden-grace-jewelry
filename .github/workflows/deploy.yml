@@ -53,21 +53,40 @@ jobs:
         # ships in the client bundle either way. Secrets belong in the function.
         env:
           NEXT_PUBLIC_API_BASE: ${{ vars.NEXT_PUBLIC_API_BASE }}
+          # Unset means the site ships with no analytics at all, which is the
+          # correct behaviour for a fork but silent breakage here. Warned about
+          # below rather than failed, because a missing measurement ID must not
+          # be able to take the store offline.
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
         run: |
           test -n "$NEXT_PUBLIC_API_BASE" || {
             echo "NEXT_PUBLIC_API_BASE repo variable is not set."
             echo "Checkout would silently POST to the site's own origin and 404."
             exit 1
           }
+          test -n "$NEXT_PUBLIC_GA_ID" || {
+            echo "::warning::NEXT_PUBLIC_GA_ID is not set. Shipping without analytics."
+          }
           npm run build
 
       - name: Verify the export actually produced pages
         # A misconfigured output mode fails silently by publishing an empty
         # directory, which looks like a successful deploy until someone visits.
+        env:
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
         run: |
           test -f out/index.html || { echo "out/index.html missing"; exit 1; }
           test -f out/cart/index.html || { echo "cart page missing"; exit 1; }
           test -f out/.nojekyll || { echo ".nojekyll missing, _next assets will 404"; exit 1; }
+          test -f out/sitemap.xml || { echo "sitemap.xml missing"; exit 1; }
+          # The tag is easy to lose to a refactor and impossible to notice is
+          # gone, because a site with no analytics looks exactly like a site
+          # with no visitors.
+          if [ -n "$NEXT_PUBLIC_GA_ID" ]; then
+            grep -q "$NEXT_PUBLIC_GA_ID" out/index.html || {
+              echo "GA measurement ID is set but did not reach the build"; exit 1;
+            }
+          fi
           echo "Exported $(find out -name '*.html' | wc -l) pages"
 
       - uses: actions/configure-pages@v5
