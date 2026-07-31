@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -12,6 +12,7 @@ import {
   type Product,
 } from '@/lib/shop';
 import { useCart } from './cart-context';
+import { trackViewItem, trackAddToCart } from '@/lib/analytics';
 
 /**
  * The order sheet.
@@ -80,10 +81,20 @@ export default function Configurator({ product }: { product: Product }) {
   const line = preview.lines[0];
   const blocked = preview.missingRequired.length > 0;
 
+  // Reported at the base price, before any option is chosen, so GA4's
+  // product report compares the six pieces to each other rather than to
+  // whatever the visitor happened to configure.
+  useEffect(() => {
+    trackViewItem(product.slug, product.name, product.priceCents);
+  }, [product.slug, product.name, product.priceCents]);
+
   function addToCart() {
     if (blocked) return;
     addLine(product.slug, cartAddOns, qty);
     setAdded(true);
+    // `preview` is this configuration alone, priced by the same module the
+    // server uses, so the event carries the spec the buyer actually built.
+    trackAddToCart(preview);
   }
 
   return (

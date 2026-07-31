@@ -25,6 +25,7 @@ const {
   normalizeSquareSale,
 } = require('./square.js');
 const { emailOrderToOwner } = require('./orders.js');
+const { subscribe, recordBuyer, SubscribeError } = require('./subscribers.js');
 
 const SITE = process.env.SITE_URL || 'https://edengracejewelry.com';
 const SHIPPO_TOKEN = process.env.SHIPPO_TOKEN || '';
@@ -168,6 +169,7 @@ async function api(req, res) {
     if (route === 'create-checkout-session' || route === 'create-payment-link') {
       return await handleCheckout(req, res);
     }
+    if (route === 'subscribe') return await handleSubscribe(req, res);
     return res.status(404).json({ error: 'unknown route' });
   } catch (err) {
     console.error('unhandled error', { route, error: err.message, stack: err.stack });
@@ -227,6 +229,35 @@ async function handleCheckout(req, res) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Email capture
+ * ------------------------------------------------------------------ */
+
+/**
+ * Cloud Run terminates TLS at a proxy, so req.ip is the proxy. The client
+ * address is the first entry in X-Forwarded-For; everything after it was
+ * appended by hops in between and the whole header is spoofable. It is used
+ * only to bucket the rate limiter, never for access control.
+ */
+function clientIp(req) {
+  const forwarded = req.get('x-forwarded-for') || '';
+  return forwarded.split(',')[0].trim() || req.ip || 'unknown';
+}
+
+async function handleSubscribe(req, res) {
+  const { email, source, company } = req.body || {};
+  try {
+    await subscribe({ email, source, honeypot: company, ip: clientIp(req) });
+    return res.json({ ok: true });
+  } catch (err) {
+    if (err instanceof SubscribeError) {
+      return res.status(err.status).json({ error: err.message });
+    }
+    console.error('subscribe failed', { error: err.message });
+    return res.status(502).json({ error: 'Could not save that address. Try again in a moment.' });
+  }
+}
+
+/* ------------------------------------------------------------------ *
  * Square payment webhook and work-order email
  * ------------------------------------------------------------------ */
 
@@ -266,6 +297,16 @@ async function fulfillPayment(paymentId) {
       chargedCents: sale.shippingCents,
     });
   }
+
+  // Before the work order, because this is the only moment the buyer's address
+  // passes through here. Never fatal: a directory write must not be able to
+  // stop Jenna being told there is a piece to make.
+  await recordBuyer(sale.customer.email).catch((err) =>
+    console.error('could not record buyer in the customer directory', {
+      orderId: sale.id,
+      error: err.message,
+    }),
+  );
 
   try {
     await emailOrderToOwner({ sale });

@@ -4,6 +4,7 @@ import './globals.css';
 import { CartProvider } from '@/components/cart-context';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
+import Analytics from '@/components/analytics';
 
 // Cormorant gives the wordmark and display type the fine, high-contrast strokes
 // found in jewelry editorial without turning small interface copy decorative.
@@ -56,6 +57,7 @@ export default function RootLayout({
       className={`${cormorant.variable} ${manrope.variable} ${pinyon.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-bench text-ink">
+        <Analytics />
         <CartProvider>
           <SiteHeader />
           <main className="flex-1">{children}</main>

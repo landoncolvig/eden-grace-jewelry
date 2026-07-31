@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Logo from './logo';
+import EmailSignup from './email-signup';
 
 /**
  * Closes the dark chrome the header opens. Between them the page is cream and
@@ -8,7 +9,7 @@ import Logo from './logo';
 export default function SiteFooter() {
   return (
     <footer className="bg-ink text-bench">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-3 sm:px-8">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
         <div>
           <div className="flex items-center gap-3">
             <Logo size={28} className="shrink-0 text-bench/85" />
@@ -77,6 +78,8 @@ export default function SiteFooter() {
             Personalised pieces are not returnable once stringing starts.
           </p>
         </div>
+
+        <EmailSignup source="footer" />
       </div>
 
       <div className="border-t border-bench/12">

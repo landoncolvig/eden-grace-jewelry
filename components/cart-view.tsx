@@ -1,8 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useCart } from './cart-context';
+import {
+  trackViewCart,
+  trackAddShippingInfo,
+  trackBeginCheckout,
+  trackRemoveFromCart,
+} from '@/lib/analytics';
 import {
   API_BASE,
   formatUSD,
@@ -41,6 +47,16 @@ export default function CartView() {
   const zipValid = /^\d{5}$/.test(zip);
   const empty = ready && lines.length === 0;
 
+  // Once per visit to this page, after the cart has been read out of
+  // localStorage. Without the ref this refires on every quantity change and
+  // GA4's cart report counts one visit as several.
+  const viewReported = useRef(false);
+  useEffect(() => {
+    if (!ready || viewReported.current || priced.lines.length === 0) return;
+    viewReported.current = true;
+    trackViewCart(priced);
+  }, [ready, priced]);
+
   const shipping = quote ? applyShippingRules(priced.subtotalCents, quote.cents) : null;
   const total = priced.subtotalCents + (shipping?.chargedCents ?? 0);
 
@@ -57,17 +73,24 @@ export default function CartView() {
       if (!res.ok) throw new Error(`quote failed: ${res.status}`);
       const data = await res.json();
       setQuote(data);
+      // The ZIP is the only address detail the storefront ever sees, so this
+      // is the last funnel step measurable before Square takes over.
+      trackAddShippingInfo(priced, data.chargedCents ?? data.cents ?? 0);
     } catch {
       setError('Could not reach the shipping service. Try again in a moment.');
       setQuote(null);
     } finally {
       setQuoting(false);
     }
-  }, [zip, zipValid, lines]);
+  }, [zip, zipValid, lines, priced]);
 
   const checkout = useCallback(async () => {
     setCheckingOut(true);
     setError(null);
+    // Fired before the request, not after. This also stashes the cart for the
+    // purchase event, and the browser is about to leave for Square, so there
+    // is no reliable moment left once the redirect starts.
+    trackBeginCheckout(priced, shipping?.chargedCents ?? 0);
     try {
       const res = await fetch(`${API_BASE}/create-payment-link`, {
         method: 'POST',
@@ -82,7 +105,7 @@ export default function CartView() {
       setError(e instanceof Error ? e.message : 'Checkout could not start.');
       setCheckingOut(false);
     }
-  }, [zip, lines]);
+  }, [zip, lines, priced, shipping]);
 
   if (!ready) {
     return <div className="mx-auto max-w-5xl px-5 py-20 sm:px-8" aria-busy="true" />;
@@ -164,7 +187,11 @@ export default function CartView() {
                       </button>
                     </div>
                     <button
-                      onClick={() => raw && removeLine(raw.key)}
+                      onClick={() => {
+                        if (!raw) return;
+                        trackRemoveFromCart(line);
+                        removeLine(raw.key);
+                      }}
                       className="text-sm text-ink-faint underline-offset-4 hover:text-flag hover:underline"
                     >
                       Remove

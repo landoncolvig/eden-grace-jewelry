@@ -307,6 +307,66 @@ function normalizeSquareSale(order, payment) {
   };
 }
 
+/* ------------------------------------------------------------------ *
+ * Customer directory
+ *
+ * Square is already the system of record for anyone who buys, because
+ * checkout writes them here. Putting website signups in the same directory
+ * means Jenna has one list to send from instead of a list and an export.
+ * ------------------------------------------------------------------ */
+
+/** The customer, or null. Square returns no `customers` key on no match. */
+async function findCustomerByEmail(email) {
+  const result = await squareRequest('/customers/search', {
+    method: 'POST',
+    body: {
+      limit: 1,
+      query: { filter: { email_address: { exact: email } } },
+    },
+  });
+  return (result.customers || [])[0] || null;
+}
+
+async function createCustomer({ email, note, referenceId }) {
+  const result = await squareRequest('/customers', {
+    method: 'POST',
+    body: {
+      idempotency_key: crypto.randomUUID(),
+      email_address: email,
+      reference_id: referenceId,
+      note,
+    },
+  });
+  if (!result.customer || !result.customer.id) {
+    throw new Error('Square did not return the created customer');
+  }
+  return result.customer;
+}
+
+async function listCustomerGroups() {
+  const result = await squareRequest('/customers/groups');
+  return result.groups || [];
+}
+
+async function createCustomerGroup(name) {
+  const result = await squareRequest('/customers/groups', {
+    method: 'POST',
+    body: { idempotency_key: crypto.randomUUID(), group: { name } },
+  });
+  if (!result.group || !result.group.id) {
+    throw new Error('Square did not return the created customer group');
+  }
+  return result.group;
+}
+
+/** Idempotent in Square: re-adding an existing member is not an error. */
+async function addCustomerToGroup(customerId, groupId) {
+  await squareRequest(
+    `/customers/${encodeURIComponent(customerId)}/groups/${encodeURIComponent(groupId)}`,
+    { method: 'PUT' },
+  );
+}
+
 module.exports = {
   STORE_FRONT,
   SquareApiError,
@@ -319,4 +379,9 @@ module.exports = {
   verifyWebhookSignature,
   isStorefrontOrder,
   normalizeSquareSale,
+  findCustomerByEmail,
+  createCustomer,
+  listCustomerGroups,
+  createCustomerGroup,
+  addCustomerToGroup,
 };

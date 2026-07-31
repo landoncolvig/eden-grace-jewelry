@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCart } from './cart-context';
+import { trackPurchase } from '@/lib/analytics';
 
 export default function SuccessView() {
   const params = useSearchParams();
@@ -17,7 +18,12 @@ export default function SuccessView() {
   // being reached, though: the webhook is what tells Jenna to start cutting,
   // so closing the tab at the wrong moment cannot lose an order.
   useEffect(() => {
-    if (receiptId) clear();
+    if (!receiptId) return;
+    // Ordered deliberately. trackPurchase reads the line items stashed at
+    // begin_checkout, which is separate storage from the cart, but clearing
+    // first would still make the ordering look accidental to the next reader.
+    trackPurchase(receiptId);
+    clear();
   }, [receiptId, clear]);
 
   return (
