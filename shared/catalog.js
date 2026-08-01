@@ -112,8 +112,7 @@ const TOGGLE_CLASP = {
 /**
  * Shared options.
  *
- * Two things are deliberately absent, both from market research into
- * comparable shops:
+ * Three things are deliberately absent:
  *
  *   Length upcharge. Nobody in this price tier charges for a longer strand.
  *   Every comparable listing checked priced all lengths the same, and it costs
@@ -123,6 +122,12 @@ const TOGGLE_CLASP = {
  *   and several state outright that paying more does not move an order up.
  *   Selling it would be a promise that is hard for one person to keep.
  *
+ *   Gift wrap and a handwritten card. Removed 2026-07-31. It was $5 for a
+ *   kraft box, ribbon, and a card carrying a message the buyer typed into a
+ *   120 character field. Every one of those is a per-order task that only
+ *   Jenna can do, and transcribing someone else's words by hand is the kind
+ *   of thing that goes wrong quietly on the order that mattered most.
+ *
  * @type {AddOn}
  */
 const ACCENTS = {
@@ -131,16 +136,6 @@ const ACCENTS = {
   note: 'Freshwater pearls and gold-tone rounds spaced through the strand.',
   priceCents: 800,
   weightOz: 0.2,
-};
-
-/** @type {AddOn} */
-const GIFT_WRAP = {
-  id: 'gift-wrap',
-  label: 'Gift wrap and a handwritten card',
-  note: "Kraft box, ribbon, and a card in Jenna's hand.",
-  priceCents: 500,
-  weightOz: 2.5,
-  input: { placeholder: 'What should the card say?', maxLength: 120 },
 };
 
 /**
@@ -177,7 +172,7 @@ const PRODUCTS = [
     swatch: '#4A7C74',
     image: 'eden-pearl-black',
     gallery: ['eden-onyx-ivory-toggle'],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS, GIFT_WRAP],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS],
   },
   {
     slug: 'the-rowan',
@@ -192,7 +187,7 @@ const PRODUCTS = [
     swatch: '#B08D57',
     image: 'rowan-ivory',
     gallery: ['rowan-green-ivory-front', 'rowan-green-ivory-angle'],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, GIFT_WRAP],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP],
   },
   {
     slug: 'the-emmy',
@@ -207,7 +202,7 @@ const PRODUCTS = [
     swatch: '#7FA9C4',
     image: 'emmy-jewel-tone',
     gallery: [],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS, GIFT_WRAP],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS],
   },
   {
     slug: 'the-blair',
@@ -222,7 +217,7 @@ const PRODUCTS = [
     swatch: '#3AA6A8',
     image: 'blair-mint-pearl',
     gallery: [],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, GIFT_WRAP],
+    addOns: [COLOUR, LENGTH, TOGGLE_CLASP],
   },
   {
     slug: 'the-delicate-monogram',
@@ -237,7 +232,7 @@ const PRODUCTS = [
     swatch: '#9BB7C9',
     image: 'delicate-monogram-aqua',
     gallery: [],
-    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP, GIFT_WRAP],
+    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP],
   },
   {
     slug: 'the-chunky-monogram',
@@ -254,7 +249,7 @@ const PRODUCTS = [
     // keeps the chunky strand reference until she supplies one.
     image: 'turquoise-heishi',
     gallery: [],
-    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP, GIFT_WRAP],
+    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP],
   },
 ];
 
