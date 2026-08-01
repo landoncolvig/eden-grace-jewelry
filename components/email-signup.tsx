@@ -69,8 +69,8 @@ export default function EmailSignup({ source = 'footer' }: { source?: string }) 
         First look
       </h2>
       <p className="mt-3 leading-relaxed text-bench/65">
-        New strands are made in small runs. Leave your email and Jenna will tell
-        you when the next one goes up.
+        New strands are made in small batches. Leave your email and Jenna will
+        tell you when the next one goes up.
       </p>
 
       <form onSubmit={submit} className="mt-4">

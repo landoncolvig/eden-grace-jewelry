@@ -20,7 +20,7 @@ export default function Hero() {
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
           <div>
             <p className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
-              Made to order
+              Small batch, made to order
             </p>
             <h1 className="mt-4 font-display text-4xl leading-[1.06] sm:text-5xl lg:text-[3.4rem]">
               Necklaces strung
@@ -31,7 +31,8 @@ export default function Hero() {
             </h1>
             <p className="mt-6 max-w-md leading-relaxed text-ink-soft">
               Natural gemstone strands, laid out on the board and finished at
-              the bench. The stones vary, so no two come out the same.
+              the bench. Every colour is strung from a small lot of beads, and
+              the stones vary, so no two come out the same.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">

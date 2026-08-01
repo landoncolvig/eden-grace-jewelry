@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     template: "%s | Eden Grace Jewelry Co.",
   },
   description:
-    'Gemstone and freshwater pearl necklaces, strung by hand and made to order. Natural stone varies, so no two strands come out the same.',
+    'Gemstone and freshwater pearl necklaces, strung by hand in small batches and made to order. Natural stone varies, so no two strands come out the same.',
   // Google Search Console. The Analytics verification method cannot be used
   // here: gtag.js is injected on hydration, so it is not in the HTML that
   // Google's verifier fetches. This meta tag is, because Next renders it into

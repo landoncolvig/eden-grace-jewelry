@@ -54,6 +54,12 @@ export default function AboutPage() {
               also why they take a few days rather than a few minutes.
             </p>
             <p>
+              I buy beads in small lots, so everything here is small batch. A
+              colour lasts as long as the lot does, and when it runs out I go
+              looking for the next one. A shade you like today may not be here
+              in a few months.
+            </p>
+            <p>
               The stones are natural, so they vary. A green aventurine strand
               will have beads that lean grey and beads that lean deep green,
               and I think that is the good part. If you want something specific,
