@@ -32,7 +32,8 @@ export type Product = {
   description: string;
   priceCents: number;
   weightOz: number;
-  material: string;
+  /** Absent on pieces where Jenna asked for no material line. */
+  material?: string;
   leadTime: string;
   swatch: string;
   /** Basename in /public/products. Both .webp and -sm.webp exist. */

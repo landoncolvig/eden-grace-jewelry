@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Logo from './logo';
 import EmailSignup from './email-signup';
+import { PRODUCTS } from '@/lib/shop';
 
 /**
  * Closes the dark chrome the header opens. Between them the page is cream and
@@ -25,37 +26,20 @@ export default function SiteFooter() {
           <h2 className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-bench/65">
             Shop
           </h2>
+          {/* Generated from the catalog rather than typed out. These were six
+              hand-written links, and retiring a piece left a footer link to a
+              page that no longer exists. */}
           <ul className="mt-3 space-y-2">
-            <li>
-              <Link href="/product/the-eden" className="text-bench/75 hover:text-bench">
-                The Eden
-              </Link>
-            </li>
-            <li>
-              <Link href="/product/the-rowan" className="text-bench/75 hover:text-bench">
-                The Rowan
-              </Link>
-            </li>
-            <li>
-              <Link href="/product/the-emmy" className="text-bench/75 hover:text-bench">
-                The Emmy
-              </Link>
-            </li>
-            <li>
-              <Link href="/product/the-blair" className="text-bench/75 hover:text-bench">
-                The Blair
-              </Link>
-            </li>
-            <li>
-              <Link href="/product/the-delicate-monogram" className="text-bench/75 hover:text-bench">
-                The Delicate Monogram
-              </Link>
-            </li>
-            <li>
-              <Link href="/product/the-chunky-monogram" className="text-bench/75 hover:text-bench">
-                The Chunky Monogram
-              </Link>
-            </li>
+            {PRODUCTS.map((product) => (
+              <li key={product.slug}>
+                <Link
+                  href={`/product/${product.slug}`}
+                  className="text-bench/75 hover:text-bench"
+                >
+                  {product.name}
+                </Link>
+              </li>
+            ))}
             <li>
               <Link href="/about" className="text-bench/75 hover:text-bench">
                 About Jenna

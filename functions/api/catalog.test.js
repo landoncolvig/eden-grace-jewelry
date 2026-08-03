@@ -6,7 +6,10 @@ const { PRODUCTS } = require('../../shared/catalog.js');
 const { priceCart } = require('../../shared/pricing.js');
 
 test('every necklace offers a $3 toggle clasp', () => {
-  assert.equal(PRODUCTS.length, 6);
+  // Pinned on purpose. A product silently vanishing from the catalog is worth
+  // one deliberate test edit to notice. Five since Jenna retired the Chunky
+  // Monogram on 2026-08-03.
+  assert.equal(PRODUCTS.length, 5);
 
   for (const product of PRODUCTS) {
     const clasp = product.addOns.find((addOn) => addOn.id === 'toggle-clasp');
@@ -22,7 +25,7 @@ test('server pricing adds the toggle clasp to the line total and work order', ()
       slug: 'the-eden',
       qty: 1,
       addOns: [
-        { id: 'colour', value: 'Green aventurine' },
+        { id: 'colour', value: 'Navy & Cream' },
         { id: 'length', value: '16 inches' },
         { id: 'toggle-clasp' },
       ],

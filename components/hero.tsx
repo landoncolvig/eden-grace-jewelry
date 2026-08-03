@@ -2,6 +2,17 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { PRODUCTS, formatUSD } from '@/lib/shop';
+
+// Read from the catalog rather than written in. This said "From $42" through a
+// repricing that made the cheapest piece $35, which is the kind of stale claim
+// nobody thinks to check.
+//
+// Whole dollars, not formatUSD, because this is a "starting at" line and every
+// piece is priced evenly. "From $35.00" reads like a checkout total.
+const cheapestCents = Math.min(...PRODUCTS.map((p) => p.priceCents));
+const cheapestLabel =
+  cheapestCents % 100 === 0 ? `$${cheapestCents / 100}` : formatUSD(cheapestCents);
 
 /**
  * The hero uses one of Jenna's finished pieces against the same warm studio
@@ -51,7 +62,10 @@ export default function Hero() {
             </div>
 
             <p className="mt-6 font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
-              From $42 &middot; Free shipping over $75
+              {/* One template string rather than text around an expression:
+                  JSX drops the space between an expression and the text that
+                  follows it, which silently ran "$35" into the separator. */}
+              {`From ${cheapestLabel} · Free shipping over $75`}
             </p>
           </div>
 

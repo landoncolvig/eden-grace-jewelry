@@ -56,7 +56,11 @@
  * @property {string} description
  * @property {number} priceCents
  * @property {number} weightOz    Piece + box + mailer.
- * @property {string} material
+ * @property {string} [material]  Omitted where Jenna asked for no material
+ *                                line. The row is not rendered when absent,
+ *                                rather than rendered empty. A material claim
+ *                                on a page taking money has to be one she
+ *                                stands behind, so no default is invented.
  * @property {string} leadTime
  * @property {string} swatch
  * @property {string} image       Primary photo, in /public/products.
@@ -65,29 +69,33 @@
  */
 
 /**
- * Colour, offered on every piece because Jenna offers it on every piece.
+ * Colour ways, built per piece.
  *
- * The list is the stones and glass she actually strings, taken from her own
- * photographs. Adding a colour here without adding the beads to the bench
- * sells something that cannot be made.
+ * These used to be one shared list on every product. They are per piece now
+ * because Jenna's 2026-08-03 edits give each strand its own set, which is what
+ * you would expect: a colour way exists when she has the bead lot for it, and
+ * the lots differ piece to piece. Adding a colour here without the beads on
+ * the bench sells something that cannot be made.
+ *
+ * The id stays `colour` across all of them so an older cart still resolves to
+ * the right add-on. A value that is no longer offered is dropped to empty by
+ * pricing.js and then fails the required check, which blocks that cart at
+ * checkout instead of sending a retired colour to the bench.
+ *
+ * @param {string[]} choices
+ * @returns {AddOn}
  */
-const COLOUR = {
-  id: 'colour',
-  label: 'Color',
-  note: 'Which color should it be?',
-  priceCents: 0,
-  weightOz: 0,
-  required: true,
-  choices: [
-    'Green aventurine',
-    'Black onyx',
-    'Pink rhodonite',
-    'Amazonite',
-    'Cream and ivory',
-    'Turquoise',
-    'Gold and hematite',
-  ],
-};
+function colourWays(choices) {
+  return {
+    id: 'colour',
+    label: 'Color Ways',
+    note: 'Which color way should it be?',
+    priceCents: 0,
+    weightOz: 0,
+    required: true,
+    choices,
+  };
+}
 
 /** @type {AddOn} */
 const LENGTH = {
@@ -110,13 +118,11 @@ const TOGGLE_CLASP = {
 };
 
 /**
- * Shared options.
- *
- * Three things are deliberately absent:
+ * Options that are deliberately absent, and why.
  *
  *   Length upcharge. Nobody in this price tier charges for a longer strand.
  *   Every comparable listing checked priced all lengths the same, and it costs
- *   pennies of wire. Length is a free choice above.
+ *   pennies of wire. Length is a free choice where it is offered at all.
  *
  *   Rush processing. No comparable shop sells queue priority as a line item,
  *   and several state outright that paying more does not move an order up.
@@ -128,15 +134,11 @@ const TOGGLE_CLASP = {
  *   Jenna can do, and transcribing someone else's words by hand is the kind
  *   of thing that goes wrong quietly on the order that mattered most.
  *
- * @type {AddOn}
+ *   Pearl and gold accent beads. Removed 2026-08-03 at Jenna's request. It was
+ *   $8 to space freshwater pearls and gold-tone rounds through the strand, and
+ *   it was offered on The Eden and The Emmy. She asked for it off both, which
+ *   left nothing using it.
  */
-const ACCENTS = {
-  id: 'accents',
-  label: 'Pearl and gold accent beads',
-  note: 'Freshwater pearls and gold-tone rounds spaced through the strand.',
-  priceCents: 800,
-  weightOz: 0.2,
-};
 
 /**
  * The monogram itself.
@@ -150,7 +152,11 @@ const ACCENTS = {
 const MONOGRAM = {
   id: 'monogram',
   label: 'Monogram',
-  note: 'Which initials?',
+  // Jenna asked for the buyer to set the letters "and in the order they want".
+  // A three character free-text field already does that, since what they type
+  // is strung left to right. The note says so rather than leaving them to
+  // assume the letters get reordered into some standard monogram form.
+  note: 'Which initials, in the order you want them strung?',
   priceCents: 0,
   weightOz: 0,
   required: true,
@@ -172,22 +178,24 @@ const PRODUCTS = [
     swatch: '#4A7C74',
     image: 'eden-pearl-black',
     gallery: ['eden-onyx-ivory-toggle'],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS],
+    addOns: [colourWays(['Navy & Cream', 'Brown & Cream']), LENGTH, TOGGLE_CLASP],
   },
   {
     slug: 'the-rowan',
     name: 'The Rowan',
     tagline: 'Pearls, with small spacers',
-    description:
-      'Pearl beaded necklace with small spacers. Color and length of your choice.',
-    priceCents: 5800,
+    description: 'White beads with colorful spacer beads',
+    priceCents: 4000,
     weightOz: 2.2,
-    material: 'Cultured freshwater pearl on gold-tone findings',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#B08D57',
     image: 'rowan-ivory',
     gallery: ['rowan-green-ivory-front', 'rowan-green-ivory-angle'],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP],
+    addOns: [
+      colourWays(['Royal Blue', 'Brown', 'Yellow', 'Green', 'Pink']),
+      LENGTH,
+      TOGGLE_CLASP,
+    ],
   },
   {
     slug: 'the-emmy',
@@ -195,61 +203,54 @@ const PRODUCTS = [
     tagline: 'Our delicate style',
     description:
       'Our delicate style necklace. Small dainty beads with color and length of your choice.',
-    priceCents: 4200,
+    priceCents: 4500,
     weightOz: 2.0,
     material: 'Small gemstone beads on gold-tone findings',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#7FA9C4',
     image: 'emmy-jewel-tone',
     gallery: [],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP, ACCENTS],
+    addOns: [
+      colourWays(['Green & Gold', 'Navy Blue & Purple', 'Light Pink', 'Brown & Cream']),
+      LENGTH,
+      TOGGLE_CLASP,
+    ],
   },
   {
     slug: 'the-blair',
     name: 'The Blair',
     tagline: 'Chunky beads with a statement',
     description:
-      'Our chunky beaded necklace. Chunky beads with a statement. Color and length of your choice.',
-    priceCents: 5600,
+      'Our 18 inch chunky beaded necklace made with natural aventurine and mother of pearl.',
+    priceCents: 7800,
     weightOz: 3.2,
-    material: 'Chunky gemstone and heishi on gold-tone findings',
+    material: 'natural aventurine and mother of pearl',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#3AA6A8',
     image: 'blair-mint-pearl',
     gallery: [],
-    addOns: [COLOUR, LENGTH, TOGGLE_CLASP],
+    // One fixed 18 inch strand in one colour way, so neither picker applies.
+    // The description carries the length instead.
+    addOns: [TOGGLE_CLASP],
   },
   {
     slug: 'the-delicate-monogram',
     name: 'The Delicate Monogram',
     tagline: 'Initials on a dainty strand',
     description:
-      'Our monogram necklace with the color and length of your choice.',
-    priceCents: 4600,
+      '16 inch necklace with dainty gemstones. Add up to 3 monogram letters.',
+    priceCents: 3500,
     weightOz: 2.1,
-    material: 'Mother-of-pearl letters on small gemstone beads',
     leadTime: 'Ships in 7 to 10 days',
     swatch: '#9BB7C9',
     image: 'delicate-monogram-aqua',
     gallery: [],
-    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP],
-  },
-  {
-    slug: 'the-chunky-monogram',
-    name: 'The Chunky Monogram',
-    tagline: 'Initials, with more presence',
-    description:
-      'Our monogram necklace with the color and length of your choice.',
-    priceCents: 5200,
-    weightOz: 3.0,
-    material: 'Mother-of-pearl letters on chunky gemstone beads',
-    leadTime: 'Ships in 7 to 10 days',
-    swatch: '#2E8F91',
-    // Jenna's 2026-07-31 note did not include a Chunky Monogram photo, so this
-    // keeps the chunky strand reference until she supplies one.
-    image: 'turquoise-heishi',
-    gallery: [],
-    addOns: [MONOGRAM, COLOUR, LENGTH, TOGGLE_CLASP],
+    // Fixed at 16 inches, which the description states, so no length picker.
+    addOns: [
+      MONOGRAM,
+      colourWays(['Light Blue', 'Pink', 'Purple', 'Yellow', 'Dark Blue']),
+      TOGGLE_CLASP,
+    ],
   },
 ];
 

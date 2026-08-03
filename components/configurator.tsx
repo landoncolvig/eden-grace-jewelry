@@ -150,10 +150,14 @@ export default function Configurator({ product }: { product: Product }) {
           <p className="mt-5 max-w-prose leading-relaxed text-ink-soft">{product.description}</p>
 
           <dl className="mt-6 grid gap-x-8 gap-y-2 border-t border-rule pt-5 text-sm sm:grid-cols-2">
-            <div className="flex gap-2">
-              <dt className="text-ink-faint">Material</dt>
-              <dd>{product.material}</dd>
-            </div>
+            {/* Not every piece carries a material line. Jenna took it off two
+                of them, and an empty "Material" row reads as a bug. */}
+            {product.material && (
+              <div className="flex gap-2">
+                <dt className="text-ink-faint">Material</dt>
+                <dd>{product.material}</dd>
+              </div>
+            )}
             <div className="flex gap-2">
               <dt className="text-ink-faint">Lead time</dt>
               <dd>{product.leadTime}</dd>
