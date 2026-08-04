@@ -234,7 +234,10 @@ const PRODUCTS = [
     material: 'natural aventurine and mother of pearl',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#3AA6A8',
-    image: 'blair-mint-pearl',
+    // Replaced blair-mint-pearl on 2026-08-03. That strand had two green beads
+    // adjacent at the bottom, breaking the alternating run. This is the shot
+    // Jenna texted, cut out of the wood board she photographed it on.
+    image: 'blair-aventurine-pearl',
     gallery: [],
     // One fixed 18 inch strand in one colour way, so neither picker applies.
     // The description carries the length instead.
