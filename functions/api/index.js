@@ -360,7 +360,23 @@ async function handleWebhook(req, res) {
     return res.status(200).end();
   }
 
-  await fulfillPayment(payment.id);
+  try {
+    await fulfillPayment(payment.id);
+  } catch (err) {
+    // A payment Square will not return to us is not going to appear on a
+    // retry, so answer 200 and stop the redelivery loop. Square's own test
+    // event does exactly this: it carries a synthetic payment id, and on
+    // 2026-07-29 it produced four 500s in a row here. A subscription that
+    // keeps failing is one Square can disable, which would silently cost
+    // Jenna every future order notification.
+    const missing =
+      err instanceof SquareApiError && (err.status === 404 || err.code === 'NOT_FOUND');
+    if (!missing) throw err;
+    console.warn('webhook referenced a payment Square cannot return; ignoring', {
+      paymentId: payment.id,
+      detail: err.detail || err.message,
+    });
+  }
   return res.status(200).end();
 }
 

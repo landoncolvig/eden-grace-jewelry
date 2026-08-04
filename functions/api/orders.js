@@ -82,9 +82,25 @@ function orderEmailHtml({ sale, shipmentsUrl = SQUARE_SHIPMENTS_URL }) {
 </body></html>`;
 }
 
-async function emailOrderToOwner({ sale }) {
+/**
+ * What Jenna sees in her inbox before she opens anything.
+ *
+ * This used to prefer the spec over the product name, which meant no subject
+ * ever named the necklace: "New order: Color Ways: Navy & Cream / Length: 16
+ * inches". The piece is the thing she needs to recognise at a glance; the
+ * spec is in the body.
+ */
+function orderSubject(sale) {
   const first = sale.lines[0];
-  const subject = `New order: ${first ? first.spec || first.description : 'jewelry'} - ${formatUSD(sale.totalCents)}`;
+  if (!first) return `New order - ${formatUSD(sale.totalCents)}`;
+
+  const qty = Number(first.quantity) > 1 ? `${first.quantity}x ` : '';
+  const more = sale.lines.length > 1 ? ` +${sale.lines.length - 1} more` : '';
+  return `New order: ${qty}${first.description}${more} - ${formatUSD(sale.totalCents)}`;
+}
+
+async function emailOrderToOwner({ sale }) {
+  const subject = orderSubject(sale);
   await sendMail({
     to: JENNA,
     subject,
@@ -96,5 +112,6 @@ async function emailOrderToOwner({ sale }) {
 module.exports = {
   SQUARE_SHIPMENTS_URL,
   orderEmailHtml,
+  orderSubject,
   emailOrderToOwner,
 };

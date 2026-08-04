@@ -36,3 +36,30 @@ test('work-order email sends Jenna to Square Shipments', () => {
   assert.match(html, /Create label/);
   assert.doesNotMatch(html, /\/label\?order=/);
 });
+
+test('the order subject names the piece, not its options', () => {
+  const { orderSubject } = require('./orders.js');
+
+  // Regression: this used to prefer the spec, so no subject ever named the
+  // necklace. Jenna could not tell from her inbox what had been ordered.
+  assert.equal(
+    orderSubject({
+      totalCents: 5317,
+      lines: [{ quantity: 1, description: 'The Eden', spec: 'Color Ways: Navy & Cream / Length: 16 inches' }],
+    }),
+    'New order: The Eden - $53.17',
+  );
+
+  assert.equal(
+    orderSubject({ totalCents: 9600, lines: [{ quantity: 2, description: 'The Emmy', spec: 'x' }] }),
+    'New order: 2x The Emmy - $96.00',
+  );
+
+  assert.equal(
+    orderSubject({
+      totalCents: 12000,
+      lines: [{ quantity: 1, description: 'The Blair', spec: '' }, { quantity: 1, description: 'The Rowan', spec: '' }],
+    }),
+    'New order: The Blair +1 more - $120.00',
+  );
+});
