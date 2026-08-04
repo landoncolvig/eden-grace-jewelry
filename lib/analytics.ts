@@ -40,6 +40,43 @@ declare global {
  * <Script> tag means the first caller wins the race and the ordering holds
  * whichever way it goes.
  */
+/* ------------------------------------------------------------------ *
+ * Internal traffic
+ *
+ * Landon and Jenna look at their own store constantly, and on a shop getting
+ * a dozen visits a day that buries the real signal. GA4 excludes any event
+ * carrying `traffic_type=internal`, so this marks their browsers as internal
+ * and the property's "Internal Traffic" data filter drops those events.
+ *
+ * GA4's own way of setting this is an IP rule in the tag settings. This is by
+ * device instead, which is the better fit: it keeps working when the ISP
+ * rotates their address, and it covers phones on mobile data, which an IP rule
+ * for the house does not.
+ *
+ * Opt in once per browser by visiting:      /?eg_internal=1
+ * Undo it with:                             /?eg_internal=0
+ *
+ * The flag is only ever set by that explicit parameter, never inferred. A real
+ * buyer cannot trip it by accident, which matters because filtered events are
+ * discarded on arrival and cannot be recovered later.
+ * ------------------------------------------------------------------ */
+
+const INTERNAL_KEY = 'eg.traffic.internal.v1';
+const INTERNAL_PARAM = 'eg_internal';
+
+function isInternalTraffic(): boolean {
+  try {
+    const param = new URLSearchParams(window.location.search).get(INTERNAL_PARAM);
+    if (param === '1') window.localStorage.setItem(INTERNAL_KEY, '1');
+    else if (param === '0') window.localStorage.removeItem(INTERNAL_KEY);
+    return window.localStorage.getItem(INTERNAL_KEY) === '1';
+  } catch {
+    // Private browsing throws on storage access. Treat as a real visitor:
+    // over-counting a session is recoverable, discarding one is not.
+    return false;
+  }
+}
+
 function ensureGtag(): NonNullable<Window['gtag']> {
   if (!window.gtag) {
     const queue = (window.dataLayer ??= []);
@@ -50,16 +87,25 @@ function ensureGtag(): NonNullable<Window['gtag']> {
       queue.push(arguments);
     } as NonNullable<Window['gtag']>;
 
-    window.gtag('js', new Date());
-    window.gtag('config', GA_ID, {
+    const config: Record<string, unknown> = {
       // Views are sent from the router effect in components/analytics.tsx
       // instead, so a client-side navigation is counted the same way a hard
       // load is. Turn off "Page changes based on browser history events" in
       // the property's enhanced measurement settings or views double-count.
       send_page_view: false,
-    });
+    };
+    if (isInternalTraffic()) config.traffic_type = 'internal';
+
+    window.gtag('js', new Date());
+    window.gtag('config', GA_ID, config);
   }
   return window.gtag;
+}
+
+/** Whether this browser is currently marked as internal. For the console. */
+export function internalTrafficStatus(): boolean {
+  if (typeof window === 'undefined') return false;
+  return isInternalTraffic();
 }
 
 function send(...args: GtagArgs): void {
