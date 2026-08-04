@@ -33,7 +33,11 @@ export default function Home() {
         <div className="flex items-baseline justify-between gap-6 border-b border-rule pb-4">
           <h2 className="font-display text-2xl sm:text-3xl">The pieces</h2>
           <p className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
-            Small batch, made to order
+            {/* The hero eyebrow already says "Small batch, made to order" a
+                few hundred pixels above this, and the two were visible at once
+                on a laptop.
+                Not "colour of your choice": The Blair has no colour picker. */}
+            Strung to order in Bedford, Texas
           </p>
         </div>
 

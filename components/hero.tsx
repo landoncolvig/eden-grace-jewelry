@@ -40,11 +40,11 @@ export default function Hero() {
               <br />
               at a time.
             </h1>
-            <p className="mt-6 max-w-md leading-relaxed text-ink-soft">
-              Natural gemstone strands, laid out on the board and finished at
-              the bench. Every colour is strung from a small lot of beads, and
-              the stones vary, so no two come out the same.
-            </p>
+            {/* No body paragraph. It used to read "Natural gemstone strands,
+                laid out on the board and finished at the bench…", which said
+                the headline over again in more words, and pushed the necklace
+                below the fold on a phone. "No two come out the same" still
+                appears in the meta description and on the About page. */}
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link
