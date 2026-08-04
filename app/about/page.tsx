@@ -49,13 +49,13 @@ export default function AboutPage() {
             <p>
               Everything here is strung one bead at a time on nylon-coated steel
               wire and finished by hand. I lay a piece out on the board first,
-              move things around until the colour runs the way I want, and only
+              move things around until the color runs the way I want, and only
               then string it. That is why no two come out the same, and it is
               also why they take a few days rather than a few minutes.
             </p>
             <p>
               I buy beads in small lots, so everything here is small batch. A
-              colour lasts as long as the lot does, and when it runs out I go
+              color lasts as long as the lot does, and when it runs out I go
               looking for the next one. A shade you like today may not be here
               in a few months.
             </p>

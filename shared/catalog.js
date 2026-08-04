@@ -29,7 +29,7 @@
  * and is not, and the only pearl on the site is the mother of pearl she named
  * in The Blair. Do not reintroduce a pearl claim anywhere without asking her.
  *
- * Colour ways and lengths differ per piece; neither is offered on all five.
+ * Color ways and lengths differ per piece; neither is offered on all five.
  */
 
 /**
@@ -72,23 +72,29 @@
  */
 
 /**
- * Colour ways, built per piece.
+ * Color ways, built per piece.
  *
  * These used to be one shared list on every product. They are per piece now
  * because Jenna's 2026-08-03 edits give each strand its own set, which is what
- * you would expect: a colour way exists when she has the bead lot for it, and
- * the lots differ piece to piece. Adding a colour here without the beads on
+ * you would expect: a color way exists when she has the bead lot for it, and
+ * the lots differ piece to piece. Adding a color here without the beads on
  * the bench sells something that cannot be made.
  *
- * The id stays `colour` across all of them so an older cart still resolves to
- * the right add-on. A value that is no longer offered is dropped to empty by
- * pricing.js and then fails the required check, which blocks that cart at
- * checkout instead of sending a retired colour to the bench.
+ * The id is `colour`, the odd British spelling left in the codebase, and it
+ * stays that way on purpose. It is a key already written into buyers'
+ * localStorage carts. Renaming it to match the American spelling used
+ * everywhere else would make every saved cart fail its required check and
+ * force the buyer to pick again for no gain, since the id is never rendered.
+ *
+ * That same mechanism is a feature when a color really is retired: a value no
+ * longer offered is dropped to empty by pricing.js and then fails the required
+ * check, blocking that cart at checkout instead of sending a color Jenna
+ * cannot make to the bench.
  *
  * @param {string[]} choices
  * @returns {AddOn}
  */
-function colourWays(choices) {
+function colorWays(choices) {
   return {
     id: 'colour',
     label: 'Color Ways',
@@ -181,13 +187,13 @@ const PRODUCTS = [
     swatch: '#4A7C74',
     image: 'eden-pearl-black',
     gallery: ['eden-onyx-ivory-toggle'],
-    addOns: [colourWays(['Navy & Cream', 'Brown & Cream']), LENGTH, TOGGLE_CLASP],
+    addOns: [colorWays(['Navy & Cream', 'Brown & Cream']), LENGTH, TOGGLE_CLASP],
   },
   {
     slug: 'the-rowan',
     name: 'The Rowan',
     // Was "Pearls, with small spacers". The Rowan is not pearls. Jenna's
-    // 2026-08-03 description calls it white beads with colourful spacers and
+    // 2026-08-03 description calls it white beads with colorful spacers and
     // took the material line off entirely, so the tagline echoes her wording
     // and claims nothing about what the beads are made of.
     tagline: 'White beads, colorful spacers',
@@ -199,7 +205,7 @@ const PRODUCTS = [
     image: 'rowan-ivory',
     gallery: ['rowan-green-ivory-front', 'rowan-green-ivory-angle'],
     addOns: [
-      colourWays(['Royal Blue', 'Brown', 'Yellow', 'Green', 'Pink']),
+      colorWays(['Royal Blue', 'Brown', 'Yellow', 'Green', 'Pink']),
       LENGTH,
       TOGGLE_CLASP,
     ],
@@ -218,7 +224,7 @@ const PRODUCTS = [
     image: 'emmy-jewel-tone',
     gallery: [],
     addOns: [
-      colourWays(['Green & Gold', 'Navy Blue & Purple', 'Light Pink', 'Brown & Cream']),
+      colorWays(['Green & Gold', 'Navy Blue & Purple', 'Light Pink', 'Brown & Cream']),
       LENGTH,
       TOGGLE_CLASP,
     ],
@@ -239,7 +245,7 @@ const PRODUCTS = [
     // Jenna texted, cut out of the wood board she photographed it on.
     image: 'blair-aventurine-pearl',
     gallery: [],
-    // One fixed 18 inch strand in one colour way, so neither picker applies.
+    // One fixed 18 inch strand in one color way, so neither picker applies.
     // The description carries the length instead.
     addOns: [TOGGLE_CLASP],
   },
@@ -258,7 +264,7 @@ const PRODUCTS = [
     // Fixed at 16 inches, which the description states, so no length picker.
     addOns: [
       MONOGRAM,
-      colourWays(['Light Blue', 'Pink', 'Purple', 'Yellow', 'Dark Blue']),
+      colorWays(['Light Blue', 'Pink', 'Purple', 'Yellow', 'Dark Blue']),
       TOGGLE_CLASP,
     ],
   },

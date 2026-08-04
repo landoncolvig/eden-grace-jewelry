@@ -17,7 +17,7 @@ test('buildPaymentLinkPayload uses server-priced items and a USPS fee', () => {
           name: 'The Eden',
           qty: 2,
           unitCents: 5600,
-          description: 'Colour: Green aventurine / Length: 18 inches',
+          description: 'Color: Green aventurine / Length: 18 inches',
         },
       ],
     },
@@ -75,7 +75,7 @@ test('normalizeSquareSale maps paid Square shipping details into a work order', 
         {
           name: 'The Eden',
           quantity: '1',
-          note: 'Colour: Green aventurine / Length: 18 inches',
+          note: 'Color: Green aventurine / Length: 18 inches',
           total_money: { amount: 4800, currency: 'USD' },
         },
       ],
@@ -117,5 +117,5 @@ test('normalizeSquareSale maps paid Square shipping details into a work order', 
   assert.equal(sale.shipping.name, 'Taylor Buyer');
   assert.equal(sale.shipping.address.postalCode, '76010');
   assert.equal(sale.customer.email, 'taylor@example.com');
-  assert.equal(sale.lines[0].spec, 'Colour: Green aventurine / Length: 18 inches');
+  assert.equal(sale.lines[0].spec, 'Color: Green aventurine / Length: 18 inches');
 });

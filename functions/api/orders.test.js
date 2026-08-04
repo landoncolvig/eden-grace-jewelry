@@ -13,7 +13,7 @@ test('work-order email sends Jenna to Square Shipments', () => {
         {
           quantity: 1,
           description: 'The Eden',
-          spec: 'Colour: Green aventurine / Length: 18 inches',
+          spec: 'Color: Green aventurine / Length: 18 inches',
           totalCents: 4800,
         },
       ],

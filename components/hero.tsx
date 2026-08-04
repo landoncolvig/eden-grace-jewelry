@@ -49,7 +49,7 @@ export default function Hero() {
                 strands", which is what used to sit here, was not true of all
                 five. */}
             <p className="mt-6 max-w-md leading-relaxed text-ink-soft">
-              Every colour comes from one small lot of beads. When the lot is
+              Every color comes from one small lot of beads. When the lot is
               gone, so is that shade.
             </p>
 

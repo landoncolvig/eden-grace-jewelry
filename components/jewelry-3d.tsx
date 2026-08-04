@@ -162,11 +162,11 @@ export function GoldMaterial({ roughness = 0.18 }: { roughness?: number }) {
 }
 
 /**
- * Polished stone or glass. Not metal: a bead has a body colour of its own plus
+ * Polished stone or glass. Not metal: a bead has a body color of its own plus
  * a hard clear surface over it, which is what the clearcoat is. Metalness here
- * would delete the colour and leave a chrome ball.
+ * would delete the color and leave a chrome ball.
  *
- * Left white by default because the strand colours the beads per instance.
+ * Left white by default because the strand colors the beads per instance.
  */
 export function BeadMaterial({ color = '#ffffff' }: { color?: string }) {
   return (
@@ -174,17 +174,17 @@ export function BeadMaterial({ color = '#ffffff' }: { color?: string }) {
       color={color}
       metalness={0}
       roughness={0.16}
-      // A full clearcoat washed the bead colour out the same way it drowned
+      // A full clearcoat washed the bead color out the same way it drowned
       // the letters: the specular lobe is additive white on top of the body
-      // colour, so at 1.0 under this environment every strand trended pale
-      // regardless of the colour it was given. Half is still a hard polished
+      // color, so at 1.0 under this environment every strand trended pale
+      // regardless of the color it was given. Half is still a hard polished
       // surface and lets the stone read.
       clearcoat={0.5}
       clearcoatRoughness={0.1}
       ior={1.55}
       // Low, deliberately. The environment is bright and near-neutral, so a
-      // strong reflection contribution drains the bead's own colour toward
-      // grey. Under-lighting them and letting the body colour dominate reads
+      // strong reflection contribution drains the bead's own color toward
+      // grey. Under-lighting them and letting the body color dominate reads
       // more like stone than a higher value does.
       envMapIntensity={0.5}
     />
@@ -195,7 +195,7 @@ export function BeadMaterial({ color = '#ffffff' }: { color?: string }) {
  * Nacre: mother of pearl, and freshwater pearl, which are the same material.
  *
  * The iridescence layer is the whole point. Nacre is stacked aragonite
- * platelets a few hundred nanometres thick, and the colour shift across a
+ * platelets a few hundred nanometres thick, and the color shift across a
  * pearl is thin-film interference in those layers, not pigment. three models
  * exactly that, so the thickness range below is doing physics rather than
  * faking a rainbow gradient. Without it a pearl renders as a white ball.
@@ -211,7 +211,7 @@ export function NacreMaterial({
    * Per-texel roughness. The letter discs use it to make the stamped glyph
    * matte while the shell around it stays polished, which is the only thing
    * that keeps the letter readable: clearcoat and iridescence add specular on
-   * top of the diffuse term, so darkening the colour map alone never wins.
+   * top of the diffuse term, so darkening the color map alone never wins.
    */
   roughnessMap?: THREE.Texture | null;
 }) {
@@ -412,7 +412,7 @@ export function Strand({
     >
       <sphereGeometry args={[1, 16, 12]} />
       {/* White, both of them: the shade of each bead rides on the instance
-          colour, and the shader multiplies the two. A tinted material here
+          color, and the shader multiplies the two. A tinted material here
           would tint the whole strand a second time. */}
       {finish === 'pearl' ? <NacreMaterial color="#ffffff" /> : <BeadMaterial />}
     </instancedMesh>

@@ -36,7 +36,7 @@ export default function Home() {
             {/* The hero eyebrow already says "Small batch, made to order" a
                 few hundred pixels above this, and the two were visible at once
                 on a laptop.
-                Not "colour of your choice": The Blair has no colour picker. */}
+                Not "color of your choice": The Blair has no color picker. */}
             Strung to order in Bedford, Texas
           </p>
         </div>
@@ -45,10 +45,10 @@ export default function Home() {
           {PRODUCTS.map((product) => (
             <Link key={product.slug} href={`/product/${product.slug}`} className="group block">
               <article className="flex h-full flex-col overflow-hidden rounded-2xl bg-paper ring-1 ring-rule transition-all group-hover:ring-2 group-hover:ring-rose">
-                {/* No decorative colour band here. Two earlier attempts at
+                {/* No decorative color band here. Two earlier attempts at
                     adding one, a multiply tint over the photo and a stripe
-                    across the card top, both read as colour bolted onto the
-                    card rather than belonging to it. The stones are the colour
+                    across the card top, both read as color bolted onto the
+                    card rather than belonging to it. The stones are the color
                     on this page; the card's job is to stay out of the way. */}
                 <Image
                   src={photo(product.image, 'sm')}

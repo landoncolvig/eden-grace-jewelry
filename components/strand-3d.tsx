@@ -7,7 +7,7 @@
  * It takes the same inputs the configurator collects, so a product page can
  * drive it from the buyer's current selection and show the piece changing
  * rather than swapping between photographs. Stone and pearl are genuinely
- * different materials and not two colours of one, which is why `finish` picks
+ * different materials and not two colors of one, which is why `finish` picks
  * the shader rather than just the tint: a pearl without the interference layer
  * on it is a white bead, and a stone with one is a soap bubble.
  *

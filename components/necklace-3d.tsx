@@ -8,7 +8,7 @@
  * piece, because what the buyer is deciding is not whether their name looks
  * good set in a face, it is whether three little discs of nacre spell it
  * nicely across the front of a strand. Nacre is also the one material on the
- * site that a photograph struggles with and a renderer does not: the colour
+ * site that a photograph struggles with and a renderer does not: the color
  * shift across it moves when the piece moves, so it only reads as itself once
  * it is turning.
  *
@@ -31,7 +31,7 @@ import {
 } from './jewelry-3d';
 
 /**
- * The four strand colours the configurator offers, keyed by the exact strings
+ * The four strand colors the configurator offers, keyed by the exact strings
  * in the catalog's `base` choices so the two cannot drift apart. Values come
  * from the product swatches and the theme tokens rather than being picked by
  * eye: pale blue and green are the swatches on the two products that use them,
@@ -77,7 +77,7 @@ const TEXTURE_PX = 256;
 /**
  * Near black, but darkening the ink alone was never going to be enough.
  *
- * The colour map multiplies into the DIFFUSE term, while clearcoat and
+ * The color map multiplies into the DIFFUSE term, while clearcoat and
  * iridescence add SPECULAR on top, and specular is not multiplied by albedo.
  * So a black texel under this environment still receives a full white
  * highlight and reads mid-grey. Two earlier attempts at this failed for
@@ -90,7 +90,7 @@ const TEXTURE_PX = 256;
  */
 const LETTER_INK = '#0b0807';
 
-/** Shared glyph placement, so colour and roughness stay in register. */
+/** Shared glyph placement, so color and roughness stay in register. */
 function paintGlyph(ctx: CanvasRenderingContext2D, char: string, family: string) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -128,7 +128,7 @@ function drawLetter(char: string, family: string, face: string, ink: string) {
  * readable, because it removes the specular highlight over the glyph rather
  * than trying to out-darken it.
  *
- * No colour space is set: roughness is linear data, not colour, and tagging it
+ * No color space is set: roughness is linear data, not color, and tagging it
  * sRGB would apply a gamma curve to a value that is not one.
  */
 function drawLetterRoughness(char: string, family: string) {

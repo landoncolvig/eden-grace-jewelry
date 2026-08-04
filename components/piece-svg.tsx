@@ -54,14 +54,14 @@ type NecklaceSvgProps = {
   word: string;
   /** True when `word` is the stand-in rather than something the buyer typed. */
   muted: boolean;
-  /** Bead colour, matching the strand colour the configurator offers. */
+  /** Bead color, matching the strand color the configurator offers. */
   color: string;
 };
 
 export function NecklaceSvg({ word, muted, color }: NecklaceSvgProps) {
   // Gradient ids have to be unique per instance. SVG resolves url(#id) against
   // the whole document, so two of these on one page with different bead
-  // colours would both paint with whichever def came first.
+  // colors would both paint with whichever def came first.
   const id = useId();
   const beadFill = `bead-${id}`;
   const nacreFill = `nacre-${id}`;
@@ -144,7 +144,7 @@ export function NecklaceSvg({ word, muted, color }: NecklaceSvgProps) {
 }
 
 type StrandSvgProps = {
-  /** Bead colour. Pearls pass their own near-white. */
+  /** Bead color. Pearls pass their own near-white. */
   color: string;
   /** Draws the pearl and gold accent beads the add-on adds. */
   accents?: boolean;
