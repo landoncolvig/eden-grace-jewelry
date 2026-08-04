@@ -38,7 +38,12 @@ export const metadata: Metadata = {
     template: "%s | Eden Grace Jewelry Co.",
   },
   description:
-    'Gemstone and freshwater pearl necklaces, strung by hand in small batches and made to order. Natural stone varies, so no two strands come out the same.',
+    // No freshwater pearl claim. The Rowan was the pearl piece and it is not
+    // pearls, so nothing in the catalog carries that material. The only pearl
+    // left on the site is the mother of pearl in The Blair, which is Jenna's
+    // own wording for that piece and stays there rather than in a site-wide
+    // description that would generalise it across all five.
+    'Beaded gemstone necklaces, strung by hand in small batches and made to order. Natural stone varies, so no two strands come out the same.',
   // Google Search Console. The Analytics verification method cannot be used
   // here: gtag.js is injected on hydration, so it is not in the HTML that
   // Google's verifier fetches. This meta tag is, because Next renders it into
@@ -51,7 +56,7 @@ export const metadata: Metadata = {
     siteName: "Eden Grace Jewelry Co.",
     title: "Eden Grace Jewelry Co.",
     description:
-      'Gemstone strands, freshwater pearl necklaces, and mother-of-pearl name necklaces, made to order.',
+      'Gemstone strands and monogram necklaces, made to order in small batches.',
   },
 };
 

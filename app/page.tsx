@@ -10,7 +10,7 @@ const STEPS = [
   {
     n: '01',
     title: 'You pick the piece',
-    body: 'Choose the stone, the length, and whether it carries pearls or letters. The order sheet builds itself as you go, so you see the exact necklace and the exact price before you pay.',
+    body: 'Choose the color way, the length where there is one, and your initials if it takes them. The order sheet builds itself as you go, so you see the exact necklace and the exact price before you pay.',
   },
   {
     n: '02',

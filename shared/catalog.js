@@ -13,20 +13,23 @@
  *
  * Prices are in cents. Weights are in ounces, including box and mailer.
  *
- * ── NAMES AND DESCRIPTIONS ARE JENNA'S, VERBATIM (2026-07-31) ──
- * She updated the six-piece line in her "Necklace names" note. The names and the wording of what each
- * piece is are hers and should not be "improved". Every one of them offers
- * color and length of the buyer's choice, which is why those are required
- * pickers on all six rather than an option on one.
+ * ── NAMES, DESCRIPTIONS, AND PRICES ARE JENNA'S (2026-08-03) ──
+ * From her "Eden Grace Website Edits" doc. Five pieces since she retired the
+ * Chunky Monogram. The names and the wording of what each piece is are hers
+ * and should not be "improved".
  *
- * ── PRICES ARE PROVISIONAL ──
- * She named the pieces; she did not price them. These are scaled from live
- * Etsy comps (high-review sellers, gold-tone hardware) by how much material
- * each piece actually uses: dainty < original < chunky, with pearl carrying
- * the premium it carries in every channel measured, and the monograms above
- * their plain equivalents because they are made to order and mother-of-pearl
- * letters cost more than beads. Every one needs her sign-off before this
- * shop takes real money at these numbers.
+ * The earlier prices here were mine, scaled from Etsy comps, and carried a
+ * standing warning that she had never signed off on them. That is settled:
+ * she priced all five herself and Landon approved them.
+ *
+ * ── MATERIAL CLAIMS ──
+ * `material` is optional and there is no default. A material line is a factual
+ * claim to someone about to pay, so it exists only where Jenna wrote one.
+ * Nothing here is freshwater pearl. The Rowan used to be described that way
+ * and is not, and the only pearl on the site is the mother of pearl she named
+ * in The Blair. Do not reintroduce a pearl claim anywhere without asking her.
+ *
+ * Colour ways and lengths differ per piece; neither is offered on all five.
  */
 
 /**
@@ -183,7 +186,11 @@ const PRODUCTS = [
   {
     slug: 'the-rowan',
     name: 'The Rowan',
-    tagline: 'Pearls, with small spacers',
+    // Was "Pearls, with small spacers". The Rowan is not pearls. Jenna's
+    // 2026-08-03 description calls it white beads with colourful spacers and
+    // took the material line off entirely, so the tagline echoes her wording
+    // and claims nothing about what the beads are made of.
+    tagline: 'White beads, colorful spacers',
     description: 'White beads with colorful spacer beads',
     priceCents: 4000,
     weightOz: 2.2,
