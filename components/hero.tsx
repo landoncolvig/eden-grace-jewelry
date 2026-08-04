@@ -40,11 +40,18 @@ export default function Hero() {
               <br />
               at a time.
             </h1>
-            {/* No body paragraph. It used to read "Natural gemstone strands,
-                laid out on the board and finished at the bench…", which said
-                the headline over again in more words, and pushed the necklace
-                below the fold on a phone. "No two come out the same" still
-                appears in the meta description and on the About page. */}
+            {/* Two sentences on purpose. The version before this ran four
+                lines and pushed the necklace off the bottom of a phone screen,
+                which is what got it cut in the first place.
+                It explains small batch rather than repeating the eyebrow above
+                it, and it claims nothing about materials. The Rowan's beads
+                have no material Jenna has named, so "natural gemstone
+                strands", which is what used to sit here, was not true of all
+                five. */}
+            <p className="mt-6 max-w-md leading-relaxed text-ink-soft">
+              Every colour comes from one small lot of beads. When the lot is
+              gone, so is that shade.
+            </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link
