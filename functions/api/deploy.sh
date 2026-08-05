@@ -12,9 +12,18 @@ set -euo pipefail
 PROJECT="${GCP_PROJECT:-dayta-analytics-sandbox}"
 REGION="${REGION:-us-central1}"
 NAME="${NAME:-jennas-jewelry-api}"
-# The active gcloud account flips between terminals, so pin it per invocation
-# rather than trusting whatever is currently configured.
-ACCOUNT="${GCLOUD_ACCOUNT:-colviglandon@gmail.com}"
+RUNTIME_SERVICE_ACCOUNT="${RUNTIME_SERVICE_ACCOUNT:-jennas-jewelry-runtime@${PROJECT}.iam.gserviceaccount.com}"
+BUILD_SERVICE_ACCOUNT="${BUILD_SERVICE_ACCOUNT:-jennas-jewelry-build@${PROJECT}.iam.gserviceaccount.com}"
+# Resolve the account once, then pin every command to it. Only the two approved
+# maintainers may deploy this function from the script.
+ACCOUNT="${GCLOUD_ACCOUNT:-$(gcloud config get-value account --quiet 2>/dev/null)}"
+case "$ACCOUNT" in
+  colviglandon@gmail.com|jennacolvig@gmail.com) ;;
+  *)
+    echo "Set GCLOUD_ACCOUNT to an approved Eden Grace maintainer account." >&2
+    exit 1
+    ;;
+esac
 # The service URL is stable for this deployed function. Supplying it here keeps
 # Square's signed webhook URL exact across deployments.
 API_BASE_URL="${API_BASE_URL:-https://jennas-jewelry-api-qrowd7xcqq-uc.a.run.app}"
@@ -27,6 +36,9 @@ echo "==> Syncing shared/ into the function source"
 rm -rf ./shared
 cp -R ../../shared ./shared
 
+# Public invoker access is configured once on the live function. Routine
+# deploys preserve it, so limited deployers do not need permission to rewrite
+# the function's IAM policy.
 echo "==> Deploying ${NAME} to ${PROJECT} (${REGION}) as ${ACCOUNT}"
 gcloud functions deploy "$NAME" \
   --account="$ACCOUNT" \
@@ -34,10 +46,11 @@ gcloud functions deploy "$NAME" \
   --region="$REGION" \
   --gen2 \
   --runtime=nodejs22 \
+  --service-account="$RUNTIME_SERVICE_ACCOUNT" \
+  --build-service-account="projects/${PROJECT}/serviceAccounts/${BUILD_SERVICE_ACCOUNT}" \
   --source=. \
   --entry-point=api \
   --trigger-http \
-  --allow-unauthenticated \
   --memory=512MiB \
   --timeout=30s \
   --min-instances=0 \
