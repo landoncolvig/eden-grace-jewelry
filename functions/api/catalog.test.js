@@ -39,6 +39,39 @@ test('server pricing adds the toggle clasp to the line total and work order', ()
   assert.match(priced.lines[0].description, /Toggle clasp/);
 });
 
+test('The Eden offers a $3 horseshoe charm priced by the server', () => {
+  const eden = PRODUCTS.find((product) => product.slug === 'the-eden');
+  const charm = eden.addOns.find((addOn) => addOn.id === 'horseshoe-charm');
+
+  assert.ok(charm);
+  assert.equal(charm.label, 'Horseshoe charm');
+  assert.equal(charm.priceCents, 300);
+  assert.deepEqual(
+    PRODUCTS.filter((product) => product.addOns.some((addOn) => addOn.id === 'horseshoe-charm')).map(
+      (product) => product.slug,
+    ),
+    ['the-eden'],
+  );
+
+  const priced = priceCart([
+    {
+      slug: 'the-eden',
+      qty: 1,
+      addOns: [
+        { id: 'colour', value: 'Brown & Cream' },
+        { id: 'length', value: '18 inches' },
+        { id: 'horseshoe-charm' },
+      ],
+    },
+  ]);
+
+  assert.deepEqual(priced.missingRequired, []);
+  assert.equal(priced.subtotalCents, 5100);
+  assert.equal(priced.lines[0].unitCents, 5100);
+  assert.equal(priced.lines[0].addOns.find((addOn) => addOn.id === 'horseshoe-charm').priceCents, 300);
+  assert.match(priced.lines[0].description, /Horseshoe charm/);
+});
+
 test('The Ellie is priced from the shared server catalog', () => {
   const ellie = PRODUCTS.find((product) => product.slug === 'the-ellie');
   assert.ok(ellie);

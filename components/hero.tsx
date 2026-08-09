@@ -78,8 +78,8 @@ export default function Hero() {
 
           <div className="overflow-hidden rounded-[28px] bg-paper ring-1 ring-rule">
             <Image
-              src="/products/eden-onyx-ivory-toggle.webp"
-              alt="A black, ivory, and gold-tone Eden necklace with a toggle clasp"
+              src="/products/eden-brown-horseshoe-hero.webp"
+              alt="A brown, cream, and gold-tone Eden necklace with a horseshoe charm"
               width={1254}
               height={1254}
               priority

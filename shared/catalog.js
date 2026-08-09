@@ -128,6 +128,15 @@ const TOGGLE_CLASP = {
   weightOz: 0,
 };
 
+/** @type {AddOn} */
+const HORSESHOE_CHARM = {
+  id: 'horseshoe-charm',
+  label: 'Horseshoe charm',
+  note: 'Add a gold-tone horseshoe charm.',
+  priceCents: 300,
+  weightOz: 0,
+};
+
 /**
  * Options that are deliberately absent, and why.
  *
@@ -187,9 +196,22 @@ const PRODUCTS = [
     material: 'Natural gemstone on gold-tone findings',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#4A7C74',
-    image: 'eden-pearl-black',
-    gallery: ['eden-onyx-ivory-toggle'],
-    addOns: [colorWays(['Navy & Cream', 'Brown & Cream']), LENGTH, TOGGLE_CLASP],
+    image: 'eden-brown-horseshoe-bust',
+    gallery: [
+      'eden-brown-horseshoe-detail',
+      'eden-brown-bead-detail',
+      'eden-navy-bust',
+      'eden-navy-bead-detail',
+      'eden-navy-bead-detail-alt',
+      'eden-brown-horseshoe-flat',
+      'eden-navy-flat',
+    ],
+    addOns: [
+      colorWays(['Navy & Cream', 'Brown & Cream']),
+      LENGTH,
+      TOGGLE_CLASP,
+      HORSESHOE_CHARM,
+    ],
   },
   {
     slug: 'the-rowan',
