@@ -4,8 +4,8 @@ import { Suspense } from 'react';
 import { PRODUCTS, getProduct } from '@/lib/shop';
 import Configurator from '@/components/configurator';
 
-// Static export needs the full list of routes at build time. Two products
-// today; this stays correct as Jenna adds more.
+// Static export needs the full list of routes at build time. This stays
+// correct as Jenna adds more products to the shared catalog.
 export function generateStaticParams() {
   return PRODUCTS.map((p) => ({ slug: p.slug }));
 }

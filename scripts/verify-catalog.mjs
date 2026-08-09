@@ -9,6 +9,7 @@ const expected = {
   'the-rowan':             { price:'$40.00', ways:['Royal Blue','Brown','Yellow','Green','Pink'], length:true, material:false },
   'the-emmy':              { price:'$45.00', ways:['Green & Gold','Navy Blue & Purple','Light Pink','Brown & Cream'], length:true, material:true },
   'the-blair':             { price:'$78.00', ways:[], length:false, material:true },
+  'the-ellie':             { price:'$50.00', ways:[], length:false, material:true },
   'the-delicate-monogram': { price:'$35.00', ways:['Light Blue','Pink','Purple','Yellow','Dark Blue'], length:false, material:false },
 };
 

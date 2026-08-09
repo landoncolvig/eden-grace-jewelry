@@ -15,21 +15,23 @@
  *
  * ── NAMES, DESCRIPTIONS, AND PRICES ARE JENNA'S (2026-08-03) ──
  * From her "Eden Grace Website Edits" doc. Five pieces since she retired the
- * Chunky Monogram. The names and the wording of what each piece is are hers
- * and should not be "improved".
+ * Chunky Monogram, plus The Ellie added by Jenna on 2026-08-09. The names and
+ * the wording of what each piece is are hers and should not be "improved".
  *
  * The earlier prices here were mine, scaled from Etsy comps, and carried a
  * standing warning that she had never signed off on them. That is settled:
- * she priced all five herself and Landon approved them.
+ * she priced all five herself and Landon approved them. The Ellie price and
+ * copy came directly from Jenna on 2026-08-09.
  *
  * ── MATERIAL CLAIMS ──
  * `material` is optional and there is no default. A material line is a factual
  * claim to someone about to pay, so it exists only where Jenna wrote one.
  * Nothing here is freshwater pearl. The Rowan used to be described that way
- * and is not, and the only pearl on the site is the mother of pearl she named
- * in The Blair. Do not reintroduce a pearl claim anywhere without asking her.
+ * and is not. The only pearl claims on the site are the mother of pearl Jenna
+ * named in The Blair and The Ellie. Do not reintroduce a pearl claim anywhere
+ * without asking her.
  *
- * Color ways and lengths differ per piece; neither is offered on all five.
+ * Color ways and lengths differ per piece; neither is offered on every piece.
  */
 
 /**
@@ -247,6 +249,21 @@ const PRODUCTS = [
     gallery: [],
     // One fixed 18 inch strand in one color way, so neither picker applies.
     // The description carries the length instead.
+    addOns: [TOGGLE_CLASP],
+  },
+  {
+    slug: 'the-ellie',
+    name: 'The Ellie',
+    tagline: 'Mother of pearl with 14k gold charms',
+    description: 'Our 18 inch beaded necklace with mother of pearl and 14k gold charms.',
+    priceCents: 5000,
+    weightOz: 4,
+    material: 'mother of pearl and 14k gold',
+    leadTime: 'Ships in 5 to 7 days',
+    swatch: '#C8D5E8',
+    image: 'ellie-pearl-gold',
+    gallery: ['ellie-gold-detail', 'ellie-mother-of-pearl-detail'],
+    // One fixed 18 inch strand. The description carries the length.
     addOns: [TOGGLE_CLASP],
   },
   {

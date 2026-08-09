@@ -39,10 +39,10 @@ export const metadata: Metadata = {
   },
   description:
     // No freshwater pearl claim. The Rowan was the pearl piece and it is not
-    // pearls, so nothing in the catalog carries that material. The only pearl
-    // left on the site is the mother of pearl in The Blair, which is Jenna's
-    // own wording for that piece and stays there rather than in a site-wide
-    // description that would generalise it across all five.
+    // pearls. The only pearl claims left on the site are the mother of pearl
+    // in The Blair and The Ellie, which is Jenna's own wording for those
+    // pieces and stays there rather than in a site-wide description that would
+    // generalise it across the whole catalog.
     'Beaded gemstone necklaces, strung by hand in small batches and made to order. Natural stone varies, so no two strands come out the same.',
   // Google Search Console. The Analytics verification method cannot be used
   // here: gtag.js is injected on hydration, so it is not in the HTML that

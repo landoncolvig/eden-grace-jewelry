@@ -7,9 +7,9 @@ const { priceCart } = require('../../shared/pricing.js');
 
 test('every necklace offers a $3 toggle clasp', () => {
   // Pinned on purpose. A product silently vanishing from the catalog is worth
-  // one deliberate test edit to notice. Five since Jenna retired the Chunky
-  // Monogram on 2026-08-03.
-  assert.equal(PRODUCTS.length, 5);
+  // one deliberate test edit to notice. Six since Jenna retired the Chunky
+  // Monogram on 2026-08-03 and added The Ellie on 2026-08-09.
+  assert.equal(PRODUCTS.length, 6);
 
   for (const product of PRODUCTS) {
     const clasp = product.addOns.find((addOn) => addOn.id === 'toggle-clasp');
@@ -37,4 +37,21 @@ test('server pricing adds the toggle clasp to the line total and work order', ()
   assert.equal(priced.lines[0].unitCents, 5100);
   assert.equal(priced.lines[0].addOns.find((addOn) => addOn.id === 'toggle-clasp').priceCents, 300);
   assert.match(priced.lines[0].description, /Toggle clasp/);
+});
+
+test('The Ellie is priced from the shared server catalog', () => {
+  const ellie = PRODUCTS.find((product) => product.slug === 'the-ellie');
+  assert.ok(ellie);
+  assert.equal(ellie.name, 'The Ellie');
+  assert.equal(ellie.priceCents, 5000);
+  assert.equal(ellie.weightOz, 4);
+  assert.match(ellie.description, /18 inch/);
+  assert.match(ellie.description, /mother of pearl/);
+  assert.match(ellie.description, /14k gold charms/);
+
+  const priced = priceCart([{ slug: 'the-ellie', qty: 1, addOns: [] }]);
+  assert.deepEqual(priced.missingRequired, []);
+  assert.equal(priced.subtotalCents, 5000);
+  assert.equal(priced.totalWeightOz, 4);
+  assert.equal(priced.lines[0].unitCents, 5000);
 });
