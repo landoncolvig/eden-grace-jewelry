@@ -62,6 +62,7 @@ function orderEmailHtml({ sale, shipmentsUrl = SQUARE_SHIPMENTS_URL }) {
   <tr><td style="padding:18px 28px;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#56646d;">
       <tr><td style="padding:3px 0;">Shipping charged</td><td style="text-align:right;color:#1b2a33;">${escapeHtml(formatUSD(sale.shippingCents))}</td></tr>
+      <tr><td style="padding:3px 0;">Sales tax</td><td style="text-align:right;color:#1b2a33;">${escapeHtml(formatUSD(sale.taxCents || 0))}</td></tr>
       <tr><td style="padding:3px 0;">Order total</td><td style="text-align:right;color:#1b2a33;"><strong>${escapeHtml(formatUSD(sale.totalCents))}</strong></td></tr>
     </table>
   </td></tr>

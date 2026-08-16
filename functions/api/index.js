@@ -12,6 +12,7 @@ const functions = require('@google-cloud/functions-framework');
 
 const { priceCart, applyShippingRules } = require('./shared/pricing.js');
 const { PARCEL_DIMS, FALLBACK_SHIPPING_CENTS, formatUSD } = require('./shared/catalog.js');
+const { salesTaxFor } = require('./shared/tax.js');
 const { getOrigin } = require('./origin.js');
 const {
   SquareApiError,
@@ -199,6 +200,11 @@ async function handleQuote(req, res) {
 
   const rate = await getRate(input.zip, input.priced.totalWeightOz);
   const shipping = applyShippingRules(input.priced.subtotalCents, rate.cents);
+  const tax = salesTaxFor({
+    subtotalCents: input.priced.subtotalCents,
+    shippingCents: shipping.chargedCents,
+    zip: input.zip,
+  });
   return res.json({
     cents: rate.cents,
     chargedCents: shipping.chargedCents,
@@ -206,6 +212,8 @@ async function handleQuote(req, res) {
     service: rate.service,
     estimate: rate.estimate,
     fallback: rate.fallback,
+    taxCents: tax.cents,
+    taxRatePercent: tax.ratePercent,
   });
 }
 
@@ -217,10 +225,16 @@ async function handleCheckout(req, res) {
   // the Square order is created, and every product price comes from catalog.js.
   const rate = await getRate(input.zip, input.priced.totalWeightOz);
   const shipping = applyShippingRules(input.priced.subtotalCents, rate.cents);
+  const tax = salesTaxFor({
+    subtotalCents: input.priced.subtotalCents,
+    shippingCents: shipping.chargedCents,
+    zip: input.zip,
+  });
   const paymentLink = await createPaymentLink({
     priced: input.priced,
     rate,
     shipping,
+    tax,
     zip: input.zip,
     siteUrl: SITE,
   });

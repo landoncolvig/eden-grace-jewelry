@@ -11,6 +11,8 @@
 const catalog = require('../shared/catalog.js');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pricing = require('../shared/pricing.js');
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const tax = require('../shared/tax.js');
 
 export type AddOn = {
   id: string;
@@ -102,6 +104,14 @@ export const applyShippingRules = pricing.applyShippingRules as (
   subtotalCents: number,
   quotedCents: number,
 ) => { chargedCents: number; free: boolean; quotedCents: number };
+
+export const TEXAS_SALES_TAX_RATE_PERCENT: string = tax.TEXAS_SALES_TAX_RATE_PERCENT;
+export const isTexasZip = tax.isTexasZip as (zip: string) => boolean;
+export const calculateTexasSalesTaxCents = tax.calculateTexasSalesTaxCents as (
+  subtotalCents: number,
+  shippingCents: number,
+  zip: string,
+) => number;
 
 /** Base URL of the Cloud Function that holds the Square and Shippo keys. */
 export const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? '').replace(/\/$/, '');

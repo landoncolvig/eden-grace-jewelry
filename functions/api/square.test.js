@@ -23,6 +23,7 @@ test('buildPaymentLinkPayload uses server-priced items and a USPS fee', () => {
     },
     rate: { service: 'USPS Ground Advantage', fallback: false },
     shipping: { chargedCents: 695 },
+    tax: { applies: true, ratePercent: '8.25', cents: 453 },
     zip: '76021',
     siteUrl: 'https://edengracejewelry.com/',
     locationId: 'LOCATION',
@@ -33,7 +34,11 @@ test('buildPaymentLinkPayload uses server-priced items and a USPS fee', () => {
   assert.equal(payload.order.line_items[0].quantity, '2');
   assert.equal(payload.order.line_items[0].base_price_money.amount, 5600);
   assert.equal(payload.checkout_options.ask_for_shipping_address, true);
-  assert.equal(payload.checkout_options.shipping_fee.charge.amount, 695);
+  assert.equal('shipping_fee' in payload.checkout_options, false);
+  assert.equal(payload.order.service_charges[0].amount_money.amount, 695);
+  assert.equal(payload.order.service_charges[0].taxable, true);
+  assert.equal(payload.order.taxes[0].percentage, '8.25');
+  assert.equal(payload.order.taxes[0].scope, 'ORDER');
   assert.equal(payload.checkout_options.redirect_url, 'https://edengracejewelry.com/success/');
   assert.equal(payload.order.metadata.shipping_quote, '76021|695|live');
 });
@@ -43,12 +48,15 @@ test('buildPaymentLinkPayload omits a zero shipping fee', () => {
     priced: { totalWeightOz: 2, lines: [{ name: 'The Eden', qty: 1, unitCents: 4800, description: 'Spec' }] },
     rate: { service: 'USPS Ground Advantage', fallback: false },
     shipping: { chargedCents: 0 },
+    tax: { applies: false, ratePercent: null, cents: 0 },
     zip: '76021',
     siteUrl: 'https://edengracejewelry.com',
     locationId: 'LOCATION',
   });
 
   assert.equal('shipping_fee' in payload.checkout_options, false);
+  assert.equal('service_charges' in payload.order, false);
+  assert.equal('taxes' in payload.order, false);
 });
 
 test('verifyWebhookSignature accepts only Square’s exact URL and raw body', () => {
@@ -69,7 +77,8 @@ test('normalizeSquareSale maps paid Square shipping details into a work order', 
     {
       id: 'ORDER',
       reference_id: 'egj_123',
-      total_money: { amount: 5495, currency: 'USD' },
+      total_money: { amount: 5948, currency: 'USD' },
+      total_tax_money: { amount: 453, currency: 'USD' },
       metadata: { storefront: 'edengracejewelry.com', weight_oz: '3.2' },
       line_items: [
         {
@@ -100,7 +109,7 @@ test('normalizeSquareSale maps paid Square shipping details into a work order', 
       ],
     },
     {
-      total_money: { amount: 5495, currency: 'USD' },
+      total_money: { amount: 5948, currency: 'USD' },
       buyer_email_address: 'taylor@example.com',
       shipping_address: {
         address_line_1: '100 Main Street',
@@ -112,8 +121,9 @@ test('normalizeSquareSale maps paid Square shipping details into a work order', 
     },
   );
 
-  assert.equal(sale.totalCents, 5495);
+  assert.equal(sale.totalCents, 5948);
   assert.equal(sale.shippingCents, 695);
+  assert.equal(sale.taxCents, 453);
   assert.equal(sale.shipping.name, 'Taylor Buyer');
   assert.equal(sale.shipping.address.postalCode, '76010');
   assert.equal(sale.customer.email, 'taylor@example.com');

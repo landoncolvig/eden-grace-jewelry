@@ -59,6 +59,7 @@ function buildPaymentLinkPayload({
   priced,
   rate,
   shipping,
+  tax,
   zip,
   siteUrl,
   locationId,
@@ -70,37 +71,60 @@ function buildPaymentLinkPayload({
     redirect_url: `${String(siteUrl).replace(/\/$/, '')}/success/`,
   };
 
-  // Square treats a hosted-checkout shipping fee as an order service charge.
-  // Omit the field entirely for free shipping instead of sending a $0 fee.
+  const order = {
+    location_id: locationId,
+    reference_id: orderReference(idempotencyKey),
+    source: { name: 'Eden Grace Jewelry website' },
+    line_items: priced.lines.map((line) => ({
+      name: line.name,
+      quantity: String(line.qty),
+      base_price_money: { amount: line.unitCents, currency: 'USD' },
+      // The note is the bench-ready custom specification.
+      note: line.description.slice(0, 2_000),
+    })),
+    // Metadata is private to this Square application and contains no buyer
+    // data. Square adds the SHIPMENT fulfillment when checkout collects the
+    // buyer's shipping address.
+    metadata: {
+      storefront: STORE_FRONT,
+      weight_oz: priced.totalWeightOz.toFixed(2),
+      shipping_quote: `${zip}|${shipping.chargedCents}|${rate.fallback ? 'fallback' : 'live'}`,
+    },
+  };
+
+  // A Texas order-level tax automatically applies to every product line and
+  // to the taxable shipping service charge below. Square calculates, displays,
+  // collects, and records the amount; the browser never supplies a tax value.
+  if (tax && tax.applies) {
+    order.taxes = [
+      {
+        uid: 'texas-sales-tax',
+        name: 'Texas sales tax',
+        type: 'ADDITIVE',
+        percentage: tax.ratePercent,
+        scope: 'ORDER',
+      },
+    ];
+  }
+
+  // Texas taxes delivery connected to taxable merchandise. A normal order
+  // service charge can be marked taxable; CheckoutOptions.shipping_fee cannot
+  // express that, so shipping belongs on the Square order itself.
   if (shipping.chargedCents > 0) {
-    checkoutOptions.shipping_fee = {
-      name: rate.service,
-      charge: { amount: shipping.chargedCents, currency: 'USD' },
-    };
+    order.service_charges = [
+      {
+        uid: 'shipping',
+        name: rate.service,
+        amount_money: { amount: shipping.chargedCents, currency: 'USD' },
+        calculation_phase: 'SUBTOTAL_PHASE',
+        taxable: Boolean(tax && tax.applies),
+      },
+    ];
   }
 
   return {
     idempotency_key: idempotencyKey,
-    order: {
-      location_id: locationId,
-      reference_id: orderReference(idempotencyKey),
-      source: { name: 'Eden Grace Jewelry website' },
-      line_items: priced.lines.map((line) => ({
-        name: line.name,
-        quantity: String(line.qty),
-        base_price_money: { amount: line.unitCents, currency: 'USD' },
-        // The note is the bench-ready custom specification.
-        note: line.description.slice(0, 2_000),
-      })),
-      // Metadata is private to this Square application and contains no buyer
-      // data. Square adds the SHIPMENT fulfillment when checkout collects the
-      // buyer's shipping address.
-      metadata: {
-        storefront: STORE_FRONT,
-        weight_oz: priced.totalWeightOz.toFixed(2),
-        shipping_quote: `${zip}|${shipping.chargedCents}|${rate.fallback ? 'fallback' : 'live'}`,
-      },
-    },
+    order,
     checkout_options: checkoutOptions,
     payment_note: 'Eden Grace Jewelry website order',
   };
@@ -282,6 +306,7 @@ function normalizeSquareSale(order, payment) {
     referenceId: order.reference_id || '',
     totalCents: moneyCents(order.total_money) || moneyCents(payment.total_money),
     shippingCents: serviceCharges || moneyCents(order.total_service_charge_money),
+    taxCents: moneyCents(order.total_tax_money),
     metadata: order.metadata || {},
     lines: (order.line_items || []).map((line) => ({
       quantity: Number(line.quantity || 0),

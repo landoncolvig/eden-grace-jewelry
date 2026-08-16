@@ -9,6 +9,7 @@ test('work-order email sends Jenna to Square Shipments', () => {
       id: 'ORDER-123',
       totalCents: 5595,
       shippingCents: 795,
+      taxCents: 396,
       lines: [
         {
           quantity: 1,
@@ -34,6 +35,8 @@ test('work-order email sends Jenna to Square Shipments', () => {
 
   assert.match(html, new RegExp(SQUARE_SHIPMENTS_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(html, /Create label/);
+  assert.match(html, /Sales tax/);
+  assert.match(html, /\$3\.96/);
   assert.doesNotMatch(html, /\/label\?order=/);
 });
 

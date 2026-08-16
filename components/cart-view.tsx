@@ -14,6 +14,9 @@ import {
   formatUSD,
   FREE_SHIPPING_THRESHOLD_CENTS,
   applyShippingRules,
+  TEXAS_SALES_TAX_RATE_PERCENT,
+  isTexasZip,
+  calculateTexasSalesTaxCents,
 } from '@/lib/shop';
 
 type Quote = {
@@ -58,7 +61,12 @@ export default function CartView() {
   }, [ready, priced]);
 
   const shipping = quote ? applyShippingRules(priced.subtotalCents, quote.cents) : null;
-  const total = priced.subtotalCents + (shipping?.chargedCents ?? 0);
+  const shippingCents = shipping?.chargedCents ?? 0;
+  const taxApplies = quote ? isTexasZip(zip) : false;
+  const taxCents = quote
+    ? calculateTexasSalesTaxCents(priced.subtotalCents, shippingCents, zip)
+    : 0;
+  const total = priced.subtotalCents + shippingCents + taxCents;
 
   const getQuote = useCallback(async () => {
     if (!zipValid) return;
@@ -84,13 +92,13 @@ export default function CartView() {
     }
   }, [zip, zipValid, lines, priced]);
 
-  const checkout = useCallback(async () => {
+  const checkout = async () => {
     setCheckingOut(true);
     setError(null);
     // Fired before the request, not after. This also stashes the cart for the
     // purchase event, and the browser is about to leave for Square, so there
     // is no reliable moment left once the redirect starts.
-    trackBeginCheckout(priced, shipping?.chargedCents ?? 0);
+    trackBeginCheckout(priced, shippingCents);
     try {
       const res = await fetch(`${API_BASE}/create-payment-link`, {
         method: 'POST',
@@ -100,12 +108,12 @@ export default function CartView() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? `checkout failed: ${res.status}`);
       // Square hosts the payment page; leaving the site here is expected.
-      window.location.href = data.url;
+      window.location.assign(data.url);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Checkout could not start.');
       setCheckingOut(false);
     }
-  }, [zip, lines, priced, shipping]);
+  };
 
   if (!ready) {
     return <div className="mx-auto max-w-5xl px-5 py-20 sm:px-8" aria-busy="true" />;
@@ -276,6 +284,14 @@ export default function CartView() {
                 <span className="text-ink-soft">Shipping</span>
                 <span className="tabular-nums">
                   {shipping ? formatUSD(shipping.chargedCents) : <span className="text-ink-faint">enter ZIP</span>}
+                </span>
+              </div>
+              <div className="flex justify-between gap-4 py-1">
+                <span className="text-ink-soft">
+                  {taxApplies ? `Sales tax (${TEXAS_SALES_TAX_RATE_PERCENT}%)` : 'Sales tax'}
+                </span>
+                <span className="tabular-nums">
+                  {quote ? formatUSD(taxCents) : <span className="text-ink-faint">enter ZIP</span>}
                 </span>
               </div>
 
