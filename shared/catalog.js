@@ -317,7 +317,12 @@ const PRODUCTS = [
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#5F8B69',
     image: 'abigail-aventurine-shell-bust',
-    gallery: ['abigail-aventurine-shell-detail', 'abigail-aventurine-shell-flat'],
+    gallery: [
+      'abigail-aventurine-shell-detail',
+      'abigail-shell-charm-macro',
+      'abigail-aventurine-clasp-flat',
+      'abigail-aventurine-shell-flat',
+    ],
     // One fixed 16 inch strand. The size is shown in the product details.
     addOns: [TOGGLE_CLASP],
   },
