@@ -14,6 +14,7 @@
 
 const {
   getProduct,
+  getMaxPurchaseQuantity,
   getAddOn,
   MAX_QTY_PER_LINE,
   FREE_SHIPPING_THRESHOLD_CENTS,
@@ -67,6 +68,7 @@ function priceCart(rawLines) {
   const lines = [];
   const dropped = [];
   const missingRequired = [];
+  const quantityBySlug = new Map();
 
   if (!Array.isArray(rawLines)) {
     return {
@@ -85,7 +87,22 @@ function priceCart(rawLines) {
       continue;
     }
 
-    const qty = clampInt(raw.qty, 1, MAX_QTY_PER_LINE);
+    const requestedQty = clampInt(raw.qty, 1, MAX_QTY_PER_LINE);
+    const maxPurchaseQuantity = getMaxPurchaseQuantity(product);
+    const alreadyPriced = quantityBySlug.get(product.slug) ?? 0;
+    const qty = Math.min(requestedQty, Math.max(0, maxPurchaseQuantity - alreadyPriced));
+
+    // A limited piece can appear on more than one cart line when the options
+    // differ. Count the product across all of those lines so splitting a cart
+    // cannot bypass its limit.
+    if (qty === 0) {
+      dropped.push(`quantity limit reached for ${product.slug}`);
+      continue;
+    }
+    if (qty < requestedQty) {
+      dropped.push(`quantity reduced to ${maxPurchaseQuantity} for ${product.slug}`);
+    }
+    quantityBySlug.set(product.slug, alreadyPriced + qty);
 
     // Resolve add-ons against the product's own list, so an add-on belonging to
     // a different product cannot be attached to this one.

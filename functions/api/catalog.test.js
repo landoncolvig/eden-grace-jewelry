@@ -7,9 +7,9 @@ const { priceCart } = require('../../shared/pricing.js');
 
 test('every necklace offers a $3 toggle clasp', () => {
   // Pinned on purpose. A product silently vanishing from the catalog is worth
-  // one deliberate test edit to notice. Six since Jenna retired the Chunky
-  // Monogram on 2026-08-03 and added The Ellie on 2026-08-09.
-  assert.equal(PRODUCTS.length, 6);
+  // one deliberate test edit to notice. Seven since Jenna retired the Chunky
+  // Monogram on 2026-08-03 and added The Ellie and The Abigail.
+  assert.equal(PRODUCTS.length, 7);
 
   for (const product of PRODUCTS) {
     const clasp = product.addOns.find((addOn) => addOn.id === 'toggle-clasp');
@@ -87,4 +87,32 @@ test('The Ellie is priced from the shared server catalog', () => {
   assert.equal(priced.subtotalCents, 5000);
   assert.equal(priced.totalWeightOz, 4);
   assert.equal(priced.lines[0].unitCents, 5000);
+});
+
+test('The Abigail is priced from the shared catalog and capped at five total', () => {
+  const abigail = PRODUCTS.find((product) => product.slug === 'the-abigail');
+  assert.ok(abigail);
+  assert.equal(abigail.name, 'The Abigail');
+  assert.equal(abigail.priceCents, 4800);
+  assert.equal(abigail.weightOz, 2.2);
+  assert.equal(abigail.maxPurchaseQuantity, 5);
+  assert.equal(abigail.size, '16 inches');
+  assert.match(abigail.material, /natural aventurine/);
+  assert.match(abigail.material, /mother of pearl/);
+  assert.match(abigail.material, /gold shell charm/);
+
+  const priced = priceCart([
+    { slug: 'the-abigail', qty: 3, addOns: [] },
+    { slug: 'the-abigail', qty: 4, addOns: [] },
+  ]);
+
+  assert.deepEqual(priced.missingRequired, []);
+  assert.equal(priced.lines.length, 2);
+  assert.deepEqual(
+    priced.lines.map((line) => line.qty),
+    [3, 2],
+  );
+  assert.equal(priced.subtotalCents, 24000);
+  assert.equal(priced.totalWeightOz, 11);
+  assert.ok(priced.dropped.some((message) => message.includes('quantity reduced to 5')));
 });

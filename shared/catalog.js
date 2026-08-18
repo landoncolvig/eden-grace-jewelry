@@ -14,14 +14,14 @@
  * Prices are in cents. Weights are in ounces, including box and mailer.
  *
  * ── NAMES, DESCRIPTIONS, AND PRICES ARE JENNA'S (2026-08-03) ──
- * From her "Eden Grace Website Edits" doc. Five pieces since she retired the
- * Chunky Monogram, plus The Ellie added by Jenna on 2026-08-09. The names and
- * the wording of what each piece is are hers and should not be "improved".
+ * From her "Eden Grace Website Edits" doc. Seven pieces since she retired the
+ * Chunky Monogram, with The Ellie and The Abigail added afterward. The names
+ * and the wording of what each piece is are hers and should not be "improved".
  *
  * The earlier prices here were mine, scaled from Etsy comps, and carried a
  * standing warning that she had never signed off on them. That is settled:
- * she priced all five herself and Landon approved them. The Ellie price and
- * copy came directly from Jenna on 2026-08-09.
+ * she priced the original five herself and Landon approved them. The Ellie
+ * and Abigail prices and copy came directly from Jenna afterward.
  *
  * ── MATERIAL CLAIMS ──
  * `material` is optional and there is no default. A material line is a factual
@@ -61,11 +61,16 @@
  * @property {string} description
  * @property {number} priceCents
  * @property {number} weightOz    Piece + box + mailer.
+ * @property {number} [maxPurchaseQuantity]
+ *           Maximum number of this piece allowed in one cart. Defaults to
+ *           MAX_QTY_PER_LINE and is enforced again by the Cloud Function.
  * @property {string} [material]  Omitted where Jenna asked for no material
  *                                line. The row is not rendered when absent,
  *                                rather than rendered empty. A material claim
  *                                on a page taking money has to be one she
  *                                stands behind, so no default is invented.
+ * @property {string} [size]      Fixed finished size, when the piece does not
+ *                                offer the length picker.
  * @property {string} leadTime
  * @property {string} swatch
  * @property {string} image       Primary photo, in /public/products.
@@ -299,6 +304,24 @@ const PRODUCTS = [
     addOns: [TOGGLE_CLASP],
   },
   {
+    slug: 'the-abigail',
+    name: 'The Abigail',
+    tagline: 'Natural aventurine with a gold shell charm',
+    description:
+      'A 16 inch necklace made with natural aventurine and mother of pearl, finished with a gold shell charm.',
+    priceCents: 4800,
+    weightOz: 2.2,
+    maxPurchaseQuantity: 5,
+    material: 'natural aventurine and mother of pearl with a gold shell charm',
+    size: '16 inches',
+    leadTime: 'Ships in 5 to 7 days',
+    swatch: '#5F8B69',
+    image: 'abigail-aventurine-shell-bust',
+    gallery: ['abigail-aventurine-shell-detail', 'abigail-aventurine-shell-flat'],
+    // One fixed 16 inch strand. The size is shown in the product details.
+    addOns: [TOGGLE_CLASP],
+  },
+  {
     slug: 'the-delicate-monogram',
     name: 'The Delicate Monogram',
     tagline: 'Initials on a dainty strand',
@@ -360,6 +383,17 @@ function getProduct(slug) {
 }
 
 /**
+ * Product-specific cart limit, capped again by the global typo guard.
+ *
+ * @param {Product} product
+ */
+function getMaxPurchaseQuantity(product) {
+  const declared = Number(product.maxPurchaseQuantity ?? MAX_QTY_PER_LINE);
+  if (!Number.isFinite(declared)) return MAX_QTY_PER_LINE;
+  return Math.min(MAX_QTY_PER_LINE, Math.max(1, Math.floor(declared)));
+}
+
+/**
  * @param {Product} product
  * @param {string} addOnId
  */
@@ -382,6 +416,7 @@ module.exports = {
   FREE_SHIPPING_THRESHOLD_CENTS,
   MAX_QTY_PER_LINE,
   getProduct,
+  getMaxPurchaseQuantity,
   getAddOn,
   formatUSD,
 };

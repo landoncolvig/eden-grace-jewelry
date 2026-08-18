@@ -9,7 +9,14 @@ import {
   useCallback,
   type ReactNode,
 } from 'react';
-import { priceCart, type CartAddOn, type CartLine, type PricedCart } from '@/lib/shop';
+import {
+  getMaxPurchaseQuantity,
+  getProduct,
+  priceCart,
+  type CartAddOn,
+  type CartLine,
+  type PricedCart,
+} from '@/lib/shop';
 
 const STORAGE_KEY = 'jj.cart.v1';
 
@@ -41,6 +48,41 @@ function lineKey(slug: string, addOns: CartAddOn[]): string {
   return `${slug}::${spec}`;
 }
 
+function productLimit(slug: string): number {
+  const product = getProduct(slug);
+  return product ? getMaxPurchaseQuantity(product) : 0;
+}
+
+function normalizeLines(value: unknown): CartLine[] {
+  if (!Array.isArray(value)) return [];
+
+  const used = new Map<string, number>();
+  const normalized: CartLine[] = [];
+
+  for (const candidate of value) {
+    if (!candidate || typeof candidate !== 'object') continue;
+    const line = candidate as Partial<CartLine>;
+    if (
+      typeof line.key !== 'string' ||
+      typeof line.slug !== 'string' ||
+      !Array.isArray(line.addOns)
+    ) {
+      continue;
+    }
+
+    const limit = productLimit(line.slug);
+    const alreadyUsed = used.get(line.slug) ?? 0;
+    const requested = Math.max(1, Math.floor(Number(line.qty) || 1));
+    const qty = Math.min(requested, Math.max(0, limit - alreadyUsed));
+    if (qty === 0) continue;
+
+    normalized.push({ key: line.key, slug: line.slug, qty, addOns: line.addOns });
+    used.set(line.slug, alreadyUsed + qty);
+  }
+
+  return normalized;
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [ready, setReady] = useState(false);
@@ -49,17 +91,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // time, so the cart loads after mount. Rendering an empty cart first and
   // filling it in avoids a hydration mismatch.
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) setLines(parsed);
+    const timer = window.setTimeout(() => {
+      try {
+        const raw = window.localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          setLines(normalizeLines(parsed));
+        }
+      } catch {
+        // A corrupt or unreadable cart is not worth breaking the page over.
+        // Starting empty is the right recovery.
       }
-    } catch {
-      // A corrupt or unreadable cart is not worth breaking the page over.
-      // Starting empty is the right recovery.
-    }
-    setReady(true);
+      setReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -75,11 +121,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addLine = useCallback((slug: string, addOns: CartAddOn[], qty = 1) => {
     const key = lineKey(slug, addOns);
     setLines((prev) => {
+      const limit = productLimit(slug);
+      const used = prev.reduce((sum, line) => sum + (line.slug === slug ? line.qty : 0), 0);
+      const addQty = Math.min(Math.max(1, Math.floor(qty)), Math.max(0, limit - used));
+      if (addQty === 0) return prev;
+
       const existing = prev.find((l) => l.key === key);
       if (existing) {
-        return prev.map((l) => (l.key === key ? { ...l, qty: l.qty + qty } : l));
+        return prev.map((l) => (l.key === key ? { ...l, qty: l.qty + addQty } : l));
       }
-      return [...prev, { key, slug, qty, addOns }];
+      return [...prev, { key, slug, qty: addQty, addOns }];
     });
   }, []);
 
@@ -87,7 +138,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setLines((prev) =>
       qty <= 0
         ? prev.filter((l) => l.key !== key)
-        : prev.map((l) => (l.key === key ? { ...l, qty } : l)),
+        : prev.map((l) => {
+            if (l.key !== key) return l;
+            const usedByOtherLines = prev.reduce(
+              (sum, other) => sum + (other.slug === l.slug && other.key !== key ? other.qty : 0),
+              0,
+            );
+            const nextQty = Math.min(
+              Math.max(1, Math.floor(qty)),
+              Math.max(1, productLimit(l.slug) - usedByOtherLines),
+            );
+            return { ...l, qty: nextQty };
+          }),
     );
   }, []);
 

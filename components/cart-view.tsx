@@ -12,6 +12,8 @@ import {
 import {
   API_BASE,
   formatUSD,
+  getMaxPurchaseQuantity,
+  getProduct,
   FREE_SHIPPING_THRESHOLD_CENTS,
   applyShippingRules,
   TEXAS_SALES_TAX_RATE_PERCENT,
@@ -146,6 +148,12 @@ export default function CartView() {
           <ul className="divide-y divide-rule border-y border-rule">
             {priced.lines.map((line, i) => {
               const raw = lines[i];
+              const product = getProduct(line.slug);
+              const maxPurchaseQuantity = product ? getMaxPurchaseQuantity(product) : 1;
+              const quantityInCart = lines.reduce(
+                (sum, cartLine) => sum + (cartLine.slug === line.slug ? cartLine.qty : 0),
+                0,
+              );
               return (
                 <li key={raw?.key ?? line.slug} className="py-6">
                   <div className="flex items-baseline justify-between gap-4">
@@ -189,11 +197,17 @@ export default function CartView() {
                       <button
                         aria-label={`One more ${line.name}`}
                         onClick={() => raw && setQty(raw.key, line.qty + 1)}
-                        className="px-3 py-1.5 text-ink-soft hover:text-ink"
+                        disabled={quantityInCart >= maxPurchaseQuantity}
+                        className="px-3 py-1.5 text-ink-soft hover:text-ink disabled:cursor-not-allowed disabled:text-ink-faint"
                       >
                         +
                       </button>
                     </div>
+                    {product?.maxPurchaseQuantity && (
+                      <span className="font-spec text-xs uppercase tracking-[0.1em] text-rose">
+                        {product.maxPurchaseQuantity} available
+                      </span>
+                    )}
                     <button
                       onClick={() => {
                         if (!raw) return;

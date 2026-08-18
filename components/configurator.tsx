@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   formatUSD,
+  getMaxPurchaseQuantity,
   photo,
   priceCart,
   type AddOn,
@@ -28,6 +29,7 @@ export default function Configurator({ product }: { product: Product }) {
   const search = useSearchParams();
   const router = useRouter();
   const { addLine } = useCart();
+  const maxPurchaseQuantity = getMaxPurchaseQuantity(product);
 
   // Required specs (what a name necklace reads) are part of the piece, not
   // options, so they are always present and get their own input above the
@@ -82,7 +84,7 @@ export default function Configurator({ product }: { product: Product }) {
   const blocked = preview.missingRequired.length > 0;
 
   // Reported at the base price, before any option is chosen, so GA4's
-  // product report compares the six pieces to each other rather than to
+  // product report compares the pieces to each other rather than to
   // whatever the visitor happened to configure.
   useEffect(() => {
     trackViewItem(product.slug, product.name, product.priceCents);
@@ -158,11 +160,23 @@ export default function Configurator({ product }: { product: Product }) {
                 <dd>{product.material}</dd>
               </div>
             )}
+            {product.size && (
+              <div className="flex gap-2">
+                <dt className="text-ink-faint">Size</dt>
+                <dd>{product.size}</dd>
+              </div>
+            )}
             <div className="flex gap-2">
               <dt className="text-ink-faint">Lead time</dt>
               <dd>{product.leadTime}</dd>
             </div>
           </dl>
+
+          {product.maxPurchaseQuantity && (
+            <p className="mt-3 font-spec text-xs uppercase tracking-[0.12em] text-rose">
+              Only {product.maxPurchaseQuantity} available
+            </p>
+          )}
 
           {requiredAddOns.map((spec) =>
             spec.choices ? (
@@ -431,10 +445,11 @@ export default function Configurator({ product }: { product: Product }) {
                     type="button"
                     aria-label="One more"
                     onClick={() => {
-                      setQty((q) => Math.min(20, q + 1));
+                      setQty((q) => Math.min(maxPurchaseQuantity, q + 1));
                       setAdded(false);
                     }}
-                    className="px-3 py-1.5 text-ink-soft hover:text-ink"
+                    disabled={qty >= maxPurchaseQuantity}
+                    className="px-3 py-1.5 text-ink-soft hover:text-ink disabled:cursor-not-allowed disabled:text-ink-faint"
                   >
                     +
                   </button>

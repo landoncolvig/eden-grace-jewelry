@@ -66,6 +66,11 @@ export default function Home() {
                 <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
                   <h3 className="font-display text-lg">{product.name}</h3>
                   <p className="mt-1 flex-1 text-sm text-ink-soft">{product.tagline}</p>
+                  {product.maxPurchaseQuantity && (
+                    <p className="mt-2 font-spec text-xs uppercase tracking-[0.1em] text-rose">
+                      Only {product.maxPurchaseQuantity} available
+                    </p>
+                  )}
 
                   <div className="mt-4 flex items-baseline justify-between">
                     <span className="font-spec text-base tabular-nums text-rose">

@@ -34,8 +34,12 @@ export type Product = {
   description: string;
   priceCents: number;
   weightOz: number;
+  /** Maximum quantity of this product allowed across a single cart. */
+  maxPurchaseQuantity?: number;
   /** Absent on pieces where Jenna asked for no material line. */
   material?: string;
+  /** Fixed finished size, when there is no length picker. */
+  size?: string;
   leadTime: string;
   swatch: string;
   /** Basename in /public/products. Both .webp and -sm.webp exist. */
@@ -90,6 +94,9 @@ export const FREE_SHIPPING_THRESHOLD_CENTS: number | null =
 export const FALLBACK_SHIPPING_CENTS: number = catalog.FALLBACK_SHIPPING_CENTS;
 
 export const getProduct = catalog.getProduct as (slug: string) => Product | undefined;
+export const getMaxPurchaseQuantity = catalog.getMaxPurchaseQuantity as (
+  product: Product,
+) => number;
 export const getAddOn = catalog.getAddOn as (
   product: Product,
   addOnId: string,
