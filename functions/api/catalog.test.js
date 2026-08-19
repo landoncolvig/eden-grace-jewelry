@@ -89,6 +89,32 @@ test('The Ellie is priced from the shared server catalog', () => {
   assert.equal(priced.lines[0].unitCents, 5000);
 });
 
+test('The Emmy is fixed at 16 inches and does not accept another length', () => {
+  const emmy = PRODUCTS.find((product) => product.slug === 'the-emmy');
+  assert.ok(emmy);
+  assert.equal(emmy.size, '16 inches');
+  assert.match(emmy.description, /16 inch/);
+  assert.equal(emmy.addOns.some((addOn) => addOn.id === 'length'), false);
+
+  // A saved cart from before the change may still submit an old length. The
+  // server drops it, so the work order cannot ask Jenna for an unavailable
+  // 18- or 20-inch Emmy.
+  const priced = priceCart([
+    {
+      slug: 'the-emmy',
+      qty: 1,
+      addOns: [
+        { id: 'colour', value: 'Green & Gold' },
+        { id: 'length', value: '20 inches' },
+      ],
+    },
+  ]);
+
+  assert.deepEqual(priced.missingRequired, []);
+  assert.equal(priced.lines[0].description, 'Color Ways: Green & Gold');
+  assert.ok(priced.dropped.some((message) => message.includes('unknown add-on for the-emmy: length')));
+});
+
 test('The Abigail is priced from the shared catalog and capped at five total', () => {
   const abigail = PRODUCTS.find((product) => product.slug === 'the-abigail');
   assert.ok(abigail);
