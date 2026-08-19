@@ -229,6 +229,7 @@ const PRODUCTS = [
     description: 'White beads with colorful spacer beads',
     priceCents: 4000,
     weightOz: 2.2,
+    size: '16 inches',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#B08D57',
     image: 'rowan-green-bust',
@@ -245,7 +246,6 @@ const PRODUCTS = [
     ],
     addOns: [
       colorWays(['Royal Blue', 'Brown', 'Yellow', 'Green', 'Pink']),
-      LENGTH,
       TOGGLE_CLASP,
     ],
   },
