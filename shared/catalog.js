@@ -14,9 +14,10 @@
  * Prices are in cents. Weights are in ounces, including box and mailer.
  *
  * ── NAMES, DESCRIPTIONS, AND PRICES ARE JENNA'S (2026-08-03) ──
- * From her "Eden Grace Website Edits" doc. Seven pieces since she retired the
- * Chunky Monogram, with The Ellie and The Abigail added afterward. The names
- * and the wording of what each piece is are hers and should not be "improved".
+ * From her "Eden Grace Website Edits" doc. Eight pieces since she retired the
+ * Chunky Monogram, with The Ellie, The Abigail, and The Faith added afterward.
+ * The names and the wording of what each piece is are hers and should not be
+ * "improved".
  *
  * The earlier prices here were mine, scaled from Etsy comps, and carried a
  * standing warning that she had never signed off on them. That is settled:
@@ -324,6 +325,27 @@ const PRODUCTS = [
       'abigail-aventurine-shell-flat',
     ],
     // One fixed 16 inch strand. The size is shown in the product details.
+    addOns: [TOGGLE_CLASP],
+  },
+  {
+    slug: 'the-faith',
+    name: 'The Faith',
+    tagline: 'Soft multicolor beads with a cross charm',
+    description: 'A 16 inch beaded necklace finished with a gold-tone cross charm.',
+    priceCents: 4500,
+    weightOz: 2.2,
+    size: '16 inches',
+    leadTime: 'Ships in 5 to 7 days',
+    swatch: '#A9B6A1',
+    image: 'faith-cross-bust',
+    gallery: [
+      'faith-cross-doubled',
+      'faith-cross-charm-detail',
+      'faith-cross-bead-detail',
+      'faith-cross-toggle-detail',
+    ],
+    // No material line until Jenna identifies the beads. One fixed 16 inch
+    // strand with the same optional $3 toggle clasp as the other necklaces.
     addOns: [TOGGLE_CLASP],
   },
   {

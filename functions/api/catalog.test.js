@@ -7,9 +7,9 @@ const { priceCart } = require('../../shared/pricing.js');
 
 test('every necklace offers a $3 toggle clasp', () => {
   // Pinned on purpose. A product silently vanishing from the catalog is worth
-  // one deliberate test edit to notice. Seven since Jenna retired the Chunky
-  // Monogram on 2026-08-03 and added The Ellie and The Abigail.
-  assert.equal(PRODUCTS.length, 7);
+  // one deliberate test edit to notice. Eight since Jenna retired the Chunky
+  // Monogram on 2026-08-03 and added The Ellie, The Abigail, and The Faith.
+  assert.equal(PRODUCTS.length, 8);
 
   for (const product of PRODUCTS) {
     const clasp = product.addOns.find((addOn) => addOn.id === 'toggle-clasp');
@@ -166,4 +166,30 @@ test('The Abigail is priced from the shared catalog and capped at five total', (
   assert.equal(priced.subtotalCents, 24000);
   assert.equal(priced.totalWeightOz, 11);
   assert.ok(priced.dropped.some((message) => message.includes('quantity reduced to 5')));
+});
+
+test('The Faith is a fixed 16 inch $45 necklace with a $3 toggle option', () => {
+  const faith = PRODUCTS.find((product) => product.slug === 'the-faith');
+  assert.ok(faith);
+  assert.equal(faith.name, 'The Faith');
+  assert.equal(faith.priceCents, 4500);
+  assert.equal(faith.weightOz, 2.2);
+  assert.equal(faith.size, '16 inches');
+  assert.equal(Object.hasOwn(faith, 'material'), false);
+  assert.equal(faith.image, 'faith-cross-bust');
+  assert.equal(faith.gallery.length, 4);
+  assert.equal(faith.addOns.some((addOn) => addOn.id === 'length'), false);
+
+  const toggle = faith.addOns.find((addOn) => addOn.id === 'toggle-clasp');
+  assert.ok(toggle);
+  assert.equal(toggle.priceCents, 300);
+
+  const priced = priceCart([
+    { slug: 'the-faith', qty: 1, addOns: [{ id: 'toggle-clasp' }] },
+  ]);
+
+  assert.deepEqual(priced.missingRequired, []);
+  assert.equal(priced.subtotalCents, 4800);
+  assert.equal(priced.totalWeightOz, 2.2);
+  assert.match(priced.lines[0].description, /Toggle clasp/);
 });
