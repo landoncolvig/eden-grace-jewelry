@@ -7,9 +7,10 @@ const { priceCart } = require('../../shared/pricing.js');
 
 test('every necklace offers a $3 toggle clasp', () => {
   // Pinned on purpose. A product silently vanishing from the catalog is worth
-  // one deliberate test edit to notice. Eight since Jenna retired the Chunky
-  // Monogram on 2026-08-03 and added The Ellie, The Abigail, and The Faith.
-  assert.equal(PRODUCTS.length, 8);
+  // one deliberate test edit to notice. Nine since Jenna retired the Chunky
+  // Monogram on 2026-08-03 and added The Ellie, The Abigail, The Faith, and
+  // The Bella.
+  assert.equal(PRODUCTS.length, 9);
 
   for (const product of PRODUCTS) {
     const clasp = product.addOns.find((addOn) => addOn.id === 'toggle-clasp');
@@ -190,6 +191,36 @@ test('The Faith is a fixed 16 inch $45 necklace with a $3 toggle option', () => 
 
   assert.deepEqual(priced.missingRequired, []);
   assert.equal(priced.subtotalCents, 4800);
+  assert.equal(priced.totalWeightOz, 2.2);
+  assert.match(priced.lines[0].description, /Toggle clasp/);
+});
+
+test('The Bella is a $40 Afghan serpentine necklace with a $3 toggle option', () => {
+  const bella = PRODUCTS.find((product) => product.slug === 'the-bella');
+  assert.ok(bella);
+  assert.equal(bella.name, 'The Bella');
+  assert.equal(bella.priceCents, 4000);
+  assert.equal(bella.weightOz, 2.2);
+  assert.equal(bella.material, 'Afghan serpentine');
+  assert.equal(Object.hasOwn(bella, 'size'), false);
+  assert.equal(bella.image, 'bella-serpentine-bust');
+  assert.deepEqual(bella.gallery, [
+    'bella-serpentine-toggle-flat',
+    'bella-serpentine-clasp-detail',
+    'bella-serpentine-bead-detail',
+  ]);
+  assert.equal(bella.addOns.some((addOn) => addOn.id === 'length'), false);
+
+  const toggle = bella.addOns.find((addOn) => addOn.id === 'toggle-clasp');
+  assert.ok(toggle);
+  assert.equal(toggle.priceCents, 300);
+
+  const priced = priceCart([
+    { slug: 'the-bella', qty: 1, addOns: [{ id: 'toggle-clasp' }] },
+  ]);
+
+  assert.deepEqual(priced.missingRequired, []);
+  assert.equal(priced.subtotalCents, 4300);
   assert.equal(priced.totalWeightOz, 2.2);
   assert.match(priced.lines[0].description, /Toggle clasp/);
 });

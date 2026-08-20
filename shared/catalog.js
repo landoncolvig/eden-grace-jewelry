@@ -14,8 +14,9 @@
  * Prices are in cents. Weights are in ounces, including box and mailer.
  *
  * ── NAMES, DESCRIPTIONS, AND PRICES ARE JENNA'S (2026-08-03) ──
- * From her "Eden Grace Website Edits" doc. Eight pieces since she retired the
- * Chunky Monogram, with The Ellie, The Abigail, and The Faith added afterward.
+ * From her "Eden Grace Website Edits" doc. Nine pieces since she retired the
+ * Chunky Monogram, with The Ellie, The Abigail, The Faith, and The Bella added
+ * afterward.
  * The names and the wording of what each piece is are hers and should not be
  * "improved".
  *
@@ -346,6 +347,27 @@ const PRODUCTS = [
     ],
     // No material line until Jenna identifies the beads. One fixed 16 inch
     // strand with the same optional $3 toggle clasp as the other necklaces.
+    addOns: [TOGGLE_CLASP],
+  },
+  {
+    slug: 'the-bella',
+    name: 'The Bella',
+    tagline: 'Afghan serpentine with gold-tone accents',
+    description:
+      'A softly colored beaded necklace made with Afghan serpentine and gold-tone accents.',
+    priceCents: 4000,
+    weightOz: 2.2,
+    material: 'Afghan serpentine',
+    leadTime: 'Ships in 5 to 7 days',
+    swatch: '#B6BE8E',
+    image: 'bella-serpentine-bust',
+    gallery: [
+      'bella-serpentine-toggle-flat',
+      'bella-serpentine-clasp-detail',
+      'bella-serpentine-bead-detail',
+    ],
+    // Jenna did not provide a finished length, so the product page does not
+    // claim one. It has the same optional $3 toggle clasp as the other pieces.
     addOns: [TOGGLE_CLASP],
   },
   {
