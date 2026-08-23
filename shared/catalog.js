@@ -14,9 +14,9 @@
  * Prices are in cents. Weights are in ounces, including box and mailer.
  *
  * ── NAMES, DESCRIPTIONS, AND PRICES ARE JENNA'S (2026-08-03) ──
- * From her "Eden Grace Website Edits" doc. Nine pieces since she retired the
- * Chunky Monogram, with The Ellie, The Abigail, The Faith, and The Bella added
- * afterward.
+ * From her "Eden Grace Website Edits" doc. Ten pieces since she retired the
+ * Chunky Monogram, with The Ellie, The Abigail, The Faith, The Bella, and The
+ * Capri added afterward.
  * The names and the wording of what each piece is are hers and should not be
  * "improved".
  *
@@ -369,6 +369,31 @@ const PRODUCTS = [
     // Jenna did not provide a finished length, so the product page does not
     // claim one. It has the same optional $3 toggle clasp as the other pieces.
     addOns: [TOGGLE_CLASP],
+  },
+  {
+    slug: 'the-capri',
+    name: 'The Capri',
+    tagline: 'Colorful beads with a fish centerpiece',
+    description:
+      'A colorful beaded necklace with a fish centerpiece, available in blue or pink.',
+    priceCents: 4000,
+    weightOz: 2.2,
+    leadTime: 'Ships in 5 to 7 days',
+    swatch: '#4D9BB7',
+    image: 'capri-blue-bust',
+    gallery: [
+      'capri-blue-fish-detail',
+      'capri-blue-doubled-flat',
+      'capri-blue-flat',
+      'capri-blue-bead-detail',
+      'capri-pink-bust',
+      'capri-pink-fish-detail',
+      'capri-pink-flat',
+      'capri-pink-fish-macro',
+    ],
+    // Jenna did not provide a finished length or material, so neither is
+    // claimed on the product page. The buyer must choose Blue or Pink.
+    addOns: [colorWays(['Blue', 'Pink'])],
   },
   {
     slug: 'the-delicate-monogram',

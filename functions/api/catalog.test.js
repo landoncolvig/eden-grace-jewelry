@@ -5,15 +5,19 @@ const test = require('node:test');
 const { PRODUCTS } = require('../../shared/catalog.js');
 const { priceCart } = require('../../shared/pricing.js');
 
-test('every necklace offers a $3 toggle clasp', () => {
+test('every necklace except The Capri offers a $3 toggle clasp', () => {
   // Pinned on purpose. A product silently vanishing from the catalog is worth
-  // one deliberate test edit to notice. Nine since Jenna retired the Chunky
-  // Monogram on 2026-08-03 and added The Ellie, The Abigail, The Faith, and
-  // The Bella.
-  assert.equal(PRODUCTS.length, 9);
+  // one deliberate test edit to notice. Ten since Jenna retired the Chunky
+  // Monogram on 2026-08-03 and added The Ellie, The Abigail, The Faith, The
+  // Bella, and The Capri.
+  assert.equal(PRODUCTS.length, 10);
 
   for (const product of PRODUCTS) {
     const clasp = product.addOns.find((addOn) => addOn.id === 'toggle-clasp');
+    if (product.slug === 'the-capri') {
+      assert.equal(clasp, undefined);
+      continue;
+    }
     assert.ok(clasp, `${product.name} is missing the toggle clasp`);
     assert.equal(clasp.label, 'Toggle clasp');
     assert.equal(clasp.priceCents, 300);
@@ -223,4 +227,52 @@ test('The Bella is a $40 Afghan serpentine necklace with a $3 toggle option', ()
   assert.equal(priced.subtotalCents, 4300);
   assert.equal(priced.totalWeightOz, 2.2);
   assert.match(priced.lines[0].description, /Toggle clasp/);
+});
+
+test('The Capri is $40, requires blue or pink, and has no toggle option', () => {
+  const capri = PRODUCTS.find((product) => product.slug === 'the-capri');
+  assert.ok(capri);
+  assert.equal(capri.name, 'The Capri');
+  assert.equal(capri.priceCents, 4000);
+  assert.equal(capri.weightOz, 2.2);
+  assert.equal(Object.hasOwn(capri, 'material'), false);
+  assert.equal(Object.hasOwn(capri, 'size'), false);
+  assert.equal(capri.image, 'capri-blue-bust');
+  assert.equal(capri.gallery.length, 8);
+  assert.equal(capri.addOns.some((addOn) => addOn.id === 'length'), false);
+  assert.equal(capri.addOns.some((addOn) => addOn.id === 'toggle-clasp'), false);
+
+  const color = capri.addOns.find((addOn) => addOn.id === 'colour');
+  assert.ok(color);
+  assert.equal(color.required, true);
+  assert.deepEqual(color.choices, ['Blue', 'Pink']);
+
+  const missing = priceCart([{ slug: 'the-capri', qty: 1, addOns: [] }]);
+  assert.equal(missing.missingRequired.length, 1);
+  assert.match(missing.missingRequired[0], /color ways/);
+
+  // A stale or edited cart cannot add the clasp back; the server drops it.
+  const blue = priceCart([
+    {
+      slug: 'the-capri',
+      qty: 1,
+      addOns: [
+        { id: 'colour', value: 'Blue' },
+        { id: 'toggle-clasp' },
+      ],
+    },
+  ]);
+  assert.deepEqual(blue.missingRequired, []);
+  assert.equal(blue.subtotalCents, 4000);
+  assert.equal(blue.totalWeightOz, 2.2);
+  assert.match(blue.lines[0].description, /Color Ways: Blue/);
+  assert.doesNotMatch(blue.lines[0].description, /Toggle clasp/);
+  assert.ok(blue.dropped.some((message) => message.includes('unknown add-on for the-capri: toggle-clasp')));
+
+  const pink = priceCart([
+    { slug: 'the-capri', qty: 1, addOns: [{ id: 'colour', value: 'Pink' }] },
+  ]);
+  assert.deepEqual(pink.missingRequired, []);
+  assert.equal(pink.subtotalCents, 4000);
+  assert.match(pink.lines[0].description, /Color Ways: Pink/);
 });
