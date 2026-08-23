@@ -5,7 +5,7 @@ const test = require('node:test');
 const { PRODUCTS } = require('../../shared/catalog.js');
 const { priceCart } = require('../../shared/pricing.js');
 
-test('every necklace except The Capri and The Emmy offers a $3 toggle clasp', () => {
+test('every necklace except The Capri, The Emmy, and The Ellie offers a $3 toggle clasp', () => {
   // Pinned on purpose. A product silently vanishing from the catalog is worth
   // one deliberate test edit to notice. Ten since Jenna retired the Chunky
   // Monogram on 2026-08-03 and added The Ellie, The Abigail, The Faith, The
@@ -14,7 +14,11 @@ test('every necklace except The Capri and The Emmy offers a $3 toggle clasp', ()
 
   for (const product of PRODUCTS) {
     const clasp = product.addOns.find((addOn) => addOn.id === 'toggle-clasp');
-    if (product.slug === 'the-capri' || product.slug === 'the-emmy') {
+    if (
+      product.slug === 'the-capri' ||
+      product.slug === 'the-emmy' ||
+      product.slug === 'the-ellie'
+    ) {
       assert.equal(clasp, undefined);
       continue;
     }
@@ -77,7 +81,7 @@ test('The Eden offers a $3 horseshoe charm priced by the server', () => {
   assert.match(priced.lines[0].description, /Horseshoe charm/);
 });
 
-test('The Ellie has three required colors and keeps its existing price and clasp option', () => {
+test('The Ellie has three required colors, keeps its existing price, and has no clasp option', () => {
   const ellie = PRODUCTS.find((product) => product.slug === 'the-ellie');
   assert.ok(ellie);
   assert.equal(ellie.name, 'The Ellie');
@@ -95,8 +99,7 @@ test('The Ellie has three required colors and keeps its existing price and clasp
   assert.deepEqual(color.choices, ['Purple', 'Neutral Pink', 'Translucent White']);
 
   const clasp = ellie.addOns.find((addOn) => addOn.id === 'toggle-clasp');
-  assert.ok(clasp);
-  assert.equal(clasp.priceCents, 300);
+  assert.equal(clasp, undefined);
 
   for (const choice of color.choices) {
     const priced = priceCart([
@@ -111,6 +114,22 @@ test('The Ellie has three required colors and keeps its existing price and clasp
 
   const missingColor = priceCart([{ slug: 'the-ellie', qty: 1, addOns: [] }]);
   assert.equal(missingColor.missingRequired.length, 1);
+
+  const removedClasp = priceCart([
+    {
+      slug: 'the-ellie',
+      qty: 1,
+      addOns: [
+        { id: 'colour', value: 'Purple' },
+        { id: 'toggle-clasp' },
+      ],
+    },
+  ]);
+  assert.equal(removedClasp.subtotalCents, 5000);
+  assert.equal(
+    removedClasp.lines[0].addOns.find((addOn) => addOn.id === 'toggle-clasp'),
+    undefined,
+  );
 
   const retiredColor = priceCart([
     { slug: 'the-ellie', qty: 1, addOns: [{ id: 'colour', value: 'Blue Gray' }] },

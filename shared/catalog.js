@@ -334,7 +334,7 @@ const PRODUCTS = [
       'ellie-neutral-pink-pearl-detail',
     ],
     // One fixed 18 inch strand. The description carries the length.
-    addOns: [colorWays(['Purple', 'Neutral Pink', 'Translucent White']), TOGGLE_CLASP],
+    addOns: [colorWays(['Purple', 'Neutral Pink', 'Translucent White'])],
   },
   {
     slug: 'the-abigail',
