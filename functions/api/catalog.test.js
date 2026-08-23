@@ -77,7 +77,7 @@ test('The Eden offers a $3 horseshoe charm priced by the server', () => {
   assert.match(priced.lines[0].description, /Horseshoe charm/);
 });
 
-test('The Ellie is priced from the shared server catalog', () => {
+test('The Ellie has two required colors and keeps its existing price and clasp option', () => {
   const ellie = PRODUCTS.find((product) => product.slug === 'the-ellie');
   assert.ok(ellie);
   assert.equal(ellie.name, 'The Ellie');
@@ -86,12 +86,37 @@ test('The Ellie is priced from the shared server catalog', () => {
   assert.match(ellie.description, /18 inch/);
   assert.match(ellie.description, /mother of pearl/);
   assert.match(ellie.description, /14k gold charms/);
+  assert.equal(ellie.image, 'ellie-translucent-white-bust');
+  assert.equal(ellie.gallery.length, 11);
 
-  const priced = priceCart([{ slug: 'the-ellie', qty: 1, addOns: [] }]);
-  assert.deepEqual(priced.missingRequired, []);
-  assert.equal(priced.subtotalCents, 5000);
-  assert.equal(priced.totalWeightOz, 4);
-  assert.equal(priced.lines[0].unitCents, 5000);
+  const color = ellie.addOns.find((addOn) => addOn.id === 'colour');
+  assert.ok(color);
+  assert.equal(color.required, true);
+  assert.deepEqual(color.choices, ['Neutral Pink', 'Translucent White']);
+
+  const clasp = ellie.addOns.find((addOn) => addOn.id === 'toggle-clasp');
+  assert.ok(clasp);
+  assert.equal(clasp.priceCents, 300);
+
+  for (const choice of color.choices) {
+    const priced = priceCart([
+      { slug: 'the-ellie', qty: 1, addOns: [{ id: 'colour', value: choice }] },
+    ]);
+    assert.deepEqual(priced.missingRequired, []);
+    assert.equal(priced.subtotalCents, 5000);
+    assert.equal(priced.totalWeightOz, 4);
+    assert.equal(priced.lines[0].unitCents, 5000);
+    assert.match(priced.lines[0].description, new RegExp(`Color Ways: ${choice}`));
+  }
+
+  const missingColor = priceCart([{ slug: 'the-ellie', qty: 1, addOns: [] }]);
+  assert.equal(missingColor.missingRequired.length, 1);
+
+  const retiredColor = priceCart([
+    { slug: 'the-ellie', qty: 1, addOns: [{ id: 'colour', value: 'Blue Gray' }] },
+  ]);
+  assert.equal(retiredColor.missingRequired.length, 1);
+  assert.ok(retiredColor.dropped.some((message) => message.includes('invalid colour for the-ellie')));
 });
 
 test('The Emmy is fixed at 16 inches with two colors and an optional clover charm', () => {
