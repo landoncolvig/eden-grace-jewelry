@@ -38,11 +38,10 @@ export const metadata: Metadata = {
     template: "%s | Eden Grace Jewelry Co.",
   },
   description:
-    // No freshwater pearl claim. The Rowan was the pearl piece and it is not
-    // pearls. The only pearl claims left on the site are the mother of pearl
-    // in The Blair and The Ellie, which is Jenna's own wording for those
-    // pieces and stays there rather than in a site-wide description that would
-    // generalise it across the whole catalog.
+    // No freshwater pearl claim. Pearl claims are limited to the real coin
+    // pearl in The Blair and the mother of pearl in The Ellie and The Abigail.
+    // Keep those product-specific claims out of the site-wide description so
+    // they are not generalised across the whole catalog.
     'Beaded gemstone necklaces, strung by hand in small batches and made to order. Natural stone varies, so no two strands come out the same.',
   // Google Search Console. The Analytics verification method cannot be used
   // here: gtag.js is injected on hydration, so it is not in the HTML that

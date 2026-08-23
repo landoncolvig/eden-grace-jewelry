@@ -138,6 +138,21 @@ test('The Ellie has three required colors, keeps its existing price, and has no 
   assert.ok(retiredColor.dropped.some((message) => message.includes('invalid colour for the-ellie')));
 });
 
+test('The Blair keeps its price and uses the real coin pearl gallery', () => {
+  const blair = PRODUCTS.find((product) => product.slug === 'the-blair');
+  assert.ok(blair);
+  assert.equal(blair.priceCents, 7800);
+  assert.equal(blair.material, 'real coin pearl');
+  assert.match(blair.description, /real coin pearl/);
+  assert.equal(blair.image, 'blair-coin-pearl-bust');
+  assert.deepEqual(blair.gallery, [
+    'blair-coin-pearl-flat',
+    'blair-coin-pearl-bead-detail',
+    'blair-coin-pearl-strand-detail',
+    'blair-coin-pearl-detail',
+  ]);
+});
+
 test('The Emmy is fixed at 16 inches with two colors and an optional clover charm', () => {
   const emmy = PRODUCTS.find((product) => product.slug === 'the-emmy');
   assert.ok(emmy);

@@ -29,9 +29,9 @@
  * `material` is optional and there is no default. A material line is a factual
  * claim to someone about to pay, so it exists only where Jenna wrote one.
  * Nothing here is freshwater pearl. The Rowan used to be described that way
- * and is not. The only pearl claims on the site are the mother of pearl Jenna
- * named in The Blair and The Ellie. Do not reintroduce a pearl claim anywhere
- * without asking her.
+ * and is not. Pearl claims are limited to the real coin pearl Jenna named in
+ * The Blair and the mother of pearl Jenna named in The Ellie and The Abigail.
+ * Do not reintroduce a pearl claim anywhere without asking her.
  *
  * Color ways and lengths differ per piece; neither is offered on every piece.
  */
@@ -291,17 +291,19 @@ const PRODUCTS = [
     name: 'The Blair',
     tagline: 'Chunky beads with a statement',
     description:
-      'Our 18 inch chunky beaded necklace made with natural aventurine and mother of pearl.',
+      'Our 18 inch chunky beaded necklace finished with a real coin pearl.',
     priceCents: 7800,
     weightOz: 3.2,
-    material: 'natural aventurine and mother of pearl',
+    material: 'real coin pearl',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#3AA6A8',
-    // Replaced blair-mint-pearl on 2026-08-03. That strand had two green beads
-    // adjacent at the bottom, breaking the alternating run. This is the shot
-    // Jenna texted, cut out of the wood board she photographed it on.
-    image: 'blair-aventurine-pearl',
-    gallery: [],
+    image: 'blair-coin-pearl-bust',
+    gallery: [
+      'blair-coin-pearl-flat',
+      'blair-coin-pearl-bead-detail',
+      'blair-coin-pearl-strand-detail',
+      'blair-coin-pearl-detail',
+    ],
     // One fixed 18 inch strand in one color way, so neither picker applies.
     // The description carries the length instead.
     addOns: [TOGGLE_CLASP],
