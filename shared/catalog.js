@@ -144,6 +144,15 @@ const HORSESHOE_CHARM = {
   weightOz: 0,
 };
 
+/** @type {AddOn} */
+const CLOVER_CHARM = {
+  id: 'clover-charm',
+  label: '18k gold-plated clover charm',
+  note: 'Add an 18k gold-plated clover charm.',
+  priceCents: 300,
+  weightOz: 0,
+};
+
 /**
  * Options that are deliberately absent, and why.
  *
@@ -263,12 +272,19 @@ const PRODUCTS = [
     size: '16 inches',
     leadTime: 'Ships in 5 to 7 days',
     swatch: '#7FA9C4',
-    image: 'emmy-jewel-tone',
-    gallery: [],
-    addOns: [
-      colorWays(['Green & Gold', 'Navy Blue & Purple', 'Light Pink', 'Brown & Cream']),
-      TOGGLE_CLASP,
+    image: 'emmy-green-bust',
+    gallery: [
+      'emmy-green-bead-detail',
+      'emmy-green-flat',
+      'emmy-neutral-purple-clover-detail',
+      'emmy-neutral-purple-flat',
+      'emmy-neutral-purple-bead-detail',
+      'emmy-neutral-purple-clover-side',
+      'emmy-neutral-purple-bust',
+      'emmy-green-transition-detail',
+      'emmy-green-strand-detail',
     ],
+    addOns: [colorWays(['Green', 'Neutral Purple']), CLOVER_CHARM],
   },
   {
     slug: 'the-blair',

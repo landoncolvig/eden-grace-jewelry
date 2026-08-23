@@ -5,7 +5,7 @@ const test = require('node:test');
 const { PRODUCTS } = require('../../shared/catalog.js');
 const { priceCart } = require('../../shared/pricing.js');
 
-test('every necklace except The Capri offers a $3 toggle clasp', () => {
+test('every necklace except The Capri and The Emmy offers a $3 toggle clasp', () => {
   // Pinned on purpose. A product silently vanishing from the catalog is worth
   // one deliberate test edit to notice. Ten since Jenna retired the Chunky
   // Monogram on 2026-08-03 and added The Ellie, The Abigail, The Faith, The
@@ -14,7 +14,7 @@ test('every necklace except The Capri offers a $3 toggle clasp', () => {
 
   for (const product of PRODUCTS) {
     const clasp = product.addOns.find((addOn) => addOn.id === 'toggle-clasp');
-    if (product.slug === 'the-capri') {
+    if (product.slug === 'the-capri' || product.slug === 'the-emmy') {
       assert.equal(clasp, undefined);
       continue;
     }
@@ -94,30 +94,67 @@ test('The Ellie is priced from the shared server catalog', () => {
   assert.equal(priced.lines[0].unitCents, 5000);
 });
 
-test('The Emmy is fixed at 16 inches and does not accept another length', () => {
+test('The Emmy is fixed at 16 inches with two colors and an optional clover charm', () => {
   const emmy = PRODUCTS.find((product) => product.slug === 'the-emmy');
   assert.ok(emmy);
   assert.equal(emmy.size, '16 inches');
   assert.match(emmy.description, /16 inch/);
+  assert.equal(emmy.image, 'emmy-green-bust');
+  assert.equal(emmy.gallery.length, 9);
   assert.equal(emmy.addOns.some((addOn) => addOn.id === 'length'), false);
+  assert.equal(emmy.addOns.some((addOn) => addOn.id === 'toggle-clasp'), false);
 
-  // A saved cart from before the change may still submit an old length. The
-  // server drops it, so the work order cannot ask Jenna for an unavailable
-  // 18- or 20-inch Emmy.
-  const priced = priceCart([
+  const color = emmy.addOns.find((addOn) => addOn.id === 'colour');
+  assert.ok(color);
+  assert.equal(color.required, true);
+  assert.deepEqual(color.choices, ['Green', 'Neutral Purple']);
+
+  const charm = emmy.addOns.find((addOn) => addOn.id === 'clover-charm');
+  assert.ok(charm);
+  assert.equal(charm.label, '18k gold-plated clover charm');
+  assert.equal(charm.priceCents, 300);
+
+  // Saved carts can still submit retired lengths and toggles. The server drops
+  // both so Jenna receives only the currently offered Emmy configuration.
+  const green = priceCart([
     {
       slug: 'the-emmy',
       qty: 1,
       addOns: [
-        { id: 'colour', value: 'Green & Gold' },
+        { id: 'colour', value: 'Green' },
         { id: 'length', value: '20 inches' },
+        { id: 'toggle-clasp' },
       ],
     },
   ]);
 
-  assert.deepEqual(priced.missingRequired, []);
-  assert.equal(priced.lines[0].description, 'Color Ways: Green & Gold');
-  assert.ok(priced.dropped.some((message) => message.includes('unknown add-on for the-emmy: length')));
+  assert.deepEqual(green.missingRequired, []);
+  assert.equal(green.subtotalCents, 4500);
+  assert.equal(green.lines[0].description, 'Color Ways: Green');
+  assert.ok(green.dropped.some((message) => message.includes('unknown add-on for the-emmy: length')));
+  assert.ok(green.dropped.some((message) => message.includes('unknown add-on for the-emmy: toggle-clasp')));
+
+  const neutralPurple = priceCart([
+    {
+      slug: 'the-emmy',
+      qty: 1,
+      addOns: [
+        { id: 'colour', value: 'Neutral Purple' },
+        { id: 'clover-charm' },
+      ],
+    },
+  ]);
+  assert.deepEqual(neutralPurple.missingRequired, []);
+  assert.equal(neutralPurple.subtotalCents, 4800);
+  assert.match(neutralPurple.lines[0].description, /Color Ways: Neutral Purple/);
+  assert.match(neutralPurple.lines[0].description, /18k gold-plated clover charm/);
+
+  // A retired color must be chosen again rather than reaching the work order.
+  const retiredColor = priceCart([
+    { slug: 'the-emmy', qty: 1, addOns: [{ id: 'colour', value: 'Green & Gold' }] },
+  ]);
+  assert.equal(retiredColor.missingRequired.length, 1);
+  assert.ok(retiredColor.dropped.some((message) => message.includes('invalid colour for the-emmy')));
 });
 
 test('The Rowan is fixed at 16 inches and does not accept another length', () => {
