@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import Hero from '@/components/hero';
+import EmailSignup from '@/components/email-signup';
+import { HomeJsonLd } from '@/components/structured-data';
 import { PRODUCTS, formatUSD, photo } from '@/lib/shop';
 
 // A real sequence with real waiting in between, which is why it is numbered.
@@ -27,6 +29,7 @@ const STEPS = [
 export default function Home() {
   return (
     <>
+      <HomeJsonLd />
       <Hero />
 
       <section id="pieces" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
@@ -84,6 +87,25 @@ export default function Home() {
               </article>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Directly under the grid, because that is where someone who has looked
+          at the pieces actually is. The footer copy of this form collected
+          nothing from 137 visitors in its first month, which is what a signup
+          below a page with a 59% bounce rate is worth. */}
+      <section className="border-y border-rule bg-paper">
+        <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-16">
+          <div>
+            <h2 className="font-display text-2xl sm:text-3xl">
+              A color lasts as long as the lot does
+            </h2>
+            <p className="mt-3 max-w-prose leading-relaxed text-ink-soft">
+              Jenna buys beads in small lots, so a shade is here until it runs out and
+              then it is gone. She sends a note when the next strands go up.
+            </p>
+          </div>
+          <EmailSignup source="home" tone="light" headingLevel="h3" />
         </div>
       </section>
 

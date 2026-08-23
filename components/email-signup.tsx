@@ -13,7 +13,43 @@ type State = 'idle' | 'sending' | 'done' | 'error';
  * customer directory, the same place a checkout puts a buyer. One list, and
  * Jenna can send to it from Square without exporting anything.
  */
-export default function EmailSignup({ source = 'footer' }: { source?: string }) {
+/**
+ * The footer sits on the dark band and the homepage block sits on cream, so
+ * the palette is a prop rather than two copies of this form. Nothing else
+ * differs between them.
+ */
+const TONE = {
+  dark: {
+    label: 'text-bench/65',
+    body: 'text-bench/65',
+    done: 'text-bench/75',
+    field: 'border-bench/25 text-bench placeholder:text-bench/40 focus:border-bench/60',
+    button: 'bg-bench text-ink',
+    error: 'text-bench/85',
+    fine: 'text-bench/45',
+  },
+  light: {
+    label: 'text-ink-faint',
+    body: 'text-ink-soft',
+    done: 'text-ink-soft',
+    field: 'border-control text-ink placeholder:text-ink-faint focus:border-rose',
+    button: 'bg-rose text-white',
+    error: 'text-flag',
+    fine: 'text-ink-faint',
+  },
+} as const;
+
+export default function EmailSignup({
+  source = 'footer',
+  tone = 'dark',
+  headingLevel = 'h2',
+}: {
+  source?: string;
+  tone?: keyof typeof TONE;
+  headingLevel?: 'h2' | 'h3';
+}) {
+  const t = TONE[tone];
+  const Heading = headingLevel;
   const [email, setEmail] = useState('');
   const [state, setState] = useState<State>('idle');
   const [message, setMessage] = useState('');
@@ -53,10 +89,10 @@ export default function EmailSignup({ source = 'footer' }: { source?: string }) 
   if (state === 'done') {
     return (
       <div className="text-sm">
-        <h2 className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-bench/65">
+        <Heading className={`font-spec text-[0.7rem] uppercase tracking-[0.16em] ${t.label}`}>
           First look
-        </h2>
-        <p className="mt-3 leading-relaxed text-bench/75" role="status">
+        </Heading>
+        <p className={`mt-3 leading-relaxed ${t.done}`} role="status">
           You&rsquo;re on the list. Jenna will send a note when new strands go up.
         </p>
       </div>
@@ -65,21 +101,21 @@ export default function EmailSignup({ source = 'footer' }: { source?: string }) 
 
   return (
     <div className="text-sm">
-      <h2 className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-bench/65">
+      <Heading className={`font-spec text-[0.7rem] uppercase tracking-[0.16em] ${t.label}`}>
         First look
-      </h2>
-      <p className="mt-3 leading-relaxed text-bench/65">
+      </Heading>
+      <p className={`mt-3 leading-relaxed ${t.body}`}>
         New strands are made in small batches. Leave your email and Jenna will
         tell you when the next one goes up.
       </p>
 
       <form onSubmit={submit} className="mt-4">
         <div className="flex items-stretch gap-2">
-          <label htmlFor="signup-email" className="sr-only">
+          <label htmlFor={`signup-email-${source}`} className="sr-only">
             Email address
           </label>
           <input
-            id="signup-email"
+            id={`signup-email-${source}`}
             type="email"
             required
             value={email}
@@ -89,12 +125,12 @@ export default function EmailSignup({ source = 'footer' }: { source?: string }) 
             }}
             placeholder="you@example.com"
             autoComplete="email"
-            className="min-w-0 flex-1 rounded-xl border border-bench/25 bg-transparent px-3 py-2 text-sm text-bench outline-none placeholder:text-bench/40 focus:border-bench/60"
+            className={`min-w-0 flex-1 rounded-xl border bg-transparent px-3 py-2 text-sm outline-none ${t.field}`}
           />
           <button
             type="submit"
             disabled={state === 'sending'}
-            className="shrink-0 rounded-xl bg-bench px-4 py-2 text-sm font-medium text-ink transition-opacity hover:opacity-85 disabled:opacity-50"
+            className={`shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition-opacity hover:opacity-85 disabled:opacity-50 ${t.button}`}
           >
             {state === 'sending' ? 'Adding…' : 'Join'}
           </button>
@@ -102,7 +138,7 @@ export default function EmailSignup({ source = 'footer' }: { source?: string }) 
 
         <input
           type="text"
-          name="company"
+          name={`company-${source}`}
           value={trap}
           onChange={(e) => setTrap(e.target.value)}
           tabIndex={-1}
@@ -112,12 +148,12 @@ export default function EmailSignup({ source = 'footer' }: { source?: string }) 
         />
 
         {state === 'error' && (
-          <p className="mt-2 text-sm text-bench/85" role="alert">
+          <p className={`mt-2 text-sm ${t.error}`} role="alert">
             {message}
           </p>
         )}
 
-        <p className="mt-2 font-spec text-[0.7rem] leading-relaxed text-bench/45">
+        <p className={`mt-2 font-spec text-[0.7rem] leading-relaxed ${t.fine}`}>
           New pieces and restocks. No more than a few times a month, and every
           email has an unsubscribe link.
         </p>

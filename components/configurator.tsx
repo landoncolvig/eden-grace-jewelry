@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
   formatUSD,
   getMaxPurchaseQuantity,
@@ -26,7 +26,6 @@ import { trackViewItem, trackAddToCart } from '@/lib/analytics';
  * Square checkout page.
  */
 export default function Configurator({ product }: { product: Product }) {
-  const search = useSearchParams();
   const router = useRouter();
   const { addLine } = useCart();
   const maxPurchaseQuantity = getMaxPurchaseQuantity(product);
@@ -37,22 +36,43 @@ export default function Configurator({ product }: { product: Product }) {
   const requiredAddOns = useMemo(() => product.addOns.filter((a) => a.required), [product]);
   const optionalAddOns = useMemo(() => product.addOns.filter((a) => !a.required), [product]);
 
-  // The hero passes the word the buyer already typed, so the hero is step one
-  // of the order rather than a separate toy.
-  const seeded = (search.get('name') ?? '').slice(0, 12);
-
   // Pickers default to their first choice so the piece is always buildable and
-  // the order sheet is never half blank. Free-text specs start empty (or
-  // seeded from the hero) because there is no sensible default for a name.
+  // the order sheet is never half blank. Free-text specs start empty, because
+  // there is no sensible default for a name.
   const [required, setRequired] = useState<Record<string, string>>(() =>
     Object.fromEntries(
-      requiredAddOns.map((a) => [a.id, a.choices ? a.choices[0] : seeded]),
+      requiredAddOns.map((a) => [a.id, a.choices ? a.choices[0] : '']),
     ),
   );
   const [options, setOptions] = useState<Record<string, { qty: number; value: string }>>({});
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [shot, setShot] = useState(product.image);
+
+  // A link can seed the buyer's word, e.g. /product/the-delicate-monogram?name=EGJ.
+  //
+  // Read off window rather than through useSearchParams. useSearchParams opts
+  // its whole Suspense boundary out of the static prerender, and this component
+  // IS the product page, so that shipped an empty div as the entire body of
+  // every product page: no heading, no photo, no price, nothing for a crawler
+  // or a link scraper to read. Google indexed zero of the nine. The seed is a
+  // convenience; the page being readable without JavaScript is not.
+  useEffect(() => {
+    const seeded = new URLSearchParams(window.location.search).get('name')?.trim();
+    if (!seeded) return;
+    setRequired((prev) => {
+      const next = { ...prev };
+      let changed = false;
+      for (const spec of requiredAddOns) {
+        // Pickers own their value, and a spec the buyer has already typed into
+        // is theirs. Only fill a free-text spec that is still empty.
+        if (spec.choices || next[spec.id]) continue;
+        next[spec.id] = seeded.slice(0, spec.input?.maxLength ?? 12);
+        changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [requiredAddOns]);
 
   function toggle(addOn: AddOn) {
     setAdded(false);

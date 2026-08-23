@@ -51,12 +51,36 @@ export const metadata: Metadata = {
   verification: {
     google: 'Ajc8HB2F4kWdmRHPhhdzbYJ-e2XtJ1urRGUK8XVcU6g',
   },
+  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
+    url: '/',
     siteName: "Eden Grace Jewelry Co.",
     title: "Eden Grace Jewelry Co.",
     description:
       'Gemstone strands and monogram necklaces, made to order in small batches.',
+    // Baked JPEG rather than one of the site's own WebPs: Facebook, Instagram
+    // and X refuse to render a WebP og:image, and Instagram is the channel
+    // these links actually travel on. Without this the store shared as a bare
+    // text card with no photograph, which for a jewelry business is the most
+    // expensive tag on the site to be missing. Built by scripts/og-cards.py.
+    images: [
+      {
+        url: '/og/default.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'An Eden necklace in brown, cream and gold-tone beads with a horseshoe charm',
+      },
+    ],
+  },
+  twitter: {
+    // summary_large_image, not summary. The small card crops to a thumbnail
+    // and the piece is the entire pitch.
+    card: 'summary_large_image',
+    title: "Eden Grace Jewelry Co.",
+    description:
+      'Gemstone strands and monogram necklaces, made to order in small batches.',
+    images: ['/og/default.jpg'],
   },
 };
 

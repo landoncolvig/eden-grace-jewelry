@@ -89,6 +89,15 @@ jobs:
           fi
           echo "Exported $(find out -name '*.html' | wc -l) pages"
 
+      - name: Verify the pages are readable without JavaScript
+        # The check above proves files exist. This proves they have content in
+        # them, which is a different failure and the one that actually happened:
+        # a useSearchParams call opted the product pages out of the prerender,
+        # so every one of them exported as an empty div wrapped in a valid head.
+        # The build passed, the pages looked right in a browser, and Google
+        # indexed none of the nine for a month. Only reading the bytes catches it.
+        run: node scripts/verify-prerender.mjs
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3

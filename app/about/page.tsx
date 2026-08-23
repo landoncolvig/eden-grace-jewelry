@@ -6,6 +6,21 @@ export const metadata: Metadata = {
   title: 'About',
   description:
     'Jenna makes beaded necklaces one at a time, strung by hand in Bedford, Texas.',
+  alternates: { canonical: '/about/' },
+  openGraph: {
+    type: 'profile',
+    url: '/about/',
+    title: 'About Eden Grace Jewelry Co.',
+    description:
+      'Jenna makes beaded necklaces one at a time, strung by hand in Bedford, Texas.',
+    // Her own portrait rather than the default card. This is the page about
+    // her, and a necklace on the share card would be the wrong picture.
+    images: [{ url: '/og/about.jpg', width: 1200, height: 630, alt: 'Jenna, who makes the necklaces, in Bedford, Texas' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/og/about.jpg'],
+  },
 };
 
 export default function AboutPage() {
