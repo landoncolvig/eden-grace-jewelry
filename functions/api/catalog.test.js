@@ -77,7 +77,7 @@ test('The Eden offers a $3 horseshoe charm priced by the server', () => {
   assert.match(priced.lines[0].description, /Horseshoe charm/);
 });
 
-test('The Ellie has two required colors and keeps its existing price and clasp option', () => {
+test('The Ellie has three required colors and keeps its existing price and clasp option', () => {
   const ellie = PRODUCTS.find((product) => product.slug === 'the-ellie');
   assert.ok(ellie);
   assert.equal(ellie.name, 'The Ellie');
@@ -87,12 +87,12 @@ test('The Ellie has two required colors and keeps its existing price and clasp o
   assert.match(ellie.description, /mother of pearl/);
   assert.match(ellie.description, /14k gold charms/);
   assert.equal(ellie.image, 'ellie-translucent-white-bust');
-  assert.equal(ellie.gallery.length, 11);
+  assert.equal(ellie.gallery.length, 14);
 
   const color = ellie.addOns.find((addOn) => addOn.id === 'colour');
   assert.ok(color);
   assert.equal(color.required, true);
-  assert.deepEqual(color.choices, ['Neutral Pink', 'Translucent White']);
+  assert.deepEqual(color.choices, ['Purple', 'Neutral Pink', 'Translucent White']);
 
   const clasp = ellie.addOns.find((addOn) => addOn.id === 'toggle-clasp');
   assert.ok(clasp);

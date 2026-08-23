@@ -319,8 +319,11 @@ const PRODUCTS = [
     image: 'ellie-translucent-white-bust',
     gallery: [
       'ellie-neutral-pink-bust',
+      'ellie-pearl-gold',
       'ellie-translucent-white-flat',
       'ellie-neutral-pink-flat',
+      'ellie-gold-detail',
+      'ellie-mother-of-pearl-detail',
       'ellie-translucent-white-green-detail',
       'ellie-neutral-pink-green-detail',
       'ellie-translucent-white-bust-detail',
@@ -331,7 +334,7 @@ const PRODUCTS = [
       'ellie-neutral-pink-pearl-detail',
     ],
     // One fixed 18 inch strand. The description carries the length.
-    addOns: [colorWays(['Neutral Pink', 'Translucent White']), TOGGLE_CLASP],
+    addOns: [colorWays(['Purple', 'Neutral Pink', 'Translucent White']), TOGGLE_CLASP],
   },
   {
     slug: 'the-abigail',
