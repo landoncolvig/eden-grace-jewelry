@@ -312,7 +312,7 @@ const PRODUCTS = [
     slug: 'the-ellie',
     name: 'The Ellie',
     tagline: 'Mother of pearl with 14k gold charms',
-    description: 'Our 18 inch beaded necklace with mother of pearl and 14k gold charms.',
+    description: 'Our 16 inch beaded necklace with mother of pearl and 14k gold charms.',
     priceCents: 5000,
     weightOz: 4,
     material: 'mother of pearl and 14k gold',
@@ -335,7 +335,7 @@ const PRODUCTS = [
       'ellie-neutral-pink-side-detail',
       'ellie-neutral-pink-pearl-detail',
     ],
-    // One fixed 18 inch strand. The description carries the length.
+    // One fixed 16 inch strand. The description carries the length.
     addOns: [colorWays(['Purple', 'Neutral Pink', 'Translucent White'])],
   },
   {

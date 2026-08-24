@@ -87,7 +87,7 @@ test('The Ellie has three required colors, keeps its existing price, and has no 
   assert.equal(ellie.name, 'The Ellie');
   assert.equal(ellie.priceCents, 5000);
   assert.equal(ellie.weightOz, 4);
-  assert.match(ellie.description, /18 inch/);
+  assert.match(ellie.description, /16 inch/);
   assert.match(ellie.description, /mother of pearl/);
   assert.match(ellie.description, /14k gold charms/);
   assert.equal(ellie.image, 'ellie-translucent-white-bust');
