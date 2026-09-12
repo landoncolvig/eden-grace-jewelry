@@ -4,18 +4,16 @@
 from pathlib import Path
 import subprocess
 
-from reportlab.lib.colors import HexColor, Color
+from reportlab.lib.colors import HexColor
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
 
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "output" / "pdf" / "eden-grace-links-flyer.pdf"
 QR = ROOT / "tmp" / "pdfs" / "eden-grace-links-qr.png"
-PHOTO = ROOT / "public" / "products" / "capri-pink-bust.webp"
 DISPLAY = ROOT / "assets" / "fonts" / "CormorantGaramond.ttf"
 BODY = ROOT / "assets" / "fonts" / "Manrope.ttf"
 DESTINATION = "https://edengracejewelry.com/links/"
@@ -26,19 +24,6 @@ ROSE = HexColor("#98474b")
 SAGE = HexColor("#5c7563")
 BRASS = HexColor("#ba863f")
 MUTED = HexColor("#7a6862")
-
-
-def draw_cover(c: canvas.Canvas, image_path: Path, x: float, y: float, width: float, height: float) -> None:
-    image = ImageReader(str(image_path))
-    iw, ih = image.getSize()
-    scale = max(width / iw, height / ih)
-    dw, dh = iw * scale, ih * scale
-    c.saveState()
-    path = c.beginPath()
-    path.rect(x, y, width, height)
-    c.clipPath(path, stroke=0, fill=0)
-    c.drawImage(image, x + (width - dw) / 2, y + (height - dh) / 2, width=dw, height=dh, mask="auto")
-    c.restoreState()
 
 
 def draw_mark(c: canvas.Canvas, cx: float, cy: float, radius: float) -> None:
@@ -76,58 +61,49 @@ def create() -> None:
     c.setFillColor(CREAM)
     c.rect(0, 0, width, height, stroke=0, fill=1)
 
-    photo_y = 360
-    draw_cover(c, PHOTO, 0, photo_y, width, height - photo_y)
+    # Oversized strand lines give the paper a branded jewelry detail without photography.
+    c.setStrokeColor(HexColor("#e7d2bf"))
+    c.setLineWidth(1.1)
+    c.circle(-68, 500, 188, stroke=1, fill=0)
+    c.circle(width + 88, 262, 208, stroke=1, fill=0)
 
-    # A restrained overlay makes the wordmark legible without flattening the photograph.
-    c.setFillColor(Color(0.29, 0.23, 0.22, alpha=0.78))
-    c.roundRect(38, height - 84, 246, 42, 12, stroke=0, fill=1)
-    draw_mark(c, 61, height - 63, 9)
-    c.setFillColor(CREAM)
-    c.setFont("Cormorant", 20)
-    c.drawString(82, height - 69, "Eden Grace Jewelry Co.")
-
-    # Hairline transition between photography and the tactile paper field.
-    c.setStrokeColor(BRASS)
-    c.setLineWidth(1.5)
-    c.line(0, photo_y, width, photo_y)
-
+    draw_mark(c, width / 2, 696, 16)
     c.setFillColor(COCOA)
-    c.setFont("Cormorant", 34)
-    c.drawString(46, 304, "Made by hand.")
-    c.drawString(46, 270, "Chosen with heart.")
-
+    c.setFont("Cormorant", 42)
+    c.drawCentredString(width / 2, 637, "Eden Grace")
     c.setFillColor(MUTED)
-    c.setFont("Manrope", 9.5)
-    c.drawString(48, 235, "BEADED GEMSTONE NECKLACES")
-    c.drawString(48, 219, "SMALL BATCHES  •  MADE TO ORDER")
+    c.setFont("Manrope", 10)
+    c.drawCentredString(width / 2, 610, "J E W E L R Y   C O .")
 
-    c.setFillColor(COCOA)
-    c.setFont("Manrope", 8.6)
-    c.drawString(48, 178, "SCAN TO SHOP & FOLLOW")
-    c.setFillColor(MUTED)
-    c.setFont("Manrope", 8.2)
-    c.drawString(48, 159, "Instagram  •  TikTok  •  Website")
-
-    qr_size = 146
-    qr_x, qr_y = width - qr_size - 43, 139
+    qr_size = 232
+    qr_x, qr_y = (width - qr_size) / 2, 320
     c.setFillColor(HexColor("#ffffff"))
-    c.roundRect(qr_x - 11, qr_y - 11, qr_size + 22, qr_size + 22, 10, stroke=0, fill=1)
+    c.roundRect(qr_x - 16, qr_y - 16, qr_size + 32, qr_size + 32, 14, stroke=0, fill=1)
     c.drawImage(str(QR), qr_x, qr_y, width=qr_size, height=qr_size, mask="auto")
 
-    # Three beads bridge the print piece back to the strand motif on the page.
-    for x, color, size in [(52, ROSE, 5), (68, SAGE, 4), (81, BRASS, 3.5)]:
+    c.setFillColor(COCOA)
+    c.setFont("Manrope", 9)
+    c.drawCentredString(width / 2, 279, "SCAN FOR LINKS")
+
+    c.setStrokeColor(HexColor("#dbc9bc"))
+    c.setLineWidth(0.7)
+    c.line(158, 247, width - 158, 247)
+
+    c.setFillColor(MUTED)
+    c.setFont("Manrope", 8.5)
+    c.drawCentredString(width / 2, 214, "EDENGRACEJEWELRY.COM")
+    c.drawCentredString(width / 2, 190, "INSTAGRAM  @EDENGRACEJEWELRYCO")
+    c.drawCentredString(width / 2, 166, "TIKTOK  @EDEN.GRACE.JEWELR")
+
+    for x, color, size in [(width / 2 - 14, ROSE, 4), (width / 2, SAGE, 3.5), (width / 2 + 13, BRASS, 3)]:
         c.setFillColor(color)
-        c.circle(x, 117, size, stroke=0, fill=1)
+        c.circle(x, 125, size, stroke=0, fill=1)
 
     c.setFillColor(COCOA)
-    c.rect(0, 0, width, 80, stroke=0, fill=1)
+    c.rect(0, 0, width, 70, stroke=0, fill=1)
     c.setFillColor(CREAM)
-    c.setFont("Manrope", 10)
-    c.drawString(46, 47, "EDENGRACEJEWELRY.COM")
-    c.setFont("Manrope", 7.5)
-    c.setFillColor(HexColor("#dbc2b1"))
-    c.drawRightString(width - 46, 47, "STRUNG BY HAND IN BEDFORD, TEXAS")
+    c.setFont("Cormorant", 17)
+    c.drawCentredString(width / 2, 27, "Eden Grace Jewelry Co.")
 
     c.showPage()
     c.save()
