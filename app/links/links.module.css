@@ -1,0 +1,156 @@
+.page {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 5%, rgba(186, 134, 63, 0.13), transparent 32rem),
+    radial-gradient(circle at 92% 92%, rgba(152, 71, 75, 0.11), transparent 28rem),
+    #fdf7f2;
+  color: #4a3b38;
+  isolation: isolate;
+}
+
+.page::before, .page::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border: 1px solid rgba(186, 134, 63, 0.3);
+  border-radius: 999px;
+}
+.page::before { width: 25rem; height: 25rem; left: -18rem; top: 18%; }
+.page::after { width: 19rem; height: 19rem; right: -14rem; bottom: 8%; }
+
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.13;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+.card {
+  width: min(100%, 31rem);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 2.2rem 1.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero { text-align: center; animation: reveal 800ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.portraitWrap { position: relative; width: 12.5rem; height: 12.5rem; margin: 0 auto 1.4rem; }
+.portrait {
+  position: absolute;
+  inset: 1.35rem;
+  width: calc(100% - 2.7rem);
+  height: calc(100% - 2.7rem);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 24%;
+  border: 5px solid #fdf7f2;
+  outline: 1px solid rgba(74, 59, 56, 0.2);
+  box-shadow: 0 1.5rem 4rem rgba(74, 59, 56, 0.13);
+}
+.strand { position: absolute; inset: 0; animation: settle 1100ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.strand svg { width: 100%; height: 100%; fill: none; stroke: rgba(74, 59, 56, 0.28); stroke-width: 0.65; }
+.strand span {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(74, 59, 56, 0.16);
+  box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.65);
+}
+.clasp {
+  position: absolute;
+  left: 50%;
+  bottom: 0.9rem;
+  width: 1.6rem;
+  height: 0.38rem;
+  border: 2px solid #ba863f;
+  border-radius: 999px;
+  transform: translateX(-50%) rotate(-8deg);
+}
+.wordmark {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+  color: #4a3b38;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+.logo { color: #98474b; }
+.company { margin-top: 0.45rem; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: #7a6862; }
+.hero h1 {
+  margin-top: 1.15rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.35rem, 10vw, 3.35rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+}
+.intro { max-width: 24rem; margin: 1rem auto 0; color: #6e5b55; font-size: 0.92rem; line-height: 1.65; }
+
+.actions { display: grid; gap: 0.7rem; margin-top: 1.6rem; }
+.link {
+  display: grid;
+  grid-template-columns: 2.65rem 1fr 1.5rem;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 4.55rem;
+  padding: 0.72rem 0.9rem;
+  color: #4a3b38;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(155, 129, 119, 0.42);
+  border-radius: 0.9rem 0.9rem 0.9rem 0.2rem;
+  box-shadow: 0 0.65rem 2.4rem rgba(74, 59, 56, 0.06);
+  backdrop-filter: blur(8px);
+  animation: rise 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: transform 180ms ease-out, border-color 180ms ease-out, background 180ms ease-out;
+}
+.link:nth-child(1) { animation-delay: 120ms; }
+.link:nth-child(2) { animation-delay: 210ms; }
+.link:nth-child(3) { animation-delay: 300ms; }
+.link:hover { transform: translateY(-2px); border-color: #98474b; background: #fff; }
+.primary { color: #fdf7f2; background: #4a3b38; border-color: #4a3b38; box-shadow: 0 1rem 2.8rem rgba(74, 59, 56, 0.17); }
+.primary:hover { color: #fff; background: #5b4844; border-color: #5b4844; }
+.icon { width: 2.65rem; height: 2.65rem; display: grid; place-items: center; color: #98474b; background: #f7eae2; border-radius: 50%; }
+.primary .icon { color: #fdf7f2; background: rgba(253, 247, 242, 0.13); }
+.icon svg, .arrow svg { width: 1.2rem; height: 1.2rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.filledIcon { fill: currentColor; stroke: none; }
+.linkCopy { min-width: 0; text-align: left; }
+.linkCopy strong, .linkCopy small { display: block; }
+.linkCopy strong { font-size: 0.94rem; font-weight: 700; letter-spacing: -0.01em; }
+.linkCopy small { margin-top: 0.12rem; overflow: hidden; color: #7a6862; font-size: 0.71rem; text-overflow: ellipsis; white-space: nowrap; }
+.primary .linkCopy small { color: rgba(253, 247, 242, 0.7); }
+.arrow { display: grid; place-items: center; color: #9b8177; transition: transform 180ms ease-out; }
+.primary .arrow { color: #d9c1b0; }
+.link:hover .arrow { transform: translateX(3px); }
+.footer { margin-top: 1.5rem; text-align: center; color: #846e64; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; animation: reveal 700ms 380ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.footerRule { display: block; width: 2.25rem; height: 1px; margin: 0 auto 0.7rem; background: #ba863f; }
+
+@keyframes reveal { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes settle { from { opacity: 0; transform: rotate(-18deg) scale(0.92); } to { opacity: 1; transform: rotate(0deg) scale(1); } }
+
+@media (min-width: 40rem) {
+  .card { padding-block: 3rem; }
+  .portraitWrap { width: 13.8rem; height: 13.8rem; }
+}
+@media (max-height: 43rem) and (orientation: landscape) {
+  .card { padding-block: 1.5rem; }
+  .portraitWrap { width: 9rem; height: 9rem; margin-bottom: 0.8rem; }
+  .hero h1 { margin-top: 0.8rem; font-size: 2.4rem; }
+  .intro { margin-top: 0.65rem; }
+  .actions { margin-top: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero, .strand, .link, .footer { animation: none; }
+}

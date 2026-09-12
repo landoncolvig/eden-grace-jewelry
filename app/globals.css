@@ -67,6 +67,13 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* /links is a self-contained mobile card. Keep the storefront chrome from
+   competing with the three destinations people came there to use. */
+body:has(.link-card-page) > header,
+body:has(.link-card-page) > footer {
+  display: none;
+}
+
 /* Display type is deliberately restrained to names and headings. */
 .font-display {
   font-family: var(--font-display), Georgia, serif;

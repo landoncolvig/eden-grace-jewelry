@@ -22,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${SITE}/`, lastModified, changeFrequency: 'weekly', priority: 1 },
     { url: `${SITE}/about/`, lastModified, changeFrequency: 'monthly', priority: 0.5 },
+    { url: `${SITE}/links/`, lastModified, changeFrequency: 'monthly', priority: 0.7 },
     ...PRODUCTS.map((product) => ({
       url: `${SITE}/product/${product.slug}/`,
       lastModified,
