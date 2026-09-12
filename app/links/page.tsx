@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Logo from '@/components/logo';
 import styles from './links.module.css';
 
-// HERO: Jenna's portrait is encircled by a loose strand of hand-drawn beads.
+// HERO: The Eden Grace necklace mark is encircled by a loose strand of hand-drawn beads.
 
 const SOCIALS = {
   instagram: 'https://www.instagram.com/edengracejewelryco/',
@@ -87,11 +86,12 @@ export default function LinksPage() {
         <header className={styles.hero}>
           <div className={styles.portraitWrap}>
             <BeadStrand />
-            <Image className={styles.portrait} src="/portrait/jenna-sm.webp" alt="Jenna, founder and maker of Eden Grace Jewelry Co." width={320} height={320} priority />
+            <div className={styles.logoMedallion}>
+              <Logo size={112} className={styles.heroLogo} />
+            </div>
             <span className={styles.clasp} aria-hidden="true" />
           </div>
           <div className={styles.wordmark}>
-            <Logo size={34} className={styles.logo} />
             <span>Eden Grace</span>
           </div>
           <p className={styles.company}>Jewelry Co.</p>

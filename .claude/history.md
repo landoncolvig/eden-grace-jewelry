@@ -19,3 +19,9 @@
 - Removed the tagline, product description, and Bedford location footer from `/links/`.
 - Simplified page metadata to describe the three linked destinations directly.
 - Verification: targeted ESLint and the Next.js production build passed.
+
+## 2026-09-11 - Link card logo replacement
+
+- Replaced Jenna's portrait on `/links/` with the same necklace-mark logo component used by the storefront.
+- Removed the smaller duplicate mark beside the Eden Grace wordmark.
+- Verification: targeted ESLint and the Next.js production build passed; the static HTML contains the large logo SVG and no portrait reference.
