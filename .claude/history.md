@@ -13,3 +13,9 @@
 - Removed the product photo, tagline, product description, and location copy from the Eden Grace flyer.
 - Rebuilt the flyer around the brand mark, QR code, website, Instagram handle, and TikTok handle.
 - Verification: the revised PDF rendered cleanly at 200 DPI; extracted text contains only factual labels; macOS Vision decoded the rendered QR to `https://edengracejewelry.com/links/`.
+
+## 2026-09-11 - Simplified link card copy
+
+- Removed the tagline, product description, and Bedford location footer from `/links/`.
+- Simplified page metadata to describe the three linked destinations directly.
+- Verification: targeted ESLint and the Next.js production build passed.

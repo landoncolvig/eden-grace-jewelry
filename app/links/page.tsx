@@ -12,15 +12,14 @@ const SOCIALS = {
 };
 
 export const metadata: Metadata = {
-  title: 'Find Eden Grace Jewelry Co.',
-  description:
-    'Shop Eden Grace Jewelry Co. and follow the latest handmade pieces on Instagram and TikTok.',
+  title: 'Eden Grace Jewelry Co. Links',
+  description: 'Website, Instagram, and TikTok links for Eden Grace Jewelry Co.',
   alternates: { canonical: '/links/' },
   openGraph: {
     type: 'website',
     url: '/links/',
-    title: 'Find Eden Grace Jewelry Co.',
-    description: 'Handmade gemstone necklaces, shop updates, and new pieces.',
+    title: 'Eden Grace Jewelry Co. Links',
+    description: 'Website, Instagram, and TikTok links for Eden Grace Jewelry Co.',
     images: ['/og/default.jpg'],
   },
 };
@@ -96,8 +95,6 @@ export default function LinksPage() {
             <span>Eden Grace</span>
           </div>
           <p className={styles.company}>Jewelry Co.</p>
-          <h1>Made by hand.<br />Chosen with heart.</h1>
-          <p className={styles.intro}>Beaded gemstone necklaces, strung by hand in small batches and made to order.</p>
         </header>
 
         <nav className={styles.actions} aria-label="Eden Grace links">
@@ -118,7 +115,6 @@ export default function LinksPage() {
           </a>
         </nav>
 
-        <footer className={styles.footer}><span className={styles.footerRule} /><p>Bedford, Texas</p></footer>
       </main>
     </div>
   );
