@@ -25,9 +25,9 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
+    <div className="mx-auto max-w-storefront px-5 py-14 sm:px-8 sm:py-20">
       <div className="grid items-start gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
-        <div className="overflow-hidden rounded-[28px] bg-paper ring-1 ring-rule">
+        <div className="storefront-media overflow-hidden rounded-[28px] bg-paper ring-1 ring-rule">
           {/*
             The lower half of this photograph is deliberately out of focus.
             Jenna's son is in it, and the page is public. A blurred rectangle
@@ -42,7 +42,6 @@ export default function AboutPage() {
             width={1800}
             height={1834}
             priority
-            className="w-full"
           />
         </div>
 

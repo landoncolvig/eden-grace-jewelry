@@ -120,7 +120,7 @@ export default function Configurator({ product }: { product: Product }) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
+    <div className="mx-auto max-w-storefront px-5 py-12 sm:px-8 sm:py-16">
       <button
         onClick={() => router.push('/')}
         className="text-sm font-medium text-ink-soft hover:text-ink"
@@ -131,14 +131,13 @@ export default function Configurator({ product }: { product: Product }) {
       <div className="mt-8 grid gap-12 lg:grid-cols-[1fr_400px] lg:gap-16">
         {/* Left: the piece and its specification */}
         <div>
-          <div className="overflow-hidden rounded-xl border border-rule bg-paper">
+          <div className="storefront-media overflow-hidden rounded-xl border border-rule bg-paper">
             <Image
               src={photo(shot)}
               alt={`${product.name}, ${product.tagline.toLowerCase()}`}
               width={1500}
               height={1500}
               priority
-              className="w-full"
             />
           </div>
 

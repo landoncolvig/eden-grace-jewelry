@@ -27,7 +27,7 @@ const cheapestLabel =
 export default function Hero() {
   return (
     <section className="border-b border-rule">
-      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
+      <div className="mx-auto max-w-storefront px-5 py-14 sm:px-8 sm:py-20">
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
           <div>
             <p className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
@@ -76,15 +76,14 @@ export default function Hero() {
             </p>
           </div>
 
-          <div className="overflow-hidden rounded-[28px] bg-paper ring-1 ring-rule">
+          <div className="storefront-media overflow-hidden rounded-[28px] bg-paper ring-1 ring-rule">
             <Image
               src="/products/eden-brown-horseshoe-hero.webp"
               alt="A brown, cream, and gold-tone Eden necklace with a horseshoe charm"
               width={1254}
               height={1254}
               priority
-              sizes="(min-width: 1024px) 52vw, 100vw"
-              className="w-full"
+              sizes="(min-width: 1280px) 604px, (min-width: 1024px) calc((100vw - 128px) * 1.1 / 2.1), (min-width: 704px) 640px, (min-width: 640px) calc(100vw - 64px), calc(100vw - 40px)"
             />
           </div>
         </div>

@@ -32,7 +32,7 @@ export default function Home() {
       <HomeJsonLd />
       <Hero />
 
-      <section id="pieces" className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+      <section id="pieces" className="mx-auto max-w-storefront px-5 py-20 sm:px-8">
         <div className="flex items-baseline justify-between gap-6 border-b border-rule pb-4">
           <h2 className="font-display text-2xl sm:text-3xl">The pieces</h2>
           <p className="font-spec text-[0.7rem] uppercase tracking-[0.16em] text-ink-faint">
@@ -95,7 +95,7 @@ export default function Home() {
           nothing from 137 visitors in its first month, which is what a signup
           below a page with a 59% bounce rate is worth. */}
       <section className="border-y border-rule bg-paper">
-        <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-16">
+        <div className="mx-auto grid max-w-storefront gap-8 px-5 py-14 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-16">
           <div>
             <h2 className="font-display text-2xl sm:text-3xl">
               A color lasts as long as the lot does
@@ -110,7 +110,7 @@ export default function Home() {
       </section>
 
       <section id="how" className="bg-ink text-bench">
-        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8">
+        <div className="mx-auto max-w-storefront px-5 py-20 sm:px-8">
           <h2 className="font-display text-2xl sm:text-3xl">How it&rsquo;s made</h2>
 
           <ol className="mt-10 grid gap-8 sm:grid-cols-3 sm:gap-10">

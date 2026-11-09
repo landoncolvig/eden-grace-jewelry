@@ -21,7 +21,7 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 bg-ink text-bench">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 py-4 sm:px-8">
+      <div className="mx-auto flex max-w-storefront items-center justify-between gap-6 px-5 py-4 sm:px-8">
         <Link href="/" className="group flex shrink-0 items-center gap-2.5">
           <Logo
             size={30}

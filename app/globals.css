@@ -45,6 +45,9 @@
   --font-body: var(--font-manrope);
   --font-script: var(--font-pinyon);
 
+  /* One shared storefront cap keeps the header, sections, and footer aligned. */
+  --container-storefront: 80rem;
+
   /* Softened geometry. Most of the friendliness comes from here rather than
      from colour: the same palette on square corners still reads editorial. */
   --radius-card: 16px;
@@ -65,6 +68,33 @@ body {
   font-family: var(--font-body), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Keep stacked photographs from filling an entire tablet screen. Both auto
+   dimensions preserve the full photo, including tall product shots. The frame
+   fits the scaled image so its border never leaves empty side panels. */
+.storefront-media {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.storefront-media > img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 40rem;
+}
+
+@media (min-width: 64rem) {
+  .storefront-media {
+    width: 100%;
+  }
+
+  .storefront-media > img {
+    width: 100%;
+    max-height: none;
+  }
 }
 
 /* /links is a self-contained mobile card. Keep the storefront chrome from
